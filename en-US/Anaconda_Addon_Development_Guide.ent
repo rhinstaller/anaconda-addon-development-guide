@@ -1,0 +1,4 @@
+<!ENTITY PRODUCT "Anaconda">
+<!ENTITY BOOKID "Anaconda_Addon_Development_Guide">
+<!ENTITY YEAR "2012">
+<!ENTITY HOLDER "| You need to change the HOLDER entity in the en-US/Anaconda_Addon_Development_Guide.ent file |">
