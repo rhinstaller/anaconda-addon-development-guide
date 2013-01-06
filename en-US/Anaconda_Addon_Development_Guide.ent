@@ -2,3 +2,5 @@
 <!ENTITY BOOKID "Anaconda_Addon_Development_Guide">
 <!ENTITY YEAR "2012">
 <!ENTITY HOLDER "Vratislav Podzimek">
+<!ENTITY FEDORA "Fedora">
+<!ENTITY RHEL "RHEL">
