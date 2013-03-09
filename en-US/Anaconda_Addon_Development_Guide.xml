@@ -4,11 +4,77 @@
 %BOOK_ENTITIES;
 ]>
 <article>
-	<xi:include href="Article_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<para>
-		This is a test paragraph
-	</para>
-	<xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<index />
+    <xi:include href="Article_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <section id="section_introduction">
+      <title>Introduction</title>
+      <para>
+        What is Anaconda? What is it supposed to do and be? Why has addons
+        support been added with the rewrite?  What is Initial Setup? How to
+        write addons for the Initial Setup?
+      </para>
+    </section>
+
+    <section id="section_architecture">
+      <title>Architecture</title>
+      <para>
+        How does Anaconda look internally? Which modules Anaconda uses/consists
+        of? How and where does Anaconda store data?
+      </para>
+    </section>
+
+    <section>
+      <title>Hub&amp;Spoke model</title>
+      <para>
+        What is the Anaconda's basic UI model? Why this model? Pros and cons of
+        the model. What elements Anaconda's UI consists of? How does the UI work
+        with the installation data? How this works in text mode?
+      </para>
+    </section>
+
+    <section>
+      <title>Threads and communication</title>
+      <para>
+        Why is Anaconda multi-thread? What should be run in a separate thread?
+        How does internal communication work? What are the dangerous actions
+        with threads and Gtk and what Anaconda provides to overcome them?
+      </para>
+    </section>
+
+    <section>
+      <title>Addon structure</title>
+      <para>
+        What is the basic structure of an Anaconda addon? Which parts it has to
+        define and which are optional?
+     </para>
+    </section>
+
+    <section>
+      <title>Writing an Anaconda addon</title>
+      <para>
+        Which packages are needed? Hello world addon example built step by step
+        with comments and API description. Coding style. Comments on the
+        "advanced features" provided by Anaconda.
+      </para>
+    </section>
+
+    <section>
+      <title>Deploying and testing an Anaconda addon</title>
+      <para>
+        How to deploy and test an Anaconda addon? On the running system vs. with
+        the installation image. How should be an addon delivered? Packaging and
+        basic structure for the .spec file.
+      </para>
+    </section>
+
+    <section>
+      <title>Addons welcomed</title>
+      <para>
+        Where to find help with the development? Additional documentation and
+        referential addon implementations? FAQ. Few words to encourage.
+      </para>
+    </section>
+
+    <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <index />
 </article>
 
