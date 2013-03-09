@@ -14,7 +14,7 @@
 		<para>
           The Anaconda installer is a piece of software used to install &FEDORA;, &RHEL; and their
 derivatives. Since the installation is internally a complicated process and there are many aspects
-of the resulting system that need to be configured during installation, it has been decided that the
+of the resulting system that need to be configured during installation it has been decided that the
 Anaconda installer needs to support dynamically loaded plugins (addons) that will be developed and
 maintained by other teams and people specialized in certain areas. This guide should help those
 people writting an Anaconda addon to get an insight to the architecture and basic principles used by
