@@ -6,8 +6,8 @@
 <articleinfo id="arti-Anaconda_Addon_Development_Guide-Anaconda_Addon_Development_Guide">
 	<title>Anaconda Addon Development Guide</title>
 	<subtitle>Things one needs to know when writing an Anaconda installer Addon</subtitle>
-	<productname>Anaconda</productname>
-	<productnumber>0.1</productnumber>
+	<productname>Fedora</productname>
+	<productnumber>19</productnumber>
 	<edition>0</edition>
 	<pubsnumber>0</pubsnumber>
 	<abstract>
