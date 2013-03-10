@@ -18,5 +18,8 @@ html-single: ${SOURCES}
 publish: html-single
 	scp -r tmp/en-US/html-single/* xpodzim@aisa.fi.muni.cz:/home/xpodzim/public_html/anaconda-addon-development-guide/
 
+publish-all: publish pdf
+	scp -r tmp/en-US/pdf/* xpodzim@aisa.fi.muni.cz:/home/xpodzim/public_html/anaconda-addon-development-guide/pdf/
+
 clean:
 	publican clean
