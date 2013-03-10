@@ -8,9 +8,119 @@
     <section id="section_introduction">
       <title>Introduction</title>
       <para>
-        What is Anaconda? What is it supposed to do and be? Why has addons
-        support been added with the rewrite?  What is Initial Setup? How to
-        write addons for the Initial Setup?
+        The Anaconda is the operating system installer (OS) used in &FEDORA;,
+        &RHEL; and their derivatives. From closer look it is a set of python
+        modules and scripts together with some additional files like Gtk widgets
+        (written in C), systemd units and dracut libraries. Altogether they form
+        a tool that allows user to set parameters of the resulting (target)
+        system and then set such system up on a machine. The final installation
+        process has four major steps:
+      </para>
+      <itemizedlist mark="bullet">
+        <listitem>
+          <para>
+            installation destination preparation (usually disk partitioning)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            package and data installation
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            boot loader installation and configuration
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            configuration of the newly installed system
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+        There are three ways how the user can set parameters for the target
+        system (and in some cases also for the installation process). The most
+        commonly used one is the graphical user interface (GUI) which should
+        cover all common use cases and should be clear and easily understandable
+        even for a non-advanced user. Although Anaconda supports also
+        installation over VNC there are some corner cases where a textual
+        interface is needed and some of these cases are installations over
+        serial consoles on "exotic" pieces of hardware. For this reason Anaconda
+        also has a textual user interface (TUI) that works basically the same
+        way as a black only line printer (because of the various serial consoles
+        not supporting cursor movement, colors and other "advanced"
+        features). Text mode installation implements only most important
+        features of the graphical installation and usually needs to be combined
+        with the command line arguments passed to the Anaconda installer because
+        it doesn't provide all options GUI provides. The third way to set the
+        installation parameters and the most advanced one is a kickstart
+        file. It is a simple file with command-like syntax that can contain data
+        driving the installation process that runs automatically unless the
+        kickstart file doesn't contain all data needed in which case UI asks
+        user about the missing pieces. More info about kickstarts can be found
+        at <ulink url="http://fedoraproject.org/wiki/Anaconda/Kickstart">the
+        Anaconda/Kickstart wiki page</ulink>. Addons related kickstart
+        specifications are covered in <xref linkend="section_addon_structure"/>.
+        Important fact is that while TUI is not full-featured mode of the
+        installation, kickstart installation provides the highest number of
+        configuration options. The golden rule is that everything has to be
+        supported in kickstart first. Then GUI and TUI pieces can come
+        supporting subsets of configuration options provided in kickstart that
+        allow to keep user interface (UI) clear and non-confusing. All in all
+        Anaconda has to be simple but at the same time complex which is always
+        hard to achieve.
+      </para>
+
+      <para>
+        As it is probably obvious there are many things that need to be happen
+        during the installation process. And for many teams and individuals it
+        seems to be a good idea to add more things to the OS installer so that
+        the target system can be pre-configured before it is run for the first
+        time. On one hand the installation environment is quite specific and
+        commonly used tools are usually not ready to work in it, but on the
+        other hand once something can be configured via kickstart multiple
+        systems with the same configuration can be installed easily. However the
+        more code the installer the more bugs it contains. Moreover the
+        maintenance becomes harder and harder with every new functionality and
+        it is harder and harder to follow changes in so many areas. So because
+        of all these reasons it was decided that when doing a major rewrite of
+        the Anaconda installer, support for addons has to be added to allow
+        other teams and individuals participate with their pieces of code
+        developed and maintained by them as experts in their particular areas of
+        interest. This guide should be one of the tools lowering the barrier to
+        understanding how the Anaconda installer works and looks like internally
+        and how its functionality can be extended with an addon.
+      </para>
+
+      <para>
+        Traditionally the first boot of the newly installed system is also being
+        considered to be a part of the installation procedure as some
+        configuration of the system (e.g. users creation) is taking place at
+        that point. For many years there has been a graphical tool called <ulink
+        url="http://fedoraproject.org/wiki/FirstBoot">Firstboot</ulink> that has
+        helped user configure some aspects of the newly installed
+        system. Problem with Firstboot is that it is using Gtk2 and pygtk module
+        which are both no longer developed so it needs a rewrite too. Since the
+        goal was to provide every options from Firstboot already during the
+        installation process it was obvious that the rewritten Firstboot should
+        be sharing the code with the Anaconda installer. At the same time it was
+        obvious that the old Firstboot had to be kept working because of the
+        third-party modules written for it. That is how new tool called <ulink
+        url="http://fedoraproject.org/wiki/Features/NewFirstboot"> Initial
+        Setup</ulink> was born. It is reusing a lot of code from the Anaconda
+        installer, it has the same model and design as the installer and it
+        reads data produced by the installer to show values set during the
+        installation process. And the great thing is that only a little is
+        needed for an Anaconda addon to become an Initial Setup addon. We will
+        get to this in detail in <xref linkend="section_writing_addon"/>.
+      </para>
+
+      <para>
+        Some additional information about the Anaconda installer can be found at
+        <ulink url="http://fedoraproject.org/wiki/Anaconda">the Anaconda wiki
+        page</ulink>.
       </para>
     </section>
 
@@ -22,7 +132,7 @@
       </para>
     </section>
 
-    <section>
+    <section id="section_hub_and_spoke">
       <title>Hub&amp;Spoke model</title>
       <para>
         What is the Anaconda's basic UI model? Why this model? Pros and cons of
@@ -31,7 +141,7 @@
       </para>
     </section>
 
-    <section>
+    <section id="section_threads_and_communication">
       <title>Threads and communication</title>
       <para>
         Why is Anaconda multi-thread? What should be run in a separate thread?
@@ -40,7 +150,7 @@
       </para>
     </section>
 
-    <section>
+    <section id="section_addon_structure">
       <title>Addon structure</title>
       <para>
         What is the basic structure of an Anaconda addon? Which parts it has to
@@ -48,16 +158,17 @@
      </para>
     </section>
 
-    <section>
+    <section id="section_writing_addon">
       <title>Writing an Anaconda addon</title>
       <para>
         Which packages are needed? Hello world addon example built step by step
         with comments and API description. Coding style. Comments on the
-        "advanced features" provided by Anaconda.
+        "advanced features" provided by Anaconda. What is needed for an
+        installer addon to become an Initial Setup addon?
       </para>
     </section>
 
-    <section>
+    <section id="section_deploying_and_testing">
       <title>Deploying and testing an Anaconda addon</title>
       <para>
         How to deploy and test an Anaconda addon? On the running system vs. with
@@ -66,7 +177,7 @@
       </para>
     </section>
 
-    <section>
+    <section id="section_final_words">
       <title>Addons welcomed</title>
       <para>
         Where to find help with the development? Additional documentation and
