@@ -3,7 +3,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "Anaconda_Addon_Development_Guide.ent">
 %BOOK_ENTITIES;
 ]>
-<article>
+<article status="draft">
     <xi:include href="Article_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <section id="section_introduction">
       <title>Introduction</title>
