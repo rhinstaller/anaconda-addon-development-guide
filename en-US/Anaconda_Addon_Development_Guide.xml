@@ -212,9 +212,65 @@
     <section id="section_hub_and_spoke">
       <title>Hub&amp;Spoke model</title>
       <para>
-        What is the Anaconda's basic UI model? Why this model? Pros and cons of
-        the model. What elements Anaconda's UI consists of? How does the UI work
-        with the installation data? How this works in text mode?
+        One of the biggest changes introduced with the rewrite of the Anaconda
+        installer was that the new UI (both graphical and textual) uses a
+        hub&amp;spoke model instead of the wizard model that had been used
+        before. The following diagram shows how hub&amp;spoke works regarding
+        the possible transitions between screens (hubs and spokes).
+      </para>
+
+      <mediaobject id="picture_hub_and_spoke">
+        <imageobject>
+          <imagedata fileref="images/hub_and_spoke.svg" format="SVG"/>
+        </imageobject>
+      </mediaobject>
+
+      <para>
+        The screens 2, 3, 5, 8, 10 and others are examples of so called "normal
+        spokes". Those are the screens reachable from hubs. The screens 1 and 14
+        are examples of a so called "standalone spoke" <!--some better way to
+        emphasize should be used--> which is a type of screen that should be
+        used only in case it has to be visited before (after) the following
+        (previous) standalone spoke or hub.
+
+        <footnote>
+          <para>
+            Screens referenced in the rest of this section are screens from
+            the graphical mode of the installation.
+          </para>
+        </footnote>
+
+        The examples of such screens are the
+        language and network configuration screens in the Anaconda installer
+        that are implemented as standalone spokes because actions available on
+        them has to and should, respectively, happen before all the other
+        actions controlled from the user interface. Currently there are two hubs
+        in the Anaconda installer:
+      </para>
+      <itemizedlist mark="bullet">
+        <listitem>
+          <para>
+            the Summary hub that shows a summary of configured options and
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the Progress hub that shows the progress of the installation process
+            and also shows a summary of options that can be configured during
+            the actual installation being done in the background thread.
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+        A number of spokes are reachable from these two hubs one for every
+        group of configuration options that are avaible in the UI. <!-- subtree
+        in self.data per spoke-->
+      </para>
+
+      <para>
+        Why this model? Pros and cons of the model. How does the UI work with
+        the installation data?
       </para>
     </section>
 
