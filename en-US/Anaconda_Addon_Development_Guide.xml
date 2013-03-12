@@ -120,7 +120,9 @@
       <para>
         Some additional information about the Anaconda installer can be found at
         <ulink url="http://fedoraproject.org/wiki/Anaconda">the Anaconda wiki
-        page</ulink>.
+        page</ulink> and additional info about the rewrite can be found at
+        <ulink url="https://fedoraproject.org/wiki/Anaconda/NewInstaller">the
+        Anaconda/NewInstaller wiki page</ulink>
       </para>
     </section>
 
