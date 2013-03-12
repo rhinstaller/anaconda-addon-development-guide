@@ -223,32 +223,81 @@
 
       <mediaobject id="picture_hub_and_spoke">
         <imageobject>
-          <imagedata fileref="images/hub_and_spoke.svg" format="SVG"/>
+          <imagedata fileref="images/hub_and_spoke.svg" format="SVG" scalefit="1"/>
         </imageobject>
       </mediaobject>
 
       <para>
-        The screens 2, 3, 5, 8, 10 and others are examples of so called "normal
-        spokes". Those are the screens reachable from hubs. The screens 1 and 14
-        are examples of a so called "standalone spoke" <!--some better way to
-        emphasize should be used--> which is a type of screen that should be
-        used only in case it has to be visited before (after) the following
-        (previous) standalone spoke or hub.
+        The screens 2, 3, 5, 8, 10 and others are examples of so called
+        <emphasis>normal spokes</emphasis>. Those are the screens reachable from
+        hubs. The screens 1 and 14 are examples of a so called
+        <emphasis>standalone spoke</emphasis> which is a type of screen that
+        should be used only in case it has to be visited before (after) the
+        following (previous) standalone spoke or hub.
 
         <footnote>
           <para>
-            Screens referenced in the rest of this section are screens from
-            the graphical mode of the installation.
+            Screens mentioned in the rest of this section are screens from the
+            graphical mode of the installation.
           </para>
         </footnote>
 
-        The examples of such screens are the
-        language and network configuration screens in the Anaconda installer
-        that are implemented as standalone spokes because actions available on
-        them has to and should, respectively, happen before all the other
-        actions controlled from the user interface. Currently there are two hubs
-        in the Anaconda installer:
+        The examples of such screens are the language and network configuration
+        screens in the Anaconda installer that are implemented as standalone
+        spokes because actions available on them have to and should,
+        respectively, take place before all the other actions controlled from
+        the user interface.
       </para>
+
+      <para>
+        The reason for the Hub&amp;Spoke model being used in the Anaconda
+        installer's UI is that it has many advantages:
+      </para>
+      <itemizedlist mark="bullet">
+        <listitem>
+          <para>
+            users are not forced to go through the screens in some strictly
+            defined order,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            users are not forced to visit every screen no matter if they
+            understand what the options configured in it mean or not,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            it is good for the transactional mode where all desired values can
+            be set while nothing is actually happening to the underlying machine
+            until a special button is clicked,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            it provides way to show an overview of the configured values,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            it has a great support for extensibility, because additional spokes
+            can be put on hubs without need to reorder anything and resolve some
+            complex ordering dependencies and
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            it can be used for both graphical and textual mode of the installer.
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+        As can be seen in the diagram central points of the Hub&amp;Spoke model
+        are hubs, so let's focus on hubs in the Anaconda installer for a
+        while. Currently there are two of them:
+      </para>
+
       <itemizedlist mark="bullet">
         <listitem>
           <para>
@@ -265,14 +314,12 @@
       </itemizedlist>
 
       <para>
-        A number of spokes are reachable from these two hubs one for every
-        group of configuration options that are avaible in the UI. <!-- subtree
-        in self.data per spoke-->
-      </para>
-
-      <para>
-        Why this model? Pros and cons of the model. How does the UI work with
-        the installation data?
+        To make the layout of the UI clearer spokes reachable from these two
+        hubs are grouped together to so called
+        <emphasis>categories</emphasis>. A good example of a category used in
+        the Anaconda installer is the <emphasis>Localization</emphasis> category
+        that groups together spokes for keyboard and timezone settings.
+        <!-- How does the UI work with the installation data? -->
       </para>
     </section>
 
