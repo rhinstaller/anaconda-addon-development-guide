@@ -347,7 +347,12 @@
         is the <emphasis> Localization </emphasis> <indexterm
         id="idx_local_cat"> <primary> Localization category </primary>
         </indexterm> category that groups together spokes for keyboard and
-        timezone settings.
+        timezone settings. So to sum it up there are hubs on the hubs there are
+        categories and in the categories there are spokes. Every spoke contains
+        UI controls that show and allow to modify values from one or more
+        subtrees of the in-memory representation of the kickstart file. As we
+        will see in <xref linkend="section_writing_addon"/> the same applies to
+        addons.
       </para>
     </section>
 
