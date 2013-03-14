@@ -8,7 +8,8 @@
     <section id="section_introduction">
       <title>Introduction</title>
       <para>
-        The Anaconda is the operating system installer (OS) used in &FEDORA;,
+        The Anaconda<indexterm id="idx_anaconda"> <primary>Anaconda</primary>
+        </indexterm> is the operating system installer (OS) used in &FEDORA;,
         &RHEL; and their derivatives. From closer look it is a set of python
         modules and scripts together with some additional files like Gtk widgets
         (written in C), systemd units and dracut libraries. Altogether they form
@@ -42,31 +43,35 @@
       <para>
         There are three ways how the user can set parameters for the target
         system (and in some cases also for the installation process). The most
-        commonly used one is the graphical user interface (GUI) which should
-        cover all common use cases and should be clear and easily understandable
-        even for a non-advanced user. Although Anaconda supports also
-        installation over VNC there are some corner cases where a textual
-        interface is needed and some of these cases are installations over
-        serial consoles on "exotic" pieces of hardware. For this reason Anaconda
-        also has a textual user interface (TUI) that works basically the same
-        way as a black only line printer (because of the various serial consoles
-        not supporting cursor movement, colors and other "advanced"
-        features). Text mode installation implements only most important
-        features of the graphical installation and usually needs to be combined
-        with the command line arguments passed to the Anaconda installer because
-        it doesn't provide all options GUI provides. The third way to set the
-        installation parameters and the most advanced one is a kickstart
-        file. It is a simple file with command-like syntax that can contain data
-        driving the installation process that runs automatically unless the
-        kickstart file doesn't contain all data needed in which case UI asks
-        user about the missing pieces. More info about kickstarts can be found
-        at <ulink url="http://fedoraproject.org/wiki/Anaconda/Kickstart">the
+        commonly used one is the graphical user interface (GUI) <indexterm
+        id="idx_gui"> <primary>GUI</primary> </indexterm> which should cover all
+        common use cases and should be clear and easily understandable even for
+        non-advanced users. Although Anaconda supports also installation over
+        VNC <indexterm id="idx_vnc"> <primary>VNC</primary> </indexterm> there
+        are some corner cases where a textual interface is needed and some of
+        these cases are installations over serial consoles on "exotic" pieces of
+        hardware. For this reason Anaconda also has a textual user interface
+        (TUI) <indexterm id="idx_tui"> <primary>TUI</primary> </indexterm> that
+        works basically the same way as a black only line printer (because of
+        the various serial consoles not supporting cursor movement, colors and
+        other "advanced" features). Text mode installation implements only most
+        important features of the graphical installation and usually needs to be
+        combined with the command line arguments passed to the Anaconda
+        installer because it doesn't provide all options GUI provides. The third
+        way to set the installation parameters and the most advanced one is a
+        kickstart file <indexterm id="idx_kickstart">
+        <primary>kickstart</primary> </indexterm>. It is a simple file with
+        command-like syntax that can contain data driving the installation
+        process that then runs automatically unless the kickstart file doesn't
+        contain all data needed in which case UI asks user about the missing
+        pieces. More info about kickstarts can be found at <ulink
+        url="http://fedoraproject.org/wiki/Anaconda/Kickstart">the
         Anaconda/Kickstart wiki page</ulink>. Addons related kickstart
         specifications are covered in <xref linkend="section_addon_structure"/>.
-        Important fact is that while TUI is not full-featured mode of the
-        installation, kickstart installation provides the highest number of
-        configuration options. The golden rule is that everything has to be
-        supported in kickstart first. Then GUI and TUI pieces can come
+        Important fact is that opposed to the TUI which is not a full-featured
+        mode of the installation, kickstart installation provides the highest
+        number of configuration options. The golden rule is that everything has
+        to be supported in kickstart first. Then GUI and TUI pieces can come
         supporting subsets of configuration options provided in kickstart that
         allow to keep user interface (UI) clear and non-confusing. All in all
         Anaconda has to be simple but at the same time complex which is always
@@ -82,13 +87,14 @@
         commonly used tools are usually not ready to work in it, but on the
         other hand once something can be configured via kickstart multiple
         systems with the same configuration can be installed easily. However the
-        more code the installer the more bugs it contains. Moreover the
+        more code in the installer, the more bugs it contains. Moreover the
         maintenance becomes harder and harder with every new functionality and
         it is harder and harder to follow changes in so many areas. So because
         of all these reasons it was decided that when doing a major rewrite of
-        the Anaconda installer, support for addons has to be added to allow
-        other teams and individuals participate with their pieces of code
-        developed and maintained by them as experts in their particular areas of
+        the Anaconda installer, support for addons <indexterm id="idx_addon">
+        <primary>addon</primary> </indexterm> has to be added to allow other
+        teams and individuals participate with their pieces of code developed
+        and maintained by them as experts in their particular areas of
         interest. This guide should be one of the tools lowering the barrier to
         understanding how the Anaconda installer works and looks like internally
         and how its functionality can be extended with an addon.
@@ -99,17 +105,19 @@
         considered to be a part of the installation procedure as some
         configuration of the system (e.g. users creation) is taking place at
         that point. For many years there has been a graphical tool called <ulink
-        url="http://fedoraproject.org/wiki/FirstBoot">Firstboot</ulink> that has
-        helped user configure some aspects of the newly installed
+        url="http://fedoraproject.org/wiki/FirstBoot">Firstboot</ulink>
+        <indexterm id="idx_firstboot"><primary>Firstboot</primary></indexterm>
+        that has helped user configure some aspects of the newly installed
         system. Problem with Firstboot is that it is using Gtk2 and pygtk module
         which are both no longer developed so it needs a rewrite too. Since the
         goal was to provide every options from Firstboot already during the
         installation process it was obvious that the rewritten Firstboot should
         be sharing the code with the Anaconda installer. At the same time it was
         obvious that the old Firstboot had to be kept working because of the
-        third-party modules written for it. That is how new tool called <ulink
+        third-party modules written for it. That is how a new tool called <ulink
         url="http://fedoraproject.org/wiki/Features/NewFirstboot"> Initial
-        Setup</ulink> was born. It is reusing a lot of code from the Anaconda
+        Setup</ulink> <indexterm id="idx_is"><primary>Initial Setup</primary>
+        </indexterm> was born. It is reusing a lot of code from the Anaconda
         installer, it has the same model and design as the installer and it
         reads data produced by the installer to show values set during the
         installation process. And the great thing is that only a little is
@@ -133,52 +141,59 @@
         modules and scripts. It of course also uses a lot of external packages
         and libraries some of which were originally created specifically for the
         needs of the installer. Major components of the whole tool are the
-        following packages: <package>pykickstart</package>,
-        <package>yum</package>, <package>blivet</package> and
-        <package>pyanaconda</package>. <package>pykickstart</package> is a
-        package that parses and validates the kickstart file (if provided) and
-        also provides a data structure that Anaconda uses to store values
-        driving the installation. We will focus more on the data representation
-        and life cycle in the following paragraph. <package>yum</package> is the
-        core python package of the <command>yum</command> package
-        manager. Anaconda uses it for operations with package repositories and
-        for package installation. <package>blivet</package> is a new separate
-        project that used to be an internal part of the
-        <package>pyanaconda</package> package as
-        <package>pyanaconda.storage</package>. As the old name suggests it is a
-        package that operates on the disks, mount points and all related aspects
-        of the installation destination preparation. Moreover it provides
-        functions for boot loader installation and configuration. The most
-        important package is <package>pyanaconda</package>. It glues all the
-        other components together, contains all the UI code and many modules for
-        things that are not handled somewhere else &mdash; e.g. keyboard,
+        following packages: <package>pykickstart</package>, <indexterm
+        id="idx_pykickstart"> <primary>pykickstart</primary> </indexterm>
+        <package>yum</package>, <indexterm id="idx_yum"> <primary>yum</primary>
+        </indexterm> <package>blivet</package> <indexterm id="idx_blivet">
+        <primary>blivet</primary> </indexterm> and
+        <package>pyanaconda</package>.  <indexterm id="idx_pyanaconda">
+        <primary>pyanaconda</primary> </indexterm>
+        <package>pykickstart</package> is a package that parses and validates
+        the kickstart file (if provided) and also provides a data structure that
+        Anaconda uses to store values driving the installation. We will focus
+        more on the data representation and life cycle in the following
+        paragraph. <package>yum</package> is the core python package of the
+        <command>yum</command> package manager. Anaconda uses it for operations
+        with package repositories and for package
+        installation. <package>blivet</package> is a new separate project that
+        used to be an internal part of the <package>pyanaconda</package> package
+        as <package>pyanaconda.storage</package>. As the old name suggests it is
+        a package that operates on the disks, mount points and all related
+        aspects of the installation destination preparation. Moreover it
+        provides functions for boot loader installation and configuration. The
+        most important package is <package>pyanaconda</package>. It glues all
+        the other components together, contains all the UI code and many modules
+        for things that are not handled somewhere else &mdash; e.g. keyboard,
         timezone, network and users configuration and also a number of utility
-        and system oriented functions. There is also he
-        <package>python-meh</package> package that contains an exception handler
-        that gathers and stores additional information from the system in case
-        of a crash and passes this data to the <package>libreport</package>
-        library (which is a part of the <ulink
-        url="https://fedorahosted.org/abrt/">ABRT project</ulink>).
+        and system oriented functions. There is also the <package> python-meh
+        </package> <indexterm id="idx_meh"> <primary> python-meh </primary>
+        </indexterm> package that contains an exception handler that gathers and
+        stores additional information from the system in case of a crash and
+        passes this data to the <package>libreport</package> <indexterm
+        id="idx_libreport"> <primary> libreport </primary> </indexterm> library
+        (which is a part of the <ulink url="https://fedorahosted.org/abrt/">ABRT
+        project</ulink>). <indexterm id="idx_abrt"> <primary> ABRT </primary>
+        </indexterm>
       </para>
 
       <!-- divide into subsections? -->
       <para>
         Life cycle of the data in the installation process is simple and
         straightforward. In the beginning if kickstart file is given to the
-        installer, it is parsed and processed by the
-        <package>pykickstart</package> module to become an in-memory treelike
-        structure. If no kickstart file is given, and empty treelike structure
-        is created. Items in that structure are then updated with the user's
-        choices from the UI. Next step is the installation process which is
-        driven by the values stored in that structure and finally all such
-        values are written out as a new kickstart file that can be used to
-        perform another installation with the same configuration. Elements of
-        the structure are defined in the <package>pykickstart</package> package,
-        but some of them are overridden by modified versions from the
-        <package>pyanaconda.kickstart</package> module. The important fact and
-        rule is that there is no other place to store configuration data and the
-        installation process is data driven and as much transactional as
-        possible. This neatly enforces some nice features:
+        installer, it is parsed and processed by the <package> pykickstart
+        </package> module to become an in-memory treelike structure. If no
+        kickstart file is given, and empty treelike structure is created. Items
+        in that structure are then updated with the user's choices from the
+        UI. Next step is the installation process which is driven by the values
+        stored in that structure and finally all such values are written out as
+        a new kickstart file that can be used to perform another installation
+        with the same configuration. Elements of the structure are defined in
+        the <package>pykickstart</package> package, but some of them are
+        overridden by modified versions from the <package> pyanaconda.kickstart
+        </package> module. The important fact and rule is that there is no other
+        place to store configuration data and the installation process is data
+        driven and as much transactional as possible. This neatly enforces some
+        nice features:
       </para>
       <itemizedlist mark="bullet">
         <listitem>
@@ -203,11 +218,13 @@
         What does it mean that the installation is data driven? It means that
         the installation (and configuration) logic lies in the methods of the
         items in the treelike structure. Every item is set up (the
-        <methodname>setup</methodname> method) to modify the runtime enviroment
+        <methodname> setup </methodname> method) <indexterm id="idx_setup">
+        <primary> setup </primary> </indexterm> to modify the runtime enviroment
         of the installation (if needed) and then executed (the
-        <methodname>execute</methodname>) to do the changes on the newly
-        installed system. We will look at these methods closer in
-        <xref linkend="section_writing_addon"/>.
+        <methodname>execute</methodname>) <indexterm id="idx_execute"> <primary>
+        execute </primary> </indexterm> to do the changes on the newly installed
+        system. We will look at these methods closer in <xref
+        linkend="section_writing_addon"/>.
       </para>
     </section>
 
@@ -216,16 +233,21 @@
       <para>
         One of the biggest changes introduced with the rewrite of the Anaconda
         installer was that the new UI (both graphical and textual) uses a
-        hub&amp;spoke model instead of the wizard model that had been used
-        before. The following diagram shows how hub&amp;spoke works regarding
-        the possible transitions between screens (hubs and spokes).
+        hub&amp;spoke model <indexterm id="idx_hub_and_spoke"> <primary>
+        hub&amp;spoke model </primary> </indexterm> instead of the wizard model
+        that had been used before. The following diagram shows how hub&amp;spoke
+        works regarding the possible transitions between screens (hubs and
+        spokes).
       </para>
 
-      <mediaobject id="picture_hub_and_spoke">
-        <imageobject>
-          <imagedata fileref="images/hub_and_spoke.svg" format="SVG" scalefit="1"/>
-        </imageobject>
-      </mediaobject>
+      <figure id="fig_hub_and_spoke">
+        <title>Hub&amp;spoke model diagram</title>
+        <mediaobject id="picture_hub_and_spoke">
+          <imageobject>
+            <imagedata fileref="images/hub_and_spoke.svg" format="SVG" scalefit="1"/>
+          </imageobject>
+        </mediaobject>
+      </figure>
 
       <para>
         The screens 2, 3, 5, 8, 10 and others are examples of so called
@@ -293,33 +315,39 @@
       </itemizedlist>
 
       <para>
-        As can be seen in the diagram central points of the Hub&amp;Spoke model
-        are hubs, so let's focus on hubs in the Anaconda installer for a
-        while. Currently there are two of them:
+        As can be seen in <xref linkend="fig_hub_and_spoke"/> central points of
+        the Hub&amp;Spoke model are hubs, so let's focus on hubs in the Anaconda
+        installer for a while. Currently there are two of them:
       </para>
 
       <itemizedlist mark="bullet">
         <listitem>
           <para>
-            the Summary hub that shows a summary of configured options and
+            the Summary hub <indexterm id="idx_summary_hub"> <primary> Summary
+            hub </primary> </indexterm> that shows a summary of configured
+            options and
           </para>
         </listitem>
         <listitem>
           <para>
-            the Progress hub that shows the progress of the installation process
-            and also shows a summary of options that can be configured during
-            the actual installation being done in the background thread.
+            the Progress hub <indexterm id="idx_progress_hub"> <primary>
+            Progress hub </primary> </indexterm> that shows the progress of the
+            installation process and also shows a summary of options that can be
+            configured during the actual installation being done in the
+            background thread.
           </para>
         </listitem>
       </itemizedlist>
 
       <para>
-        To make the layout of the UI clearer spokes reachable from these two
-        hubs are grouped together to so called
-        <emphasis>categories</emphasis>. A good example of a category used in
-        the Anaconda installer is the <emphasis>Localization</emphasis> category
-        that groups together spokes for keyboard and timezone settings.
-        <!-- How does the UI work with the installation data? -->
+        To make the layout of the UI clearer, spokes reachable from these two
+        hubs are grouped together to so called <emphasis> categories
+        </emphasis>. <indexterm id="idx_category"> <primary> category </primary>
+        </indexterm> A good example of a category used in the Anaconda installer
+        is the <emphasis> Localization </emphasis> <indexterm
+        id="idx_local_cat"> <primary> Localization category </primary>
+        </indexterm> category that groups together spokes for keyboard and
+        timezone settings.
       </para>
     </section>
 
