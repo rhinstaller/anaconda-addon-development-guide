@@ -340,8 +340,18 @@
       </itemizedlist>
 
       <para>
-        To make the layout of the UI clearer, spokes reachable from these two
-        hubs are grouped together to so called <emphasis> categories
+        Every spoke has a few predefined properties that are reflected on the
+        hub. There are: the <property> ready </property> property stating
+        whether the spoke can be visited or not, the <property> completed
+        </property> property marking the spoke as completed (all required values
+        are set) or not, the <property> mandatory </property> property telling
+        whether the spoke has to be completed before allowing user continue to
+        the next hub or standalone spoke and the <property> status </property>
+        property providing a short summary of the values set in the
+        spoke. <indexterm id="idx_spoke_properties"> <primary> spokes'
+        properties </primary>
+        </indexterm> To make the layout of the UI clearer, spokes reachable from
+        these two hubs are grouped together to so called <emphasis> categories
         </emphasis>. <indexterm id="idx_category"> <primary> category </primary>
         </indexterm> A good example of a category used in the Anaconda installer
         is the <emphasis> Localization </emphasis> <indexterm
