@@ -369,9 +369,71 @@
     <section id="section_threads_and_communication">
       <title>Threads and communication</title>
       <para>
-        Why is Anaconda multi-thread? What should be run in a separate thread?
-        How does internal communication work? What are the dangerous actions
-        with threads and Gtk and what Anaconda provides to overcome them?
+        Some of the actions that need to take place during the installaton
+        process take a long time to be finished (e.g. scaning disks for existing
+        partitions, downloading package repository metadata, etc). And since
+        basic principle of the GUI programming is that the user interface should
+        be as responsive as possible and since the goal is to allow user
+        configure other settings while some are blocked by the long lasting
+        actions, the Anaconda installer has to run such actions in separate
+        threads. However, the Gtk toolkit doesn't support changing its elements
+        from multiple threads. The Gtk main event loop is running in the main
+        thread of the Anaconda installer process and every code doing some GUI
+        involving actions has to make sure that these actions are run in the
+        main thread as well. The only supported way to do that is by using
+        <methodname>GLib.idle_add</methodname> method with is not much
+        comfortable. To facilitate this issue there are some helper functions
+        and decorators <!--add reference--> defined in the <package>
+        pyanaconda.ui.gui.utils </package> module. The most useful ones are
+        <emphasis> @gtk_thread_wait </emphasis> and <emphasis>
+        @gtk_thread_nowait </emphasis> decorators that change the decorated
+        function or method in a way that when it is called it is automatically
+        queued to Gtk's main loop, run in the main thread and then the return
+        value is returned to the caller or dropped respectively. Problem with
+        these decorators is that a programmer has to make sure decorated
+        functions are not called from the main thread as it would cause a
+        deadlock. So as always using threads complicates the code, debugging and
+        may lead to a whole set of additional problems if is done in a way not
+        careful enough.
+      </para>
+      <para>
+        As it has been already mentioned one of the goals of using multiple
+        threads is to allow user configure something else while some parts of
+        the GUI wait for some actions to finish. The example of such case is
+        package repository metadata download which can take a while and without
+        it being finished the Source <indexterm id="idx_source_spoke"> <primary>
+        Source spoke </primary> </indexterm> and Software <indexterm
+        id="idx_softw_spoke"> <primary> Software spoke </primary> </indexterm>
+        spokes cannot be visited as they cannot display valid data. In the same
+        time there is no reason why e.g. the Datetime spoke <indexterm
+        id="idx_datetime_spoke"> <primary> Datetime spoke </primary>
+        </indexterm> should be blocked. Now let's take a look from the blocked
+        spoke's perspective. It waits for some background thread to finish. But
+        once this thread is finished how should the spoke announce it is ready
+        and should not be blocked anymore? The hub that provides an access to
+        the spoke has no relation with the thread the spoke has been waiting for
+        and thus can't tell whether the spoke is yet ready or not. For such
+        cases there is a message queue called <emphasis>hubQ</emphasis>
+        <indexterm id="idx_hubq"> <primary> hubQ </primary> </indexterm> that is
+        being periodically checked in the main event loop. Once the thread the
+        spoke has been waiting for is finished the spoke sends a message
+        <footnote>
+          <para>
+            or more precisely puts a message to the queue
+          </para>
+        </footnote>
+        that anounces the spoke should no longer be blocked. The same applies to
+        the situation when the spoke needs to refresh its status or completion
+        flag. In case of the Progress hub there is also a <emphasis> progressQ
+        </emphasis> <indexterm id="idx_progressq"> <primary>progressQ</primary>
+        </indexterm> which serves as a medium to transfer installation progress
+        updates. These mechanisms are needed also for the text mode where the
+        situation is much more complicated, because there is no main loop in the
+        text mode and for vast majority of time it is waiting for input from
+        keyboard. However there is a bit experimental implementation of
+        asynchronous messages handling in TUI and the goal is to make, from
+        spoke's perspective, everything very similar to the graphical user
+        interface.
       </para>
     </section>
 
