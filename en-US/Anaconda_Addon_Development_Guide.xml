@@ -493,19 +493,167 @@
     <section id="section_writing_addon">
       <title>Writing an Anaconda addon</title>
       <para>
-        Which packages are needed? Hello world addon example built step by step
-        with comments and API description. Coding style. Comments on the
-        "advanced features" provided by Anaconda. What is needed for an
-        installer addon to become an Initial Setup addon?
+        We know how the addon's tree-like structure should look like, but
+        obviously the actual work needs to be done in the leafs, the addon's
+        modules. Instead of a lot of words describing how such modules should
+        look like and what they should contain, let's create a simple addon step
+        by step as a practical example. To make it obvious it is just a simple
+        example, we will call it <emphasis>&HWADDON;</emphasis>.<indexterm
+        id="idx_hello_world_addon"> <primary> &HWADDON; </primary> </indexterm>
+        To get an overall view on the addon and the code it is recommended to
+        clone the <ulink
+        url="http://www.fi.muni.cz/~xpodzim/git/?p=hello-world-anaconda-addon.git">
+        &HWADDON;'s git repository</ulink> or if it is not possible, at least
+        use the web interface to open the source files. The same applies to the
+        <ulink url="http://git.fedorahosted.org/git/anaconda.git">Anaconda's git
+        repository</ulink> as the installer's sources will be referred many
+        times in the following text.<indexterm id="idx_anaconda_git"> <primary>
+        Anaconda git </primary> </indexterm>
+      </para>
+
+      <para>
+        First we need the directories as described in the <xref
+        linkend="section_addon_structure"/> &mdash; the top-level directory
+        giving the addon its name (in this case <filename
+        class="directory">org_fedora_hello_world</filename>) and the directories
+        for separate parts providing code for kickstart, GUI and TUI support. As
+        it was already mentioned many times (intentionally) kickstart support is
+        the most important one so let's start with that part. Its subpackage
+        name is expected to be <package>ks</package> and we will thus need a
+        directory named <filename class="directory">ks</filename> under the
+        addon's top-level directory <filename
+        class="directory">org_fedora_hello_world</filename>. In that directory
+        there has to be the <filename>__init__.py</filename> file and at least
+        one Python module with arbitrary name. Let's use
+        <filename>hello_world.py</filename> which conforms to<ulink
+        url="http://www.python.org/dev/peps/pep-0008/#package-and-module-names">
+        Python's conventions for module names</ulink>. That brings us to the
+        coding style questions that should be answer before we start with any
+        actual code. The general rule is to follow Python's <ulink
+        url="http://www.python.org/dev/peps/pep-0008/">PEP 8</ulink> and <ulink
+        url="http://www.python.org/dev/peps/pep-0257/">PEP 257</ulink>
+        (docstring conventions). There is no consensus on the format of the
+        actual content of docstrings in the Anaconda installer. Anything that is
+        well human-readable is okay only if the addon is supposed to have a
+        documentation generated automatically, docstrings should, of course,
+        follow the rules of the toolkit used to generate the documentation. But
+        let's get back to the module with code providing &HWADDON;'s
+        support for kickstart. The reason why it can have an arbitrary name is
+        that the Anaconda installer looks in all files in the particular
+        directory and collects classes that are inherited from a particular
+        class defined by the API. The same rules apply to all of the <filename
+        class="directory">ks</filename>, <filename
+        class="directory">gui/spokes</filename> and <filename
+        class="directory">tui/spokes</filename> directories containing
+        modules. For the kickstart part of the addon the key class is the
+        <classname>AddonData</classname> class defined in the
+        <package>pyanaconda.addons</package> module that represents an object
+        for parsing and storing data from the kickstart file. The part of a
+        kickstart file containing data for an addon has the following format:
+
+        <programlisting>%addon ADDON_NAME
+first line
+second line
+...
+%end</programlisting>
+
+        Such sequence of lines is called <emphasis>a section</emphasis>. The
+        percent sign followed by the keyword <emphasis>addon</emphasis> marks
+        the begining of addon section while <emphasis>%end</emphasis> marks its
+        end. In place of the string <emphasis>ADDON_NAME</emphasis> there should
+        be a name of a real addon (like
+        <emphasis>org_fedora_hello_world</emphasis> in our case). The content
+        between the two lines starting with the percent sign is passed to an
+        instance of the addon's class inherited from the
+        <classname>AddonData</classname> class. To make the code as simple as
+        possible, the &HWADDON; will just squash the lines passed in a
+        kickstart file to a single line separating the original lines with a
+        space. We know that our addon needs a class inherited from the
+        <classname>AddonData</classname> with a method handling lines from a
+        kickstart <emphasis>%addon</emphasis> section. A quick look into the
+        <filename>pyanaconda/addons.py</filename> file tells that the name of
+        such method is <methodname>handle_line</methodname> and it takes the
+        line as the only argument. Let's have a look at the code implementing
+        what we have covered so far.
+
+      <programlisting>from pyanaconda.addons import AddonData
+
+# export HelloWorldData class to prevent Anaconda's collect method from taking
+# AddonData class instead of the HelloWorldData class
+# @see: pyanaconda.kickstart.AnacondaKSHandler.__init__
+__all__ = ["HelloWorldData"]
+
+HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"
+
+class HelloWorldData(AddonData):
+    """
+    Class parsing and storing data for the Hello world addon.
+
+    @see: pyanaconda.addons.AddonData
+
+    """
+
+    def __init__(self, name):
+        """
+        @param name: name of the addon
+        @type name: str
+
+        """
+
+        AddonData.__init__(self, name)
+        self.text = ""
+
+    def handle_line(self, line):
+        """
+        The handle_line method that is called with every line from this addon's
+        %addon section of the kickstart file.
+
+        @param line: a single line from the %addon section
+        @type line: str
+
+        """
+
+        # simple example, we just append lines to the text attribute
+        if self.text is "":
+            self.text = line.strip()
+        else:
+            self.text += " " + line.strip()</programlisting>
+
+      First few lines of the code describe what could be summed up as the
+      following rule:
+
+      <important>
+        <para>
+          Use <varname>__all__</varname> variables in modules as it is needed
+          for Anaconda's method for collecting classes to work properly.
+        </para>
+      </important>
+
+      Then there is a definition of the <classname>HelloWorldData</classname>
+      class inherited from the <classname>AddonData</classname> class with its
+      <methodname>__init__</methodname> method calling the parent's
+      <methodname>__init__</methodname> method and initializing the attribute
+      <property>self.text</property> to an empty string. This attribute is
+      populated in the <methodname>handle_line</methodname> method which just
+      strips the lines (removes whitespace characters at the begining and the
+      end of the line) and appends them to it.
+
+      </para>
+
+      <para>
+        &HWADDON; example built step by step with comments and API
+        description. Comments on the "advanced features" provided by
+        Anaconda. What is needed for an installer addon to become an Initial
+        Setup addon?
       </para>
     </section>
 
     <section id="section_deploying_and_testing">
       <title>Deploying and testing an Anaconda addon</title>
       <para>
-        How to deploy and test an Anaconda addon? On the running system vs. with
-        the installation image. How should be an addon delivered? Packaging and
-        basic structure for the .spec file.
+        Which packages are needed? How to deploy and test an Anaconda addon? On
+        the running system vs. with the installation image. How should be an
+        addon delivered? Packaging and basic structure for the .spec file.
       </para>
     </section>
 
