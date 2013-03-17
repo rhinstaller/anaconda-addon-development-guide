@@ -219,7 +219,7 @@
         the installation (and configuration) logic lies in the methods of the
         items in the treelike structure. Every item is set up (the
         <methodname> setup </methodname> method) <indexterm id="idx_setup">
-        <primary> setup </primary> </indexterm> to modify the runtime enviroment
+        <primary> setup </primary> </indexterm> to modify the runtime environment
         of the installation (if needed) and then executed (the
         <methodname>execute</methodname>) <indexterm id="idx_execute"> <primary>
         execute </primary> </indexterm> to do the changes on the newly installed
@@ -369,8 +369,8 @@
     <section id="section_threads_and_communication">
       <title>Threads and communication</title>
       <para>
-        Some of the actions that need to be run during the installaton process
-        take a long time to be finished (e.g. scaning disks for existing
+        Some of the actions that need to be run during the installation process
+        take a long time to be finished (e.g. scanning disks for existing
         partitions, downloading package repository metadata, etc). And since
         basic principle of the GUI programming is that the user interface should
         be as responsive as possible and since the goal is to allow user
@@ -423,7 +423,7 @@
             internally it means that it puts a message to the queue
           </para>
         </footnote>
-        that anounces the spoke should no longer be blocked. The same applies to
+        that announces the spoke should no longer be blocked. The same applies to
         the situation when the spoke needs to refresh its status or completion
         flag. In case of the Progress hub there is the <emphasis> progressQ
         </emphasis> <indexterm id="idx_progressq"> <primary>progressQ</primary>
@@ -559,7 +559,7 @@ second line
 
         Such sequence of lines is called <emphasis>a section</emphasis>. The
         percent sign followed by the keyword <emphasis>addon</emphasis> marks
-        the begining of addon section while <emphasis>%end</emphasis> marks its
+        the beginning of addon section while <emphasis>%end</emphasis> marks its
         end. In place of the string <emphasis>ADDON_NAME</emphasis> there should
         be a name of a real addon (like
         <emphasis>org_fedora_hello_world</emphasis> in our case). The content
@@ -635,7 +635,7 @@ class HelloWorldData(AddonData):
       <methodname>__init__</methodname> method and initializing the attribute
       <property>self.text</property> to an empty string. This attribute is
       populated in the <methodname>handle_line</methodname> method which just
-      strips the lines (removes whitespace characters at the begining and the
+      strips the lines (removes white space characters at the beginning and the
       end of the line) and appends them to it.
 
       </para>
