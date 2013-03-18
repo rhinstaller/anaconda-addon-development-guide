@@ -641,6 +641,116 @@ class HelloWorldData(AddonData):
       </para>
 
       <para>
+        So far our code covers the first phase of the data life cycle in the
+        installation process where data from the kickstart file has to be
+        read. The second phase of the life cycle is updating data with values
+        from the UI which will be covered in the UI code. Then data is used to
+        drive the actual installation process. This is done by two methods with
+        predefined names -- <methodname>setup</methodname> and
+        <methodname>execute</methodname>. The former one is called before the
+        installation transaction starts and should do all changes of the runtime
+        environment an addons needs to do. The later one is called at the end of
+        the transaction and should do all changes to the newly installed
+        (target) system an addon is supposed to do. Again, to make the code as
+        simple as possible, these two methods will be minimalistic. We will need
+        to prepend few imports and a constant definition to the begining of the
+        source file:
+      </para>
+
+      <programlisting>import os.path
+
+from pyanaconda.addons import AddonData
+from pyanaconda.constants import ROOT_PATH
+
+HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
+
+      <para>
+        And this is how the two methods will look:
+      </para>
+
+      <programlisting>    def setup(self, storage, ksdata, instclass):
+        """
+        The setup method that should make changes to the runtime environment
+        according to the data stored in this object.
+
+        @param storage: object storing storage-related information
+                        (disks, partitioning, bootloader, etc.)
+        @type storage: blivet.Blivet instance
+        @param ksdata: data parsed from the kickstart file and set in the
+                       installation process
+        @type ksdata: pykickstart.base.BaseHandler instance
+        @param instclass: distribution-specific information
+        @type instclass: pyanaconda.installclass.BaseInstallClass
+
+        """
+
+        # no actions needed in this addon
+        pass
+
+    def execute(self, storage, ksdata, instclass, users):
+        """
+        The execute method that should make changes to the installed system. It
+        is called only once in the post-install setup phase.
+
+        @see: setup
+        @param users: information about created users
+        @type users: pyanaconda.users.Users instance
+
+        """
+
+        hello_file_path = os.path.normpath(ROOT_PATH + HELLO_FILE_PATH)
+        with open(hello_file_path, "w") as fobj:
+            fobj.write("%s\n" % self.text)
+      </programlisting>
+
+      <para>
+        It should be easy to find out that the <methodname>setup</methodname>
+        method does nothing and the <methodname>execute</methodname> method just
+        writes the stored text to a file created in the target system's root
+        (<filename class="directory">/</filename>) directory. The most important
+        information delivered by the code above is the number and meaning of the
+        arguments passed to those two methods as described in the docstrings.
+      </para>
+
+      <para>
+        That brings us to the last phase of the data life cycle and also the
+        last piece of the code needed in the module providing a kickstart
+        support. At the end of the installation a new kickstart file with the
+        values set in the original kickstart file or during the installation
+        process is written out to the target system's <filename
+        class="directory">/root</filename> directory. It is done by calling
+        the <methodname>__str__</methodname> recursively on the tree-like
+        structure storing the data which means that our class inherited from the
+        <classname>AddonData</classname> class needs to define its own
+        <methodname>__str__</methodname> method returning its stored data in the
+        format that could be parsed again if the resulting kickstart file was
+        used to install another similar system. It should be obvious how the
+        <methodname>__str__</methodname> method should look like in our case:
+      </para>
+
+      <programlisting>    def __str__(self):
+        """
+        What should end up between %addon and %end lines in the resulting
+        kickstart file, i.e. string representation of the stored data.
+
+        """
+
+        return self.text</programlisting>
+
+      <para>
+        By adding this method method we have everything that is needed for a
+        kickstart support done and at the same time we have everything that an
+        addon needs to implement to become a valid addon. Thus we could finish
+        here and start enjoying the warm feeling of writing a new piece of the
+        OS installer. And, believe it or not, we only needed 36 lines of code (not
+        counting the docstrings and comments) to do that. But try to explain
+        how great this is to a majority of people who don't like writing
+        kickstart files and instead prefer clicking on buttons, filling in text
+        entries and so on. To make our code reachable for such people we need to
+        create a user interface for it.
+      </para>
+
+      <para>
         &HWADDON; example built step by step with comments and API
         description. Comments on the "advanced features" provided by
         Anaconda. What is needed for an installer addon to become an Initial
