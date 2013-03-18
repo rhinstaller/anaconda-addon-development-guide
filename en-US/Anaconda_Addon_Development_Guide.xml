@@ -575,6 +575,7 @@ second line
         such method is <methodname>handle_line</methodname> and it takes the
         line as the only argument. Let's have a look at the code implementing
         what we have covered so far.
+      </para>
 
       <programlisting>from pyanaconda.addons import AddonData
 
@@ -618,26 +619,25 @@ class HelloWorldData(AddonData):
             self.text = line.strip()
         else:
             self.text += " " + line.strip()</programlisting>
+      <para>
+        First few lines of the code describe what could be summed up as the
+        following rule:
 
-      First few lines of the code describe what could be summed up as the
-      following rule:
+        <important>
+          <para>
+            Use <varname>__all__</varname> variables in modules as it is needed
+            for Anaconda's method for collecting classes to work properly.
+          </para>
+        </important>
 
-      <important>
-        <para>
-          Use <varname>__all__</varname> variables in modules as it is needed
-          for Anaconda's method for collecting classes to work properly.
-        </para>
-      </important>
-
-      Then there is a definition of the <classname>HelloWorldData</classname>
-      class inherited from the <classname>AddonData</classname> class with its
-      <methodname>__init__</methodname> method calling the parent's
-      <methodname>__init__</methodname> method and initializing the attribute
-      <property>self.text</property> to an empty string. This attribute is
-      populated in the <methodname>handle_line</methodname> method which just
-      strips the lines (removes white space characters at the beginning and the
-      end of the line) and appends them to it.
-
+        Then there is a definition of the <classname>HelloWorldData</classname>
+        class inherited from the <classname>AddonData</classname> class with its
+        <methodname>__init__</methodname> method calling the parent's
+        <methodname>__init__</methodname> method and initializing the attribute
+        <property>self.text</property> to an empty string. This attribute is
+        populated in the <methodname>handle_line</methodname> method which just
+        strips the lines (removes white space characters at the beginning and the
+        end) and appends them to it.
       </para>
 
       <para>
