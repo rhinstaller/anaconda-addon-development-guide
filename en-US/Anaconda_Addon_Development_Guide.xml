@@ -511,6 +511,8 @@
         Anaconda git </primary> </indexterm>
       </para>
 
+      <section>
+        <title>Kickstart support</title>
       <para>
         First we need the directories as described in the <xref
         linkend="section_addon_structure"/> &mdash; the top-level directory
@@ -749,13 +751,18 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         entries and so on. To make our code reachable for such people we need to
         create a user interface for it.
       </para>
+      </section>
 
+      <section>
+        <title>Graphical user interface</title>
       <para>
         &HWADDON; example built step by step with comments and API
         description. Comments on the "advanced features" provided by
         Anaconda. What is needed for an installer addon to become an Initial
         Setup addon?
       </para>
+      </section>
+
     </section>
 
     <section id="section_deploying_and_testing">
