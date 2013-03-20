@@ -757,9 +757,9 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         <title>Graphical user interface</title>
       <para>
         &HWADDON; example built step by step with comments and API
-        description. Comments on the "advanced features" provided by
-        Anaconda. What is needed for an installer addon to become an Initial
-        Setup addon?
+        description. Beware of Glade! Comments on the "advanced features"
+        provided by Anaconda. What is needed for an installer addon to become an
+        Initial Setup addon?
       </para>
       </section>
 
