@@ -511,7 +511,7 @@
         Anaconda git </primary> </indexterm>
       </para>
 
-      <section>
+      <section id="section_kickstart_support">
         <title>Kickstart support</title>
       <para>
         First we need the directories as described in the <xref
@@ -753,8 +753,237 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
       </para>
       </section>
 
-      <section>
+      <section id="section_gui_support">
         <title>Graphical user interface</title>
+      <para>
+        Since the textual interface uses a custom toolkit developed for the
+        Anaconda installer, let's start with the Graphical user interface using
+        standard Gtk toolkit that should be more familiar to developers. Again,
+        first we need a subdirectory (subpackage) in the addon's top-level
+        directory (package). The one for the GUI code must be named <filename
+        class="directory">gui</filename> and since there are more types of
+        objects it can provide, it needs to have subdirectories itself. We will
+        start with the most important and most common one &mdash; <filename
+        class="directory">spokes</filename>. As it was described in the <xref
+        linkend="section_kickstart_support"/> every part of the addon has to
+        contain at least one module with a definition of a class inherited from
+        a particular class defined by the API. In case of the kickstart support
+        this class was the <classname>AddonData</classname> class in case of the
+        GUI support there are multiple such classes. But the only recommended
+        one for an addon is the <classname>NormalSpoke</classname> class defined
+        in the <package>pyanaconda.ui.gui.spokes</package> package. As its name
+        suggests it is a class for the <emphasis>normal spoke</emphasis> screen
+        described in the <xref linkend="section_hub_and_spoke"/>. To implement a
+        new class inherited from the <classname>NormalSpoke</classname> class we
+        need to define the folowing class attributes required by the API:
+      </para>
+      <itemizedlist mark="bullet">
+        <listitem>
+          <para>
+            <varname>builderObjects</varname> that should list all top-level
+            objects from the spoke's <filename>.glade</filename> file that
+            should be, with their children objects (recursively), exposed to the
+            spoke or should be an empty list if everything should be exposed to
+            the spoke (not recommended),
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>mainWidgetName</varname> containing the id of the main
+            window widget
+            <footnote>
+              <para>
+                an instance of the SpokeWindow widget which is a custom widget
+                created for the Anaconda installer
+              </para>
+            </footnote>
+            as defined in the <filename>.glade</filename> file,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>uiFile</varname> containing the name of the
+            <filename>.glade</filename> file,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>category</varname> containing the class of the category
+            the spoke belongs to,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>icon</varname> containing the identifier of the icon that
+            will be used for the spoke on the hub and
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>title</varname> defining the title that will be used for
+            the spoke on the hub.
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+        The code with all those definitions will then look like this:
+      </para>
+      <programlisting># will never be translated
+_ = lambda x: x
+N_ = lambda x: x
+
+# the path to addons is in sys.path so we can import things from org_fedora_hello_world
+from org_fedora_hello_world.gui.categories.hello_world import HelloWorldCategory
+from pyanaconda.ui.gui.spokes import NormalSpoke
+
+# export only the spoke, no helper functions, classes or constants
+__all__ = ["HelloWorldSpoke"]
+
+class HelloWorldSpoke(NormalSpoke):
+    """
+    Class for the Hello world spoke. This spoke will be in the Hello world
+    category and thus on the Summary hub. It is a very simple example of
+    a unit for the Anaconda's graphical user interface.
+
+    @see: pyanaconda.ui.common.UIObject
+    @see: pyanaconda.ui.common.Spoke
+    @see: pyanaconda.ui.gui.GUIObject
+
+    """
+
+    ### class attributes defined by API ###
+
+    # list all top-level objects from the .glade file that should be exposed
+    # to the spoke or leave empty to extract everything
+    builderObjects = ["helloWorldSpokeWindow", "buttonImage"]
+
+    # the name of the main window widget
+    mainWidgetName = "helloWorldSpokeWindow"
+
+    # name of the .glade file in the same directory as this source
+    uiFile = "hello_world.glade"
+
+    # category this spoke belongs to
+    category = HelloWorldCategory
+
+    # spoke icon (will be displayed on the hub)
+    # preferred are the -symbolic icons as these are used in Anaconda's spokes
+    icon = "face-cool-symbolic"
+
+    # title of the spoke (will be displayed on the hub)
+    title = N_("_HELLO WORLD")</programlisting>
+
+      <para>
+        In the begining two common functions for translations are defined, but
+        with the unusual definition for the <function>_</function>
+        function. This is caused by the fact that our addon is not meant to have
+        translations. Then we can again see the usage of the
+        <varname>__all__</varname> variable to export only the spoke class
+        <!--add reference to the warning?--> followed by the first lines of its
+        definition including the definitions of attributes mentioned
+        above. Their values are referencing the widgets defined in the
+        <filename>org_fedora_hello_world/gui/spokes/hello.glade</filename> file
+        included in the &HWADDON;'s sources (if you want to open the file, see
+        the begining of the <xref linkend="section_deploying_and_testing"/> that
+        lists the packages that are needed). Only two of the attributes deserve
+        a further comment. The first one is the <varname>category</varname>
+        attribute the value of which is the
+        <classname>HelloWorldCategory</classname> class imported from the
+        <package>org_fedora_hello_world.gui.categories</package> module. We will
+        get to the <classname>HelloWorldCategory</classname> definition later,
+        but for now note what was mentioned in the comment just before the
+        import:
+
+        <important>
+          <para>
+            The path to addons is in sys.path so things can be imported from the
+            org_fedora_hello_world package.
+          </para>
+        </important>
+
+        The second attribute that deserves a comment is the
+        <varname>title</varname> attribute whose definition contains two
+        underscores. The former one is part of the <function>N_</function>
+        function name that marks the string for translation, but returns the
+        non-translated version of the string (translation is done later). The
+        latter one is part of the title itself and makes the spoke reachable
+        from the hub with the Alt+H keyboard shortcut.
+      </para>
+
+      <para>
+        What usually follows the header of the class definition and the class
+        attributes definitions is the constructor that initializes an instance
+        of the class. In case of the Anaconda installer's GUI objects there are
+        two methods initializing a new instance &mdash; common Python's
+        <methodname>__init__</methodname> method and the
+        <methodname>initialize</methodname> method. The reason for two such
+        functions is that the GUI objects may be created in memory at one time
+        and fully initialized (which can take a longer time) at a different
+        time. Thus the <methodname>__init__</methodname> method should only
+        call the parent's <methodname>__init__</methodname> method and
+        e.g. initialize non-GUI attributes. On the other hand the
+        <methodname>initialize</methodname> method that is called when the
+        installer's graphical user interface initializes should finish the full
+        initialization of the spoke. This is how these two methods look in our
+        case (note the number and description of the arguments passed to the
+        <methodname>__init__</methodname> method):
+      </para>
+
+      <programlisting>    def __init__(self, data, storage, payload, instclass):
+        """
+        @see: pyanaconda.ui.common.Spoke.__init__
+        @param data: data object passed to every spoke to load/store data
+                     from/to it
+        @type data: pykickstart.base.BaseHandler
+        @param storage: object storing storage-related information
+                        (disks, partitioning, bootloader, etc.)
+        @type storage: blivet.Blivet
+        @param payload: object storing packaging-related information
+        @type payload: pyanaconda.packaging.Payload
+        @param instclass: distribution-specific information
+        @type instclass: pyanaconda.installclass.BaseInstallClass
+
+        """
+
+        NormalSpoke.__init__(self, data, storage, payload, instclass)
+
+    def initialize(self):
+        """
+        The initialize method that is called after the instance is created.
+        The difference between __init__ and this method is that this may take
+        a long time and thus could be called in a separated thread.
+
+        @see: pyanaconda.ui.common.UIObject.initialize
+
+        """
+
+        NormalSpoke.initialize(self)
+        self._entry = self.builder.get_object("textEntry")</programlisting>
+
+      <para>
+        Both methods are very simple, but still there are few things deserving a
+        comment. The most important one is the <varname>data</varname> parametr
+        passed to the <methodname>__init__</methodname> method. It is the
+        in-memory tree-like representation of the kickstart file where all the
+        data is stored. In one of the ancestors'
+        <methodname>__init__</methodname> methods it is stored in the
+        <varname>self.data</varname> attribute so we can read and modify it in
+        all other methods of the class. Since we have defined the
+        <classname>HelloWorldData</classname> class in <xref
+        linkend="section_kickstart_support"/> there is a subtree in
+        <varname>self.data</varname> for our addon and its root (an instance of
+        the <classname>HelloWorldData</classname>) is available as
+        <varname>self.data.addons.org_fedora_hello_world</varname>. One of the
+        other things an ancestor's <methodname>__init__</methodname> does is
+        initializing an instance of the <classname>GtkBuilder</classname>
+        with the spoke's <filename>.glade</filename> file and storing it as
+        <varname>self.builder</varname>. This is used in the
+        <methodname>initialize</methodname> method to get the
+        <classname>GtkTextEntry</classname> used to show and modify the text
+        from the kickstart file's %addon section.
+      </para>
+
       <para>
         &HWADDON; example built step by step with comments and API
         description. Beware of Glade! Comments on the "advanced features"
