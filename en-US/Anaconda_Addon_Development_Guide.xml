@@ -10,7 +10,7 @@
       <para>
         The Anaconda<indexterm id="idx_anaconda"> <primary>Anaconda</primary>
         </indexterm> is the operating system installer (OS) used in &FEDORA;,
-        &RHEL; and their derivatives. From closer look it is a set of python
+        &RHEL; and their derivatives. From a closer look it is a set of Python
         modules and scripts together with some additional files like Gtk widgets
         (written in C), systemd units and dracut libraries. Altogether they form
         a tool that allows user to set parameters of the resulting (target)
@@ -59,11 +59,11 @@
         combined with the command line arguments passed to the Anaconda
         installer because it doesn't provide all options GUI provides. The third
         way to set the installation parameters and the most advanced one is a
-        kickstart file <indexterm id="idx_kickstart">
-        <primary>kickstart</primary> </indexterm>. It is a simple file with
-        command-like syntax that can contain data driving the installation
+        kickstart file. <indexterm id="idx_kickstart">
+        <primary>kickstart</primary> </indexterm> It is a simple file with
+        command-like syntax which can contain data driving the installation
         process that then runs automatically unless the kickstart file doesn't
-        contain all data needed in which case UI asks user about the missing
+        contain all data needed in which case the UI asks user about the missing
         pieces. More info about kickstarts can be found at <ulink
         url="http://fedoraproject.org/wiki/Anaconda/Kickstart">the
         Anaconda/Kickstart wiki page</ulink>. Addons related kickstart
@@ -110,11 +110,18 @@
         that has helped user configure some aspects of the newly installed
         system. Problem with Firstboot is that it is using Gtk2 and pygtk module
         which are both no longer developed so it needs a rewrite too. Since the
-        goal was to provide every options from Firstboot already during the
+        goal was to provide all options from the Firstboot already during the
         installation process it was obvious that the rewritten Firstboot should
-        be sharing the code with the Anaconda installer. At the same time it was
-        obvious that the old Firstboot had to be kept working because of the
-        third-party modules written for it. That is how a new tool called <ulink
+        be sharing the code with the Anaconda installer.
+
+        <footnote>
+          <para>
+            At the same time it was obvious that the old Firstboot had to be
+            kept working because of the third-party modules written for it.
+          </para>
+        </footnote>
+
+        That is how a new tool called <ulink
         url="http://fedoraproject.org/wiki/Features/NewFirstboot"> Initial
         Setup</ulink> <indexterm id="idx_is"><primary>Initial Setup</primary>
         </indexterm> was born. It is reusing a lot of code from the Anaconda
@@ -163,7 +170,7 @@
         provides functions for boot loader installation and configuration. The
         most important package is <package>pyanaconda</package>. It glues all
         the other components together, contains all the UI code and many modules
-        for things that are not handled somewhere else &mdash; e.g. keyboard,
+        for things that are not handled anywhere else &mdash; e.g. keyboard,
         timezone, network and users configuration and also a number of utility
         and system oriented functions. There is also the <package> python-meh
         </package> <indexterm id="idx_meh"> <primary> python-meh </primary>
@@ -218,7 +225,7 @@
         What does it mean that the installation is data driven? It means that
         the installation (and configuration) logic lies in the methods of the
         items in the treelike structure. Every item is set up (the
-        <methodname> setup </methodname> method) <indexterm id="idx_setup">
+        <methodname>setup</methodname> method) <indexterm id="idx_setup">
         <primary> setup </primary> </indexterm> to modify the runtime environment
         of the installation (if needed) and then executed (the
         <methodname>execute</methodname>) <indexterm id="idx_execute"> <primary>
