@@ -392,16 +392,11 @@
         comfortable. To facilitate this issue there are some helper functions
         and decorators <!--add reference--> defined in the <package>
         pyanaconda.ui.gui.utils </package> module. The most useful ones are
-        <emphasis> @gtk_thread_wait </emphasis> and <emphasis>
-        @gtk_thread_nowait </emphasis> decorators that change the decorated
+        <emphasis> @gtk_action_wait </emphasis> and <emphasis>
+        @gtk_action_nowait </emphasis> decorators that change the decorated
         function or method in a way that when it is called it is automatically
         queued to Gtk's main loop, run in the main thread and then the return
-        value is returned to the caller or dropped, respectively. Problem with
-        these decorators is that a programmer has to make sure decorated
-        functions are not called from the main thread as it would cause a
-        deadlock. So as always using threads complicates the code, debugging and
-        may lead to a whole set of additional problems if done in a way not
-        careful enough.
+        value is returned to the caller or dropped, respectively.
       </para>
 
       <para>
