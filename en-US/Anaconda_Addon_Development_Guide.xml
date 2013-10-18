@@ -757,6 +757,8 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
 
       <section id="section_gui_support">
         <title>Graphical user interface</title>
+        <section id="basic_features">
+          <title>Basic features</title>
       <para>
         Since the textual interface uses a custom toolkit developed for the
         Anaconda installer, let's start with the Graphical user interface using
@@ -987,13 +989,231 @@ class HelloWorldSpoke(NormalSpoke):
       </para>
 
       <para>
-        &HWADDON; example built step by step with comments and API
-        description. Beware of Glade! Comments on the "advanced features"
-        provided by Anaconda. What is needed for an installer addon to become an
-        Initial Setup addon?
+        The <methodname>__init__</methodname> and
+        <methodname>initialize</methodname> methods are the two methods that
+        play their roles when the spoke is created. However, the main role of
+        the spoke is to be visited by user who wants to change or review some
+        values it shows and sets. There are three methods --
+        <methodname>refresh</methodname>, <methodname>apply</methodname> and
+        <methodname>execute</methodname> -- that handle things that need to be
+        done when the spoke is entered and left. The
+        <methodname>refresh</methodname> method is called when the spoke is
+        about to be visited by the user and its responsibility is to refresh the
+        spoke's state (mainly it's UI elements) to reflect the current values
+        stored in the <varname>self.data</varname> structure. The
+        <methodname>apply</methodname> and <methodname>execute</methodname>
+        methods are called when the spoke is left and they should store values
+        set in the UI elements to the <varname>self.data</varname> structure and
+        do all runtime changes the spoke requires based on its current state,
+        respectively.
       </para>
-      </section>
 
+      <para>
+        The implementations of those three functions are very simple in the
+        &HWADDON;:
+      </para>
+
+      <programlisting>    def refresh(self):
+        """
+        The refresh method that is called every time the spoke is displayed.
+        It should update the UI elements according to the contents of
+        self.data.
+
+        @see: pyanaconda.ui.common.UIObject.refresh
+
+        """
+
+        self._entry.set_text(self.data.addons.org_fedora_hello_world.text)
+
+    def apply(self):
+        """
+        The apply method that is called when the spoke is left. It should
+        update the contents of self.data with values set in the GUI elements.
+
+        """
+
+        self.data.addons.org_fedora_hello_world.text = self._entry.get_text()
+
+    def execute(self):
+        """
+        The excecute method that is called when the spoke is left. It is
+        supposed to do all changes to the runtime environment according to
+        the values set in the GUI elements.
+
+        """
+
+        # nothing to do here
+        pass</programlisting>
+
+      <para>
+        So far we have covered methods that can be used to instantiate and visit
+        spoke. It may seem like everything that is needed, but not every spoke
+        can be visited anytime (e.g. What would be the point of software
+        selection being shown before the repository is set?) and while values
+        shown and controlled by some spokes are crucial to the installation
+        process and cannot be omitted, some spokes allow modification of
+        optional values with minor effect on the installed system. That's why
+        all spokes have the <property>ready</property>,
+        <property>completed</property> and <property>mandatory</property>
+        properties. As their names suggest, these properties determine if the
+        spoke is ready to be visited, if the spoke is completed (i.e. all values
+        it requires to be set are set) and if the spoke is mandatory to be
+        completed for the installation to continue. All these attributes of the
+        spoke need to be dynamically determined based on the current state of
+        the installer/installation process. Here comes the trivial
+        implementation of those properties from the &HWADDON; which requires
+        some value to be set in the <classname>HelloWorldData</classname>'s
+        <varname>text</varname> attribute:
+      </para>
+
+      <programlisting>    @property
+    def ready(self):
+        """
+        The ready property that tells whether the spoke is ready (can be visited)
+        or not. The spoke is made (in)sensitive based on the returned value.
+
+        @rtype: bool
+
+        """
+
+        # this spoke is always ready
+        return True
+
+    @property
+    def completed(self):
+        """
+        The completed property that tells whether all mandatory items on the
+        spoke are set, or not. The spoke will be marked on the hub as completed
+        or uncompleted acording to the returned value.
+
+        @rtype: bool
+
+        """
+
+        return bool(self.data.addons.org_fedora_hello_world.text)
+
+    @property
+    def mandatory(self):
+        """
+        The mandatory property that tells whether the spoke is mandatory to be
+        completed to continue in the installation process.
+
+        @rtype: bool
+
+        """
+
+        # this is an optional spoke that is not mandatory to be completed
+        return False</programlisting>
+
+      <para>
+        With those three properties defined, a spoke can tell users whether they
+        may, have to or cannot visit the spoke. Nevertheless, users seeing the
+        hub need to decide whether to visit the spoke or not. That's why every
+        spoke also has the <property>status</property> property, which is
+        supposed to provide a short (one-line) summary describing values set on
+        the spoke. Since the only value managed by the spoke is the text it
+        shows, allows to edit and stores in the <varname>self.data</varname>
+        structure, it is only logical to use that text as the status. Also, the
+        status should warn user if no text is set:
+      </para>
+
+      <programlisting>    @property
+    def status(self):
+        """
+        The status property that is a brief string describing the state of the
+        spoke. It should describe whether all values are set and if possible
+        also the values themselves. The returned value will appear on the hub
+        below the spoke's title.
+
+        @rtype: str
+
+        """
+
+        text = self.data.addons.org_fedora_hello_world.text
+        if text:
+            return _("Text set: %s") % text
+        else:
+            return _("Text not set")</programlisting>
+
+      <para>
+        And that's it! Less than 60 lines of code (the real code lines) are
+        needed to implement the basic GUI of an addon. Of course, it is a
+        trivial addon that does nothing useful, but anything else is just a
+        common Python Gtk programming.
+      </para>
+        </section>
+
+        <section id="advanced_features">
+          <title>Advanced features</title>
+      <para>
+        Because many spokes have a lot in common, the
+        <package>pyanaconda</package> package contains a lot of helper and
+        utility functions and constructs, that may be used by hubs and
+        spokes. Majority of them are available in the
+        <package>pyanaconda.ui.gui.utils</package> module. The &HWADDON;
+        demonstrates usage of the utility, that is used in a number of
+        Anaconda's GUI code -- the <function>englightbox</function> context
+        manager, that puts a window into a lightbox to make it better visible,
+        focused and to prevent users from interaction with the underlying
+        window. To demonstrate such functionality, the &HWADDON;'s GUI contains
+        a button that runs a dialog. The dialog itself is a special class
+        <classname>HelloWorldDialog</classname> inheriting from the
+        <classname>GUIObject</classname> class defined in the
+        <package>pyanaconda.ui.gui.__init__</package> module. The dialog class
+        defines the <function>run</function> method that runs and destroys an
+        internal Gtk dialog accessible through the
+        <varname>self.window</varname> attribute that is populated thanks to the
+        <varname>mainWidgetName</varname> class attribute with the same meaning
+        as in case of the spoke. The code running the dialog within a lightbox
+        is then very simple:
+      </para>
+
+      <programlisting>        # every GUIObject gets ksdata in __init__
+        dialog = HelloWorldDialog(self.data)
+
+        # show dialog above the lightbox
+        with enlightbox(self.window, dialog.window):
+            dialog.run()
+      </programlisting>
+
+      <para>
+        The code simply creates an instance of the dialog and then uses the
+        <function>enlightbox</function> context manager to run the dialog within
+        a lightbox. The context manager needs a reference to the window of the
+        spoke and to the dialog's window to instantiate the lightbox for them.
+      </para>
+
+      <para>
+        Another useful feature of the Anaconda's codebase is a possibility to
+        define a spoke that will appear in the installation process as well as
+        in the first boot when the <command>Initial Setup</command> tool reusing
+        the <package>pyanaconda</package> package runs. All that is needed to
+        make spoke available in the <command>Initial Setup</command> is to
+        inherit the special <classname>FirstbootSpokeMixIn</classname> class (or
+        more precisely mixin) as the first inherited class. The other option is
+        the <classname>FirstbootOnlySpokeMixIn</classname>
+        <footnote>
+          <para>
+            both those classes are defined in the
+            <package>pyanaconda.ui.common</package> module
+          </para>
+        </footnote>
+        class/mixin which, as its name suggests, make spoke appear only in the
+        <command>Initial Setup</command> utility.
+      </para>
+
+      <para>
+        There are many more advanced features provided by the
+        <package>pyanaconda</package> package (like the
+        <emphasis>@gtk_action_wait</emphasis> and
+        <emphasis>@gtk_action_nowait</emphasis> decorators), but they are out of
+        scope of this guide. Readers are recommended to go through the Anaconda
+        installer's sources that contain a lot of examples.
+      </para>
+
+        </section>
+
+      </section>
     </section>
 
     <section id="section_deploying_and_testing">
