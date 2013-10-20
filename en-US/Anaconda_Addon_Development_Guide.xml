@@ -650,7 +650,7 @@ class HelloWorldData(AddonData):
         read. The second phase of the life cycle is updating data with values
         from the UI which will be covered in the UI code. Then data is used to
         drive the actual installation process. This is done by two methods with
-        predefined names -- <methodname>setup</methodname> and
+        predefined names &mdash; <methodname>setup</methodname> and
         <methodname>execute</methodname>. The former one is called before the
         installation transaction starts and should do all changes of the runtime
         environment an addons needs to do. The later one is called at the end of
@@ -993,9 +993,9 @@ class HelloWorldSpoke(NormalSpoke):
         <methodname>initialize</methodname> methods are the two methods that
         play their roles when the spoke is created. However, the main role of
         the spoke is to be visited by user who wants to change or review some
-        values it shows and sets. There are three methods --
+        values it shows and sets. There are three methods &mdash;
         <methodname>refresh</methodname>, <methodname>apply</methodname> and
-        <methodname>execute</methodname> -- that handle things that need to be
+        <methodname>execute</methodname> &mdash; that handle things that need to be
         done when the spoke is entered and left. The
         <methodname>refresh</methodname> method is called when the spoke is
         about to be visited by the user and its responsibility is to refresh the
@@ -1152,7 +1152,7 @@ class HelloWorldSpoke(NormalSpoke):
         spokes. Majority of them are available in the
         <package>pyanaconda.ui.gui.utils</package> module. The &HWADDON;
         demonstrates usage of the utility, that is used in a number of
-        Anaconda's GUI code -- the <function>englightbox</function> context
+        Anaconda's GUI code &mdash; the <function>englightbox</function> context
         manager, that puts a window into a lightbox to make it better visible,
         focused and to prevent users from interaction with the underlying
         window. To demonstrate such functionality, the &HWADDON;'s GUI contains
