@@ -1139,7 +1139,14 @@ class HelloWorldSpoke(NormalSpoke):
         And that's it! Less than 60 lines of code (the real code lines) are
         needed to implement the basic GUI of an addon. Of course, it is a
         trivial addon that does nothing useful, but anything else is just a
-        common Python Gtk programming.
+        common Python Gtk programming with some minor specific restrictions. For
+        example, as was mentioned in the begining of this section, every spoke
+        has to have its main window &mdash; an instance of the
+        <classname>SpokeWindow</classname> widget. This widget (together with
+        some more Anaconda-specific widgets) exists in the
+        <package>anaconda-widgets</package> package and files needed for
+        development (e.g. Glade definitions) live in the
+        <package>anaconda-widgets-devel</package> package.
       </para>
         </section>
 
