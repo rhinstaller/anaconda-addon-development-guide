@@ -1226,6 +1226,52 @@ class HelloWorldSpoke(NormalSpoke):
     <section id="section_deploying_and_testing">
       <title>Deploying and testing an Anaconda addon</title>
       <para>
+        As was mentioned in the previous section, there are some packages
+        required for development of an Anaconda addon. In particular the
+        <package>anaconda-widgets</package> and
+        <package>anaconda-widgets-devel</package> packages that contain the
+        widgets, glade specifications etc. and the <package>anaconda</package>
+        package that contains the <package>pyanaconda</package> Python package
+        (needed for running pylint checks and so on).
+      </para>
+
+      <para>
+        To test a newly created addon one needs to put it in the installation
+        environment and let the Anaconda installer collect addon's classes and
+        definitions. Addons are collected from the <filename
+        class="directory">/usr/share/anaconda/addons/</filename> directory, that
+        is expected to contain addons' Python packages (directory trees). The
+        easiest way to achieve that is to create the <filename
+        class="directory">usr/share/anaconda/addons/</filename> directory tree
+        somewhere, place a copy of the addon's package into it and then run the
+        following command:
+      </para>
+
+      <programlisting>$ find . |cpio -c -o |gzip -9 > addon_updates.img</programlisting>
+
+      <para>
+        The result is a gzipped cpio archive, but at the same time a so-called
+        <emphasis>updates image</emphasis> that can be uploaded to a web server
+        or copied to a USB drive and used to update the installation
+        environment. If a boot option formatted as
+        <emphasis>"updates=UPDATES_IMAGE_URL"</emphasis> is used when booting
+        into the installer, Anaconda fetches the updates image, and unpacks it
+        to the installation environment.
+
+        <footnote>
+          <para>
+            overwriting the files that already exist with the files from the
+            updates image (which is how the Anaconda developers use those files
+            for testing patches)
+          </para>
+        </footnote>
+
+        If everything goes well, all addon's classes are collected by the
+        installer, the kickstart section (if any) is passed to the addon to
+        process, spokes are shown on the hub etc.
+      </para>
+
+      <para>
         Which packages are needed? How to deploy and test an Anaconda addon? On
         the running system vs. with the installation image. How should be an
         addon delivered? Packaging and basic structure for the .spec file.
