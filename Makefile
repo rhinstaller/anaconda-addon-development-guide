@@ -16,10 +16,10 @@ html-single: ${SOURCES}
 	publican build --langs=en-US --formats=html-single
 
 publish: html-single
-	rsync -avz tmp/en-US/html-single/ xpodzim@aisa.fi.muni.cz:/home/xpodzim/public_html/anaconda-addon-development-guide/
+	rsync -avz tmp/en-US/html-single/ vpodzime@fedorapeople.org:/home/fedora/vpodzime/public_html/anaconda-addon-development-guide/
 
 publish-all: publish pdf
-	rsync -avz tmp/en-US/pdf/ xpodzim@aisa.fi.muni.cz:/home/xpodzim/public_html/anaconda-addon-development-guide/pdf/
+	rsync -avz tmp/en-US/pdf/ vpodzime@fedorapeople.org:/home/fedora/vpodzime/public_html/anaconda-addon-development-guide/pdf/
 
 clean:
 	publican clean
