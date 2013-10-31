@@ -1221,6 +1221,41 @@ class HelloWorldSpoke(NormalSpoke):
         </section>
 
       </section>
+      <section id="section_tui">
+        <title>Textual user interface</title>
+
+        <para>
+          The <xref linkend="section_introduction"/> mentions that apart from
+          the GUI installation, the Anaconda installer also supports text mode
+          installation that may be the only choice on some hardware
+          configurations. The previous <xref linkend="section_gui_support"/>
+          describes, how it is possible for an addon to define and implement
+          graphical screens for the installer allowing user interaction. Now
+          it's time to have a look at the text mode which is based on the
+          Anaconda's <emphasis>simpleline</emphasis> toolkit that is suitable
+          for purely textual output without any "advanced" features like
+          colours, fonts, cursor movement etc.
+        </para>
+
+        <para>
+          Internally, there are three main classes in the
+          <emphasis>simpleline</emphasis> toolkit &mdash;
+          <classname>App</classname>, <classname>UIScreen</classname> and
+          <classname>Widget</classname>. Widgets, which are elemental units
+          containing the information to be shown (printed) to the user, are
+          placed on the UIScreens that are switched by a single instance of the
+          <classname>App</classname> class. On top of those basic elements there
+          are hubs, spokes and dialogs all containing various widgets similarly
+          as in the GUI. So from the addon's perspective, the most important
+          classes are the <classname>NormalTUISpoke</classname> and various
+          other classes defined in the
+          <package>pyanaconda.ui.tui.spokes</package> package. All those classes
+          are based on the <classname>TUIObject</classname> class which is an
+          equivalent of the <classname>GUIObject</classname> class mentioned in
+          the previous chapter.
+        </para>
+
+      </section>
     </section>
 
     <section id="section_deploying_and_testing">
