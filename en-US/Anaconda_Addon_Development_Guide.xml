@@ -1255,6 +1255,222 @@ class HelloWorldSpoke(NormalSpoke):
           the previous chapter.
         </para>
 
+        <para>
+          Creating a text spoke for an addon again means creating subpackages of
+          the main addon's package. This time it has to be named <filename
+          class="directory">tui</filename> and the directory for spokes has to
+          be, surprisingly, named <filename
+          class="directory">spokes</filename>. A TUI spoke is again a Python
+          class this time inheriting from the
+          <classname>NormalTUISpoke</classname> class overriding special
+          arguments and methods defined by the API. Because the TUI is simpler
+          than the GUI there are fewer such arguments, namely two &mdash;
+          <varname>title</varname> and <varname>category</varname>. The former
+          one has the same meaning and type as in the GUI case, but the latter
+          one has to be a string in text mode. Categories are handled in a
+          different way in the GUI and TUI code of the Anaconda installer.
+          <footnote>
+            <para>
+              which is likely to change in the future to sticking to the better
+              (GUI) way
+            </para>
+          </footnote>
+
+          However, categories are used only for grouping and ordering spokes on
+          hubs in the text mode (their titles are not shown anywere), so the
+          easiest thing is to use some preexisting category (a new TUI category
+          would require a patch for the Anaconda installer).
+        </para>
+
+        <para>
+          Apart from the two arguments, the spoke class is expected to define
+          (override) a few methods &mdash; <methodname>__init__</methodname>,
+          <methodname>initialize</methodname>, <methodname>refresh</methodname>,
+          <methodname>refresh</methodname>, <methodname>apply</methodname>,
+          <methodname>execute</methodname>, <methodname>input</methodname>,
+          <methodname>prompt</methodname> &mdash; and properties described in
+          the <xref linkend="section_gui_support"/> for the case of a GUI
+          spoke. Let's have a look on a trivial TUI spoke defined in the
+          &HWADDON;. We could start with the methods:
+        </para>
+
+        <programlisting>def __init__(self, app, data, storage, payload, instclass):
+        """
+        @see: pyanaconda.ui.tui.base.UIScreen
+        @see: pyanaconda.ui.tui.base.App
+        @param app: reference to application which is a main class for TUI
+                    screen handling, it is responsible for mainloop control
+                    and keeping track of the stack where all TUI screens are
+                    scheduled
+        @type app: instance of pyanaconda.ui.tui.base.App
+        @param data: data object passed to every spoke to load/store data
+                     from/to it
+        @type data: pykickstart.base.BaseHandler
+        @param storage: object storing storage-related information
+                        (disks, partitioning, bootloader, etc.)
+        @type storage: blivet.Blivet
+        @param payload: object storing packaging-related information
+        @type payload: pyanaconda.packaging.Payload
+        @param instclass: distribution-specific information
+        @type instclass: pyanaconda.installclass.BaseInstallClass
+
+        """
+
+        NormalTUISpoke.__init__(self, app, data, storage, payload, instclass)
+
+    def initialize(self):
+        """
+        The initialize method that is called after the instance is created.
+        The difference between __init__ and this method is that this may take
+        a long time and thus could be called in a separated thread.
+
+        @see: pyanaconda.ui.common.UIObject.initialize
+
+        """
+
+        NormalTUISpoke.initialize(self)
+        self._entered_text = ""
+
+    def refresh(self, args=None):
+        """
+        The refresh method that is called every time the spoke is displayed.
+        It should update the UI elements according to the contents of
+        self.data.
+
+        @see: pyanaconda.ui.common.UIObject.refresh
+        @see: pyanaconda.ui.tui.base.UIScreen.refresh
+        @param args: optional argument that may be used when the screen is
+                     scheduled (passed to App.switch_screen* methods)
+        @type args: anything
+        @return: whether this screen requests input or not
+        @rtype: bool
+
+        """
+
+        self._entered_text = self.data.addons.org_fedora_hello_world.text
+        return True
+
+    def apply(self):
+        """
+        The apply method that is called when the spoke is left. It should
+        update the contents of self.data with values set in the spoke.
+
+        """
+
+        self.data.addons.org_fedora_hello_world.text = self._entered_text
+
+    def execute(self):
+        """
+        The excecute method that is called when the spoke is left. It is
+        supposed to do all changes to the runtime environment according to
+        the values set in the spoke.
+
+        """
+
+        # nothing to do here
+        pass
+
+    def input(self, args, key):
+        """
+        The input method that is called by the main loop on user's input.
+
+        @param args: optional argument that may be used when the screen is
+                     scheduled (passed to App.switch_screen* methods)
+        @type args: anything
+        @param key: user's input
+        @type key: unicode
+        @return: if the input should not be handled here, return it, otherwise
+                 return True or False if the input was processed succesfully or
+                 not respectively
+        @rtype: bool|unicode
+
+        """
+
+        if key:
+            self._entered_text = key
+
+        # no other actions scheduled, apply changes
+        self.apply()
+
+        # close the current screen (remove it from the stack)
+        self.close()
+        return True
+
+    def prompt(self, args=None):
+        """
+        The prompt method that is called by the main loop to get the prompt
+        for this screen.
+
+        @param args: optional argument that can be passed to App.switch_screen*
+                     methods
+        @type args: anything
+        @return: text that should be used in the prompt for the input
+        @rtype: unicode|None
+
+        """
+
+        return _("Enter a new text or leave empty to use the old one: ")</programlisting>
+
+        <para>
+          There is no need to override the <methodname>__init__</methodname>
+          method if it just calls the ancestor's
+          <methodname>__init__</methodname> method, but the comments in the
+          example code describe the arguments passed to constructors of spoke
+          classes in an understandable way. The
+          <methodname>initialize</methodname> method just sets up a default
+          value for the spoke's internal attribute which is then updated by the
+          <methodname>refresh</methodname> method and used by the
+          <methodname>apply</methodname> method to update the kickstart
+          data. The only differences from the GUI equivalents of those two
+          methods are the return type of the <methodname>refresh</methodname>
+          method that is <type>bool</type> instead of <type>None</type> and an
+          additional <varname>args</varname> argument it takes. The meaning of
+          the returned value is explained in the comment &mdash; it tells the
+          application (the single <classname>App</classname> class instance)
+          whether that spoke requires input from user or not. The additional
+          <varname>args</varname> argument is used for passing extra information
+          to the spoke when it scheduled. Then there is also the
+          <methodname>execute</methodname> method with the same purpose as in
+          the GUI and with the same <emphasis>pass</emphasis> statement doing
+          all that is needed in such a trivial case.
+        </para>
+
+        <para>
+          The <methodname>input</methodname> and <methodname>prompt</methodname>
+          methods are TUI-specific and as thier names suggest they are
+          responsible for interaction with the user. The
+          <methodname>prompt</methodname> method should simply return the prompt
+          that should be printed once the content of the spoke is printed. After
+          a user enters some string in a reaction to the prompt, the entered
+          string is passed to the <methodname>input</methodname> method for
+          processing. The <methodname>input</methodname> method usually needs to
+          parse the input and take some actions based on its type and
+          value. Since our spoke just asks for some value, the value is simply
+          stored in an internal attribute. But typically there are some
+          non-trivial actions done like accepting the 'c' or 'r' inputs for
+          continuing or refreshing, respectively, converting numbers into
+          integers and showing additional screens or toggling bool values based
+          on them etc. In contrast to the GUI code, the
+          <methodname>apply</methodname> method is not called automatically when
+          leaving the spoke, so we need to call it explicitly from the
+          <methodname>input</methodname> method. The same applies to closing
+          (hiding) the spoke's screen done by calling the
+          <methodname>close</methodname> method of the spoke. If we want to show
+          another screen (need some additional info from user entered in a
+          different spoke, dialog, etc.) we can also instantiate another
+          <classname>TUIObject</classname> here and call one of the
+          <methodname>self.app.switch_screen*</methodname> methods of the
+          <classname>App</classname>.  The last interesting thing about the
+          <methodname>input</methodname> method is its return value. It has to
+          be either <varname>INPUT_PROCESSED</varname> or
+          <varname>INPUT_DISCARDED</varname> constant (both defined in the
+          <package>pyanaconda.constants_text</package> module) or the input
+          string itself in case such an input should be processed by some other
+          screen.
+        </para>
+
+        <!-- TODO: add example of nested TUI screens and document it -->
+
       </section>
     </section>
 
