@@ -1613,11 +1613,10 @@ class HelloWorldEditSpoke(EditTUISpoke):
         process, spokes are shown on the hub etc.
       </para>
 
-      <para>
-        Which packages are needed? How to deploy and test an Anaconda addon? On
-        the running system vs. with the installation image. How should be an
-        addon delivered? Packaging and basic structure for the .spec file.
-      </para>
+      <!--
+        Which packages are needed? How to deploy and test an Anaconda addon on
+        the running system? Packaging and basic structure for the .spec file.
+      -->
     </section>
 
     <section id="section_final_words">
