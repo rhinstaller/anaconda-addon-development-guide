@@ -7,7 +7,7 @@
 	<title>Anaconda Addon Development Guide</title>
 	<subtitle>Things one needs to know when writing an Anaconda installer Addon</subtitle>
 	<productname>Fedora</productname>
-	<productnumber>19</productnumber>
+	<productnumber>20</productnumber>
 	<edition>0</edition>
 	<pubsnumber>0</pubsnumber>
 	<abstract>
@@ -34,4 +34,5 @@
 	<xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </articleinfo>
+
 
