@@ -1622,9 +1622,60 @@ class HelloWorldEditSpoke(EditTUISpoke):
     <section id="section_final_words">
       <title>Addons welcomed</title>
       <para>
-        Where to find help with the development? Additional documentation and
-        referential addon implementations? FAQ. Few words to encourage.
+        As has been described in the <xref linkend="section_introduction" />,
+        there are many things that could be added to the Anaconda installer to
+        facilitate installation and configuration of the operating system. This
+        guide is supposed to be the first place to start the adventure of
+        Anaconda addon development and hopefully it shows it's quite easy and
+        peaceful to write a brand new piece of an OS installer. Apart from the
+        trivial &HWADDON; there exists the <ulink
+        url="https://fedorahosted.org/oscap-anaconda-addon">OSCAP Anaconda
+        Addon</ulink> <indexterm id="oscap_addon"><primary>OSCAP Anaconda
+        Addon</primary></indexterm> project that may be used as a source of
+        additional information, tips and patterns useful for addon
+        development. Hopefully there will soon be more addons created by various
+        developers coming from various projects.
       </para>
+
+      <para>
+        This guide and the examples of addons are definitely not covering 100 %
+        of the trick&amp;treat game of Anaconda addon development. However,
+        members of the Anaconda installer team (and in particular Vratislav
+        Podzimek), are always willing to help addon developers with their
+        questions and issues. The best place to ask is the <ulink
+        url="https://www.redhat.com/mailman/listinfo/anaconda-devel-list">
+        anaconda-devel</ulink><indexterm id="anaconda_devel"> <primary>
+        anaconda-devel-list</primary> </indexterm> mailing list that is read
+        and moderated by the Anaconda developers.
+      </para>
+
+      <para>
+        If there is a nice feature that should be added to the Anaconda
+        installer's codebase and API or if there is a bug, please send tested
+        patches and pylint-checked
+
+        <footnote>
+          <para>
+            to facilitate testing and pylint checks, the <command>make
+            check</command> command may be used to run tests and checks with
+            quite effective false-positives handling
+          </para>
+        </footnote>
+
+        patches to the <ulink
+        url="https://lists.fedorahosted.org/pipermail/anaconda-patches/">anaconda-patches</ulink>
+        <indexterm id="anaconda_patches"> <primary> anaconda-patches-list
+        </primary> </indexterm>mailing list for a review. If accepted, one of
+        the developers will push the patches to the Anaconda's git repository.
+      </para>
+
+      <para>
+        Keep in mind, <emphasis>addons and patches welcomed!</emphasis>.
+      </para>
+        <!--
+            The FAQ section will be added based on the initial feedback and
+            actual FAQs
+        -->
     </section>
 
     <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
