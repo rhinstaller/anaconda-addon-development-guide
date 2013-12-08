@@ -585,7 +585,7 @@ second line
 
 # export HelloWorldData class to prevent Anaconda's collect method from taking
 # AddonData class instead of the HelloWorldData class
-# @see: pyanaconda.kickstart.AnacondaKSHandler.__init__
+# :see: pyanaconda.kickstart.AnacondaKSHandler.__init__
 __all__ = ["HelloWorldData"]
 
 HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"
@@ -594,14 +594,14 @@ class HelloWorldData(AddonData):
     """
     Class parsing and storing data for the Hello world addon.
 
-    @see: pyanaconda.addons.AddonData
+    :see: pyanaconda.addons.AddonData
 
     """
 
     def __init__(self, name):
         """
-        @param name: name of the addon
-        @type name: str
+        :param name: name of the addon
+        :type name: str
 
         """
 
@@ -613,8 +613,8 @@ class HelloWorldData(AddonData):
         The handle_line method that is called with every line from this addon's
         %addon section of the kickstart file.
 
-        @param line: a single line from the %addon section
-        @type line: str
+        :param line: a single line from the %addon section
+        :type line: str
 
         """
 
@@ -677,14 +677,14 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         The setup method that should make changes to the runtime environment
         according to the data stored in this object.
 
-        @param storage: object storing storage-related information
+        :param storage: object storing storage-related information
                         (disks, partitioning, bootloader, etc.)
-        @type storage: blivet.Blivet instance
-        @param ksdata: data parsed from the kickstart file and set in the
+        :type storage: blivet.Blivet instance
+        :param ksdata: data parsed from the kickstart file and set in the
                        installation process
-        @type ksdata: pykickstart.base.BaseHandler instance
-        @param instclass: distribution-specific information
-        @type instclass: pyanaconda.installclass.BaseInstallClass
+        :type ksdata: pykickstart.base.BaseHandler instance
+        :param instclass: distribution-specific information
+        :type instclass: pyanaconda.installclass.BaseInstallClass
 
         """
 
@@ -696,9 +696,9 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         The execute method that should make changes to the installed system. It
         is called only once in the post-install setup phase.
 
-        @see: setup
-        @param users: information about created users
-        @type users: pyanaconda.users.Users instance
+        :see: setup
+        :param users: information about created users
+        :type users: pyanaconda.users.Users instance
 
         """
 
@@ -850,9 +850,9 @@ class HelloWorldSpoke(NormalSpoke):
     category and thus on the Summary hub. It is a very simple example of
     a unit for the Anaconda's graphical user interface.
 
-    @see: pyanaconda.ui.common.UIObject
-    @see: pyanaconda.ui.common.Spoke
-    @see: pyanaconda.ui.gui.GUIObject
+    :see: pyanaconda.ui.common.UIObject
+    :see: pyanaconda.ui.common.Spoke
+    :see: pyanaconda.ui.gui.GUIObject
 
     """
 
@@ -936,17 +936,17 @@ class HelloWorldSpoke(NormalSpoke):
 
       <programlisting>    def __init__(self, data, storage, payload, instclass):
         """
-        @see: pyanaconda.ui.common.Spoke.__init__
-        @param data: data object passed to every spoke to load/store data
+        :see: pyanaconda.ui.common.Spoke.__init__
+        :param data: data object passed to every spoke to load/store data
                      from/to it
-        @type data: pykickstart.base.BaseHandler
-        @param storage: object storing storage-related information
+        :type data: pykickstart.base.BaseHandler
+        :param storage: object storing storage-related information
                         (disks, partitioning, bootloader, etc.)
-        @type storage: blivet.Blivet
-        @param payload: object storing packaging-related information
-        @type payload: pyanaconda.packaging.Payload
-        @param instclass: distribution-specific information
-        @type instclass: pyanaconda.installclass.BaseInstallClass
+        :type storage: blivet.Blivet
+        :param payload: object storing packaging-related information
+        :type payload: pyanaconda.packaging.Payload
+        :param instclass: distribution-specific information
+        :type instclass: pyanaconda.installclass.BaseInstallClass
 
         """
 
@@ -958,7 +958,7 @@ class HelloWorldSpoke(NormalSpoke):
         The difference between __init__ and this method is that this may take
         a long time and thus could be called in a separated thread.
 
-        @see: pyanaconda.ui.common.UIObject.initialize
+        :see: pyanaconda.ui.common.UIObject.initialize
 
         """
 
@@ -1019,7 +1019,7 @@ class HelloWorldSpoke(NormalSpoke):
         It should update the UI elements according to the contents of
         self.data.
 
-        @see: pyanaconda.ui.common.UIObject.refresh
+        :see: pyanaconda.ui.common.UIObject.refresh
 
         """
 
@@ -1072,7 +1072,7 @@ class HelloWorldSpoke(NormalSpoke):
         The ready property that tells whether the spoke is ready (can be visited)
         or not. The spoke is made (in)sensitive based on the returned value.
 
-        @rtype: bool
+        :rtype: bool
 
         """
 
@@ -1086,7 +1086,7 @@ class HelloWorldSpoke(NormalSpoke):
         spoke are set, or not. The spoke will be marked on the hub as completed
         or uncompleted acording to the returned value.
 
-        @rtype: bool
+        :rtype: bool
 
         """
 
@@ -1098,7 +1098,7 @@ class HelloWorldSpoke(NormalSpoke):
         The mandatory property that tells whether the spoke is mandatory to be
         completed to continue in the installation process.
 
-        @rtype: bool
+        :rtype: bool
 
         """
 
@@ -1125,7 +1125,7 @@ class HelloWorldSpoke(NormalSpoke):
         also the values themselves. The returned value will appear on the hub
         below the spoke's title.
 
-        @rtype: str
+        :rtype: str
 
         """
 
@@ -1296,23 +1296,23 @@ class HelloWorldSpoke(NormalSpoke):
 
         <programlisting>def __init__(self, app, data, storage, payload, instclass):
         """
-        @see: pyanaconda.ui.tui.base.UIScreen
-        @see: pyanaconda.ui.tui.base.App
-        @param app: reference to application which is a main class for TUI
+        :see: pyanaconda.ui.tui.base.UIScreen
+        :see: pyanaconda.ui.tui.base.App
+        :param app: reference to application which is a main class for TUI
                     screen handling, it is responsible for mainloop control
                     and keeping track of the stack where all TUI screens are
                     scheduled
-        @type app: instance of pyanaconda.ui.tui.base.App
-        @param data: data object passed to every spoke to load/store data
+        :type app: instance of pyanaconda.ui.tui.base.App
+        :param data: data object passed to every spoke to load/store data
                      from/to it
-        @type data: pykickstart.base.BaseHandler
-        @param storage: object storing storage-related information
+        :type data: pykickstart.base.BaseHandler
+        :param storage: object storing storage-related information
                         (disks, partitioning, bootloader, etc.)
-        @type storage: blivet.Blivet
-        @param payload: object storing packaging-related information
-        @type payload: pyanaconda.packaging.Payload
-        @param instclass: distribution-specific information
-        @type instclass: pyanaconda.installclass.BaseInstallClass
+        :type storage: blivet.Blivet
+        :param payload: object storing packaging-related information
+        :type payload: pyanaconda.packaging.Payload
+        :param instclass: distribution-specific information
+        :type instclass: pyanaconda.installclass.BaseInstallClass
 
         """
 
@@ -1325,7 +1325,7 @@ class HelloWorldSpoke(NormalSpoke):
         The difference between __init__ and this method is that this may take
         a long time and thus could be called in a separated thread.
 
-        @see: pyanaconda.ui.common.UIObject.initialize
+        :see: pyanaconda.ui.common.UIObject.initialize
 
         """
 
@@ -1337,13 +1337,13 @@ class HelloWorldSpoke(NormalSpoke):
         It should update the UI elements according to the contents of
         self.data.
 
-        @see: pyanaconda.ui.common.UIObject.refresh
-        @see: pyanaconda.ui.tui.base.UIScreen.refresh
-        @param args: optional argument that may be used when the screen is
+        :see: pyanaconda.ui.common.UIObject.refresh
+        :see: pyanaconda.ui.tui.base.UIScreen.refresh
+        :param args: optional argument that may be used when the screen is
                      scheduled (passed to App.switch_screen* methods)
-        @type args: anything
-        @return: whether this screen requests input or not
-        @rtype: bool
+        :type args: anything
+        :return: whether this screen requests input or not
+        :rtype: bool
 
         """
 
@@ -1374,15 +1374,15 @@ class HelloWorldSpoke(NormalSpoke):
         """
         The input method that is called by the main loop on user's input.
 
-        @param args: optional argument that may be used when the screen is
+        :param args: optional argument that may be used when the screen is
                      scheduled (passed to App.switch_screen* methods)
-        @type args: anything
-        @param key: user's input
-        @type key: unicode
-        @return: if the input should not be handled here, return it, otherwise
+        :type args: anything
+        :param key: user's input
+        :type key: unicode
+        :return: if the input should not be handled here, return it, otherwise
                  return True or False if the input was processed succesfully or
                  not respectively
-        @rtype: bool|unicode
+        :rtype: bool|unicode
 
         """
 
@@ -1401,11 +1401,11 @@ class HelloWorldSpoke(NormalSpoke):
         The prompt method that is called by the main loop to get the prompt
         for this screen.
 
-        @param args: optional argument that can be passed to App.switch_screen*
+        :param args: optional argument that can be passed to App.switch_screen*
                      methods
-        @type args: anything
-        @return: text that should be used in the prompt for the input
-        @rtype: unicode|None
+        :type args: anything
+        :return: text that should be used in the prompt for the input
+        :rtype: unicode|None
 
         """
 
