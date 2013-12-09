@@ -1294,7 +1294,7 @@ class HelloWorldSpoke(NormalSpoke):
           &HWADDON;. We could start with the methods:
         </para>
 
-        <programlisting>def __init__(self, app, data, storage, payload, instclass):
+        <programlisting>    def __init__(self, app, data, storage, payload, instclass):
         """
         :see: pyanaconda.ui.tui.base.UIScreen
         :see: pyanaconda.ui.tui.base.App
