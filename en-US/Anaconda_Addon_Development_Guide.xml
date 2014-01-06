@@ -8,13 +8,13 @@
     <section id="section_introduction">
       <title>Introduction</title>
       <para>
-        The Anaconda<indexterm id="idx_anaconda"> <primary>Anaconda</primary>
+        Anaconda<indexterm id="idx_anaconda"> <primary>Anaconda</primary>
         </indexterm> is the operating system installer (OS) used in &FEDORA;,
-        &RHEL; and their derivatives. From a closer look it is a set of Python
+        &RHEL; and their derivatives. At a closer look, it is a set of Python
         modules and scripts together with some additional files like Gtk widgets
         (written in C), systemd units and dracut libraries. Altogether they form
-        a tool that allows user to set parameters of the resulting (target)
-        system and then set such system up on a machine. The final installation
+        a tool that allows users to set parameters of the resulting (target)
+        system and then set such a system up on a machine. The final installation
         process has four major steps:
       </para>
       <itemizedlist mark="bullet">
@@ -41,82 +41,83 @@
       </itemizedlist>
 
       <para>
-        There are three ways how the user can set parameters for the target
+        There are three ways the user can set parameters for the target
         system (and in some cases also for the installation process). The most
-        commonly used one is the graphical user interface (GUI) <indexterm
+        commonly used is via the graphical user interface (GUI) <indexterm
         id="idx_gui"> <primary>GUI</primary> </indexterm> which should cover all
         common use cases and should be clear and easily understandable even for
-        non-advanced users. Although Anaconda supports also installation over
-        VNC <indexterm id="idx_vnc"> <primary>VNC</primary> </indexterm> there
-        are some corner cases where a textual interface is needed and some of
-        these cases are installations over serial consoles on "exotic" pieces of
-        hardware. For this reason Anaconda also has a textual user interface
-        (TUI) <indexterm id="idx_tui"> <primary>TUI</primary> </indexterm> that
-        works basically the same way as a black only line printer (because of
-        the various serial consoles not supporting cursor movement, colors and
-        other "advanced" features). Text mode installation implements only most
-        important features of the graphical installation and usually needs to be
-        combined with the command line arguments passed to the Anaconda
-        installer because it doesn't provide all options GUI provides. The third
-        way to set the installation parameters and the most advanced one is a
-        kickstart file. <indexterm id="idx_kickstart">
-        <primary>kickstart</primary> </indexterm> It is a simple file with
-        command-like syntax which can contain data driving the installation
-        process that then runs automatically unless the kickstart file doesn't
-        contain all data needed in which case the UI asks user about the missing
-        pieces. More info about kickstarts can be found at <ulink
+        non-advanced users. Although Anaconda also supports installation over
+        VNC <indexterm id="idx_vnc"> <primary>VNC</primary> </indexterm>, there
+        are some corner cases where a textual interface is needed, such as
+        installation over serial console on "exotic" pieces of hardware. For
+        this reason, Anaconda also has a textual user interface (TUI)
+        <indexterm id="idx_tui"> <primary>TUI</primary> </indexterm> that works
+        the same way as a black-only line printer. This behavior was chosen as
+        a result of various serial consoles not supporting cursor movement,
+        colors and other "advanced" features. Text mode installation implements
+        only the most important features of the graphical installation and
+        usually needs to be combined with installer-specific command line
+        arguments since it does not provide all of the options the GUI provides.
+        The third and most advanced way to set installation parameters is by
+        using a kickstart file. <indexterm id="idx_kickstart">
+        <primary>kickstart</primary> </indexterm> This is a simple file with
+        shell-like syntax which can contain data driving the installation
+        process, which then runs automatically. If the kickstart file doesn't
+        contain all data required, the installer asks the user about the missing
+        pieces. More information about kickstart can be found at <ulink
         url="http://fedoraproject.org/wiki/Anaconda/Kickstart">the
         Anaconda/Kickstart wiki page</ulink>. Addons related kickstart
         specifications are covered in <xref linkend="section_addon_structure"/>.
-        Important fact is that opposed to the TUI which is not a full-featured
-        mode of the installation, kickstart installation provides the highest
-        number of configuration options. The golden rule is that everything has
-        to be supported in kickstart first. Then GUI and TUI pieces can come
-        supporting subsets of configuration options provided in kickstart that
-        allow to keep user interface (UI) clear and non-confusing. All in all
-        Anaconda has to be simple but at the same time complex which is always
-        hard to achieve.
+        The important distinction to note is that, compared to the TUI, which is
+        not a full-featured mode of installation, kickstart installation
+        provides the highest number of configuration options. The golden rule is
+        that everything has to be supported in kickstart first. Then the GUI and
+        TUI pieces can follow, supporting subsets of configuration options
+        provided in kickstart that allow the user interface (UI) to remain clear
+        and succinct. Anaconda has to maintain a balance between simplicity and
+        complexity which is difficult to achieve.
       </para>
 
       <para>
-        As it is probably obvious there are many things that need to be happen
-        during the installation process. And for many teams and individuals it
-        seems to be a good idea to add more things to the OS installer so that
-        the target system can be pre-configured before it is run for the first
-        time. On one hand the installation environment is quite specific and
-        commonly used tools are usually not ready to work in it, but on the
-        other hand once something can be configured via kickstart multiple
-        systems with the same configuration can be installed easily. However the
-        more code in the installer, the more bugs it contains. Moreover the
-        maintenance becomes harder and harder with every new functionality and
-        it is harder and harder to follow changes in so many areas. So because
-        of all these reasons it was decided that when doing a major rewrite of
-        the Anaconda installer, support for addons <indexterm id="idx_addon">
-        <primary>addon</primary> </indexterm> has to be added to allow other
-        teams and individuals participate with their pieces of code developed
-        and maintained by them as experts in their particular areas of
-        interest. This guide should be one of the tools lowering the barrier to
-        understanding how the Anaconda installer works and looks like internally
-        and how its functionality can be extended with an addon.
+        It should be clear by now that there are many things which need to
+        happen during the installation process. Many teams and individuals favor
+        the idea of adding more options to the installer so the target system
+        can be pre-configured before it is run for the first time. On one hand,
+        the installation environment is quite specific, and commonly used tools
+        utilized by Anaconda are not always ready to work in it. On the other
+        hand, once a feature is supported via kickstart, multiple systems with
+        the same configuration can be installed easily. However, the more code
+        in the installer, the more bugs it contains. Moreover, the maintenance
+        becomes increasingly difficult with additional functionality, which
+        makes it difficult to follow changes in so many areas. For these
+        reasons, it was decided when doing a major rewrite of the Anaconda
+        installer, support for addons <indexterm id="idx_addon">
+        <primary>addon</primary> </indexterm> must be added. This allows other
+        teams and individuals to participate and contribute as experts in their
+        particular areas of interest by developing and maintaining their own
+        pieces of code. This guide is intended to serve as a tool for lowering
+        the barrier to entry by providing an understanding of how the Anaconda
+        installer works and looks like internally, as well as explaining how its
+        functionality can be extended with an addon.
       </para>
 
       <para>
-        Traditionally the first boot of the newly installed system is also being
-        considered to be a part of the installation procedure as some
-        configuration of the system (e.g. users creation) is taking place at
-        that point. For many years there has been a graphical tool called <ulink
+        Traditionally, the first boot of the newly installed system is also
+        considered to be a part of the installation procedure--usually, some
+        configuration of the system (e.g. user creation) is taking place at
+        this point. For many years there has been a graphical tool called <ulink
         url="http://fedoraproject.org/wiki/FirstBoot">Firstboot</ulink>
-        <indexterm id="idx_firstboot"><primary>Firstboot</primary></indexterm>
-        that has helped user configure some aspects of the newly installed
-        system. Problem with Firstboot is that it is using Gtk2 and pygtk module
-        which are both no longer developed so it needs a rewrite too. Since the
-        goal was to provide all options from the Firstboot already during the
-        installation process it was obvious that the rewritten Firstboot should
-        be sharing the code with the Anaconda installer.
+        <indexterm id="idx_firstboot"><primary>Firstboot</primary></indexterm>,
+        which has helped users configure some aspects of the newly installed
+        system. The issue with Firstboot is that it is using Gtk2 and the pygtk
+        module, which are both no longer being developed. Since the goal was to
+        provide all existing options from Firstboot during the installation
+        process, it was obvious that the rewritten Firstboot should be sharing
+        code with the Anaconda installer.
 
         <footnote>
           <para>
-            At the same time it was obvious that the old Firstboot had to be
+            At the same time, it was obvious that the old Firstboot had to be
             kept working because of the third-party modules written for it.
           </para>
         </footnote>
@@ -124,19 +125,19 @@
         That is how a new tool called <ulink
         url="http://fedoraproject.org/wiki/Features/NewFirstboot"> Initial
         Setup</ulink> <indexterm id="idx_is"><primary>Initial Setup</primary>
-        </indexterm> was born. It is reusing a lot of code from the Anaconda
-        installer, it has the same model and design as the installer and it
-        reads data produced by the installer to show values set during the
-        installation process. And the great thing is that only a little is
-        needed for an Anaconda addon to become an Initial Setup addon. We will
-        get to this in detail in <xref linkend="section_writing_addon"/>.
+        </indexterm> was born. It reuses a lot of code from the installer: it
+        has the same model and design as anaconda, and it reads data produced by
+        the installer to show which values are set during the installation
+        process. Most noteworthy is that only a little is needed for an Anaconda
+        addon to become an Initial Setup addon. This is explained in more detail
+        in <xref linkend="section_writing_addon"/>.
       </para>
 
       <para>
         Some additional information about the Anaconda installer can be found at
         <ulink url="http://fedoraproject.org/wiki/Anaconda">the Anaconda wiki
-        page</ulink> and additional info about the rewrite can be found at
-        <ulink url="https://fedoraproject.org/wiki/Anaconda/NewInstaller">the
+        page</ulink>, and additional information about the rewrite can be found
+        at <ulink url="https://fedoraproject.org/wiki/Anaconda/NewInstaller">the
         Anaconda/NewInstaller wiki page</ulink>.
       </para>
     </section>
