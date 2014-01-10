@@ -460,7 +460,7 @@
         valid identifier for a Python package. For example
         <filename class="directory">org_fedora_hello_world</filename> which is
         used by <ulink
-        url="http://www.fi.muni.cz/~xpodzim/git/hello-world-anaconda-addon.git">
+        url="https://github.com/vpodzime/hello-world-anaconda-addon">
         the &HWADDON;</ulink> from <xref
         linkend="section_writing_addon"/>. <indexterm id="idx_hello_world">
         <primary> &HWADDON; </primary> </indexterm> As it has been
@@ -505,7 +505,7 @@
         id="idx_hello_world_addon"> <primary> &HWADDON; </primary> </indexterm>
         To get an overall view on the addon and the code it is recommended to
         clone the <ulink
-        url="http://www.fi.muni.cz/~xpodzim/git/?p=hello-world-anaconda-addon.git">
+        url="https://github.com/vpodzime/hello-world-anaconda-addon.git">
         &HWADDON;'s git repository</ulink> or if it is not possible, at least
         use the web interface to open the source files. The same applies to the
         <ulink url="http://git.fedorahosted.org/git/anaconda.git">Anaconda's git
