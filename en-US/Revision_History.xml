@@ -8,6 +8,20 @@
 	<simpara>
 		<revhistory>
 			<revision>
+				<revnumber>1-0</revnumber>
+				<date>Wed Jan 15 2014</date>
+				<author>
+					<firstname>Vratislav</firstname>
+					<surname>Podzimek</surname>
+					<email>vpodzime@redhat.com</email>
+				</author>
+				<revdescription>
+					<simplelist>
+						<member>First version to be a part of the official documentation</member>
+					</simplelist>
+				</revdescription>
+			</revision>
+			<revision>
 				<revnumber>0-0</revnumber>
 				<date>Fri Dec 28 2012</date>
 				<author>
