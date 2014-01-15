@@ -145,10 +145,10 @@
     <section id="section_architecture">
       <title>Architecture</title>
       <para>
-        As has been already mentioned, the Anaconda installer is a set of python
-        modules and scripts. It of course also uses a lot of external packages
-        and libraries some of which were originally created specifically for the
-        needs of the installer. Major components of the whole tool are the
+        As already noted, the Anaconda installer is a set of
+        python modules and scripts. It also uses a number of external packages
+        and libraries, some of which were originally created specifically for
+        the installer. Major components of the toolset include the
         following packages: <package>pykickstart</package>, <indexterm
         id="idx_pykickstart"> <primary>pykickstart</primary> </indexterm>
         <package>yum</package>, <indexterm id="idx_yum"> <primary>yum</primary>
@@ -157,81 +157,86 @@
         <package>pyanaconda</package>.  <indexterm id="idx_pyanaconda">
         <primary>pyanaconda</primary> </indexterm>
         <package>pykickstart</package> is a package that parses and validates
-        the kickstart file (if provided) and also provides a data structure that
-        Anaconda uses to store values driving the installation. We will focus
+        a provided kickstart file and also provides a data structure that
+        Anaconda uses to store values driving installation. We will focus
         more on the data representation and life cycle in the following
         paragraph. <package>yum</package> is the core python package of the
-        <command>yum</command> package manager. Anaconda uses it for operations
-        with package repositories and for package
-        installation. <package>blivet</package> is a new separate project that
-        used to be an internal part of the <package>pyanaconda</package> package
-        as <package>pyanaconda.storage</package>. As the old name suggests it is
-        a package that operates on the disks, mount points and all related
-        aspects of the installation destination preparation. Moreover it
-        provides functions for boot loader installation and configuration. The
-        most important package is <package>pyanaconda</package>. It glues all
-        the other components together, contains all the UI code and many modules
-        for things that are not handled anywhere else &mdash; e.g. keyboard,
-        timezone, network and users configuration and also a number of utility
-        and system oriented functions. There is also the <package> python-meh
+        <command>yum</command> package manager. Anaconda uses it to interface
+        with package repositories and handle operations related to package
+        management during installation.
+        <package>blivet</package> is a relatively recent project which was split
+        out from the <package>pyanaconda</package> package as
+        <package>pyanaconda.storage</package>. As the old name suggests, blivet
+        is a storage library which handles all activities related to disk
+        management. Additionally, it provides functions for boot loader
+        installation and configuration. The <package>pyanaconda</package>
+        package acts as a glue for holding all of the components together; it
+        contains all of the UI code and several modules for functionality unique
+        to anaconda, such as keyboard and timezone selection, network
+        configuration, and user creation, as well as a number of utilities and
+        system-oriented functions.
+
+        There is also the <package> python-meh
         </package> <indexterm id="idx_meh"> <primary> python-meh </primary>
-        </indexterm> package that contains an exception handler that gathers and
+        </indexterm> package which contains an exception handler that gathers and
         stores additional information from the system in case of a crash and
         passes this data to the <package>libreport</package> <indexterm
-        id="idx_libreport"> <primary> libreport </primary> </indexterm> library
-        (which is a part of the <ulink url="https://fedorahosted.org/abrt/">ABRT
-        project</ulink>). <indexterm id="idx_abrt"> <primary> ABRT </primary>
+        id="idx_libreport"> <primary> libreport </primary> </indexterm> library,
+        which is a part of the <ulink url="https://fedorahosted.org/abrt/">ABRT
+        project</ulink>. <indexterm id="idx_abrt"> <primary> ABRT </primary>
         </indexterm>
       </para>
 
       <!-- divide into subsections? -->
       <para>
-        Life cycle of the data in the installation process is simple and
-        straightforward. In the beginning if kickstart file is given to the
-        installer, it is parsed and processed by the <package> pykickstart
-        </package> module to become an in-memory treelike structure. If no
-        kickstart file is given, and empty treelike structure is created. Items
-        in that structure are then updated with the user's choices from the
-        UI. Next step is the installation process which is driven by the values
-        stored in that structure and finally all such values are written out as
-        a new kickstart file that can be used to perform another installation
-        with the same configuration. Elements of the structure are defined in
-        the <package>pykickstart</package> package, but some of them are
-        overridden by modified versions from the <package> pyanaconda.kickstart
-        </package> module. The important fact and rule is that there is no other
-        place to store configuration data and the installation process is data
-        driven and as much transactional as possible. This neatly enforces some
-        nice features:
+        The life cycle of the data in the installation process is simple and
+        straightforward. If a kickstart file is provided, it is parsed and
+        processed by the <package>pykickstart</package> module to behave as an
+        in-memory, tree-like structure. If no kickstart file is given, an empty
+        tree-like structure is created. Items in this structure are then updated
+        with the user's choices as they are made within the UI. Next, the
+        installation process begins, and it is driven by the values which are
+        stored in the tree-like structure. At this point, the values are also
+        written out as a kickstart file which can be used to perform another
+        installation with the same configuration. Elements of the structure are
+        defined in the <package>pykickstart</package> package, but some of them
+        are overridden by modified versions from the
+        <package>pyanaconda.kickstart</package> module. The important rule which
+        governs this behavior is that there is nowhere to store configuration
+        data, and the installation process is data-driven and relies on
+        transactions as much as possible. This neatly enforces some nice
+        features:
       </para>
       <itemizedlist mark="bullet">
         <listitem>
           <para>
-            everything has to be supported in kickstart first (because in
-            automated installation only the transaction happens),
+            everything has to be supported in kickstart first, because in an
+            automated installation only the transaction happens
           </para>
         </listitem>
         <listitem>
           <para>
-            there is a single and obvious point where underlying machine starts
-            to be modified (begging of the transaction) and
+            there is a single and obvious point where the underlying machine starts
+            to be modified -- this marks the beginning of the transaction
           </para>
         </listitem>
         <listitem>
           <para>
-            everything set in the UI is reflected in the resulting kickstart file.
+            everything configured in the UI is reflected in the resultant
+            kickstart file
           </para>
         </listitem>
       </itemizedlist>
       <para>
-        What does it mean that the installation is data driven? It means that
-        the installation (and configuration) logic lies in the methods of the
-        items in the treelike structure. Every item is set up (the
+        What does it mean that the installation is data-driven? The installation
+        and configuration logic lies within the methods of the items in the
+        tree-like structure. Every item is set up (the
         <methodname>setup</methodname> method) <indexterm id="idx_setup">
         <primary> setup </primary> </indexterm> to modify the runtime environment
-        of the installation (if needed) and then executed (the
+        of the installation if needed, and then executed (the
         <methodname>execute</methodname>) <indexterm id="idx_execute"> <primary>
-        execute </primary> </indexterm> to do the changes on the newly installed
-        system. We will look at these methods closer in <xref
+        execute </primary> </indexterm> to perform the changes on the newly
+        installed system. We will look at these methods closer in <xref
         linkend="section_writing_addon"/>.
       </para>
     </section>
