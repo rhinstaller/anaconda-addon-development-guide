@@ -561,7 +561,7 @@
         for parsing and storing data from the kickstart file. The part of a
         kickstart file containing data for an addon has the following format:
 
-        <programlisting>%addon ADDON_NAME
+        <programlisting>%addon ADDON_NAME [arguments]
 first line
 second line
 ...
@@ -572,22 +572,27 @@ second line
         the beginning of addon section while <emphasis>%end</emphasis> marks its
         end. In place of the string <emphasis>ADDON_NAME</emphasis> there should
         be a name of a real addon (like
-        <emphasis>org_fedora_hello_world</emphasis> in our case). The content
-        between the two lines starting with the percent sign is passed to an
-        instance of the addon's class inherited from the
-        <classname>AddonData</classname> class. To make the code as simple as
+        <emphasis>org_fedora_hello_world</emphasis> in our case). Any additional
+        <emphasis>arguments</emphasis> on the addon line will be passed as a
+        list to an instance of the addon's class inherited from the
+        <classname>AddonData</classname> class. The content between the two
+        lines starting with the percent sign is passed to the instance of the
+        addon's class one line at a time.  To make the code as simple as
         possible, the &HWADDON; will just squash the lines passed in a
         kickstart file to a single line separating the original lines with a
         space. We know that our addon needs a class inherited from the
-        <classname>AddonData</classname> with a method handling lines from a
-        kickstart <emphasis>%addon</emphasis> section. A quick look into the
-        <filename>pyanaconda/addons.py</filename> file tells that the name of
-        such method is <methodname>handle_line</methodname> and it takes the
-        line as the only argument. Let's have a look at the code implementing
-        what we have covered so far.
+        <classname>AddonData</classname> with a method handling the
+        <emphasis>%addon</emphasis> argument list and with a method handling
+        lines inside a kickstart <emphasis>%addon</emphasis> section. A quick
+        look into the <filename>pyanaconda/addons.py</filename> shows these
+        two methods: <methodname>handle_header</methodname> takes a list of
+        arguments and the current line numbers (for error reporting), and
+        <methodname>handle_line</methodname> takes a single line of content.
+        Let's have a look at the code implementing what we have covered so far.
       </para>
 
       <programlisting>from pyanaconda.addons import AddonData
+from pykickstart.options import KSOptionParser
 
 # export HelloWorldData class to prevent Anaconda's collect method from taking
 # AddonData class instead of the HelloWorldData class
@@ -613,6 +618,32 @@ class HelloWorldData(AddonData):
 
         AddonData.__init__(self, name)
         self.text = ""
+        self.reverse = False
+
+    def handle_header(self, lineno, args):
+        """
+        The handle_header method is called to parse additional arguments in the
+        %addon section line.
+
+        :param lineno: the current linenumber in the kickstart file
+        :type lineno: int
+        :param args: any additional arguments after %addon &lt;name&gt;
+        :type args: list
+        """
+
+        op = KSOptionParser()
+        op.add_option("--reverse", action="store_true", default=False,
+                dest="reverse", help="Reverse the display of the addon text")
+        (opts, extra) = op.parse_args(args=args, lineno=lineno)
+
+        # Reject any additoinal arguments. Since AddonData.handle_header
+        # rejects any arguments, we can use it to create an error message
+        # and raise an exception.
+        if extra:
+            AddonData.handle_header(self, lineno, extra)
+
+        # Store the result of the option parsing
+        self.reverse = opts.reverse
 
     def handle_line(self, line):
         """
@@ -643,11 +674,19 @@ class HelloWorldData(AddonData):
         Then there is a definition of the <classname>HelloWorldData</classname>
         class inherited from the <classname>AddonData</classname> class with its
         <methodname>__init__</methodname> method calling the parent's
-        <methodname>__init__</methodname> method and initializing the attribute
-        <property>self.text</property> to an empty string. This attribute is
-        populated in the <methodname>handle_line</methodname> method which just
-        strips the lines (removes white space characters at the beginning and the
-        end) and appends them to it.
+        <methodname>__init__</methodname> method and initializing the attributes
+        <property>self.text</property> to an empty string and
+        <property>self.reverse</property> to False.
+        <property>self.reverse</property> is populated in the
+        <methodname>handle_header</methodname> method, and
+        <property>self.text</property> is populated in the
+        <methodname>handle_line</methodname> method.
+        <methodname>handle_header</methodname> uses an instance of the
+        <classname>KSOptionParser</classname> class provided by pykickstart to
+        parse the additional arguments on the <emphasis>%addon</emphasis> line,
+        and <methodname>handle_line</methodname> strips the content lines
+        (removes white space characters at the beginning and the end) and
+        appends them to <property>self.text</property>.
       </para>
 
       <para>
@@ -740,12 +779,18 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
 
       <programlisting>    def __str__(self):
         """
-        What should end up between %addon and %end lines in the resulting
-        kickstart file, i.e. string representation of the stored data.
+        What should end up in the resulting kickstart file, i.e. the %addon
+        section containing string representation of the stored data.
 
         """
 
-        return self.text</programlisting>
+        addon_str = "%%addon %s" % self.name
+
+        if self.reverse:
+            addon_str += "--reverse"
+
+        addon_str += "\n%s\n%%end" % self.text
+        return addon_str</programlisting>
 
       <para>
         By adding this method method we have everything that is needed for a
@@ -1136,6 +1181,11 @@ class HelloWorldSpoke(NormalSpoke):
         """
 
         text = self.data.addons.org_fedora_hello_world.text
+
+        # If --reverse was specified in the kickstart, reverse the text
+        if self.data.addons.org_fedora_hello_world.reverse:
+            text = text[::-1]
+
         if text:
             return _("Text set: %s") % text
         else:
