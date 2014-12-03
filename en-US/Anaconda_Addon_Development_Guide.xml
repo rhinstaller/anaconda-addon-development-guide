@@ -636,11 +636,13 @@ class HelloWorldData(AddonData):
                 dest="reverse", help="Reverse the display of the addon text")
         (opts, extra) = op.parse_args(args=args, lineno=lineno)
 
-        # Reject any additoinal arguments. Since AddonData.handle_header
-        # rejects any arguments, we can use it to create an error message
-        # and raise an exception.
+        # Reject any additional arguments.
         if extra:
-            AddonData.handle_header(self, lineno, extra)
+            msg = "Unhandled arguments on %%addon line for %s" % self.name
+            if lineno != None:
+                raise KickstartParseError(formatErrorMsg(lineno, msg=msg))
+            else:
+                raise KickstartParseError(msg)
 
         # Store the result of the option parsing
         self.reverse = opts.reverse
@@ -787,9 +789,9 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         addon_str = "%%addon %s" % self.name
 
         if self.reverse:
-            addon_str += "--reverse"
+            addon_str += " --reverse"
 
-        addon_str += "\n%s\n%%end" % self.text
+        addon_str += "\n%s\n%%end\n" % self.text
         return addon_str</programlisting>
 
       <para>
