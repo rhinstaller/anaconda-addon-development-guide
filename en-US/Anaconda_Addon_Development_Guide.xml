@@ -754,7 +754,7 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
 
         hello_file_path = os.path.normpath(getSysroot() + HELLO_FILE_PATH)
         with open(hello_file_path, "w") as fobj:
-            fobj.write("%s\n" % self.text)
+            fobj.write("%s&#92;n" % self.text)
       </programlisting>
 
       <para>
@@ -794,7 +794,7 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         if self.reverse:
             addon_str += " --reverse"
 
-        addon_str += "\n%s\n%%end\n" % self.text
+        addon_str += "&#92;n%s&#92;n%%end&#92;n" % self.text
         return addon_str</programlisting>
 
       <para>
@@ -1563,7 +1563,7 @@ class HelloWorldEditSpoke(EditTUISpoke):
     category = "localization"
 
     # simple RE used to specify we only accept a single word as a valid input
-    _valid_input = re.compile(r'\w+')
+    _valid_input = re.compile(r'&#92;w+')
 
     # special class attribute defining spoke's entries as:
     # Entry(TITLE, ATTRIBUTE, CHECKING_RE or TYPE, SHOW_FUNC or SHOW)
@@ -1735,13 +1735,13 @@ VERSION = 0.1
 ADDON = org_fedora_example
 TESTS = tests
 
-FILES = $(ADDON) \
-	$(TESTS) \
-	COPYING \
-	Makefile \
+FILES = $(ADDON) &#92;
+	$(TESTS) &#92;
+	COPYING &#92;
+	Makefile &#92;
 	README
 
-EXCLUDES = \
+EXCLUDES = &#92;
 	*.pyc
 
 all:
@@ -1764,23 +1764,23 @@ uninstall:
 dist:
 	rm -rf $(DISTNAME)
 	mkdir -p $(DISTNAME)
-	@if test -d ".git"; \
-	then \
-		echo Creating ChangeLog &amp;&amp; \
-		( cd "$(top_srcdir)" &amp;&amp; \
-		  echo '# Generate automatically. Do not edit.'; echo; \
-		  git log --stat --date=short ) > ChangeLog.tmp \
-		&amp;&amp; mv -f ChangeLog.tmp $(DISTNAME)/ChangeLog \
-		|| ( rm -f ChangeLog.tmp ; \
-		     echo Failed to generate ChangeLog >&amp;2 ); \
-	else \
-		echo A git clone is required to generate a ChangeLog >&amp;2; \
+	@if test -d ".git"; &#92;
+	then &#92;
+		echo Creating ChangeLog &amp;&amp; &#92;
+		( cd "$(top_srcdir)" &amp;&amp; &#92;
+		  echo '# Generate automatically. Do not edit.'; echo; &#92;
+		  git log --stat --date=short ) > ChangeLog.tmp &#92;
+		&amp;&amp; mv -f ChangeLog.tmp $(DISTNAME)/ChangeLog &#92;
+		|| ( rm -f ChangeLog.tmp ; &#92;
+		     echo Failed to generate ChangeLog >&amp;2 ); &#92;
+	else &#92;
+		echo A git clone is required to generate a ChangeLog >&amp;2; &#92;
 	fi
-	for file in $(FILES); do \
-		cp -rpv $$file $(DISTNAME)/$$file; \
+	for file in $(FILES); do &#92;
+		cp -rpv $$file $(DISTNAME)/$$file; &#92;
 	done
-	for excl in $(EXCLUDES); do \
-		find $(DISTNAME) -name "$$excl" -delete; \
+	for excl in $(EXCLUDES); do &#92;
+		find $(DISTNAME) -name "$$excl" -delete; &#92;
 	done
 	tar -czvf $(DISTBALL) $(DISTNAME)
 	rm -rf $(DISTNAME)
