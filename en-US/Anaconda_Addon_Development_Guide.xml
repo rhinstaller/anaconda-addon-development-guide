@@ -468,27 +468,32 @@
         url="https://github.com/vpodzime/hello-world-anaconda-addon">
         the &HWADDON;</ulink> from <xref
         linkend="section_writing_addon"/>. <indexterm id="idx_hello_world">
-        <primary> &HWADDON; </primary> </indexterm> As it has been
-        mentioned in <xref linkend="section_introduction"/> everything should be
-        supported in the kickstart first, then GUI and TUI pieces can come
-        covering some (or all) configuration options from the kickstart part. As
-        these three parts are more or less independent the Anaconda's addon API
-        defines that they should be separate subpackages of the top-level addon
-        package (i.e. subdirectories of the top-level directory) with the
-        following names: <package>ks</package>, <package>gui</package> and
-        <package>tui</package>, with the <package>ks</package> being the only
-        compulsory one. The <package>gui</package> and <package>tui</package>
-        packages should then contain <package> spokes </package> subpackages.
+        <primary> &HWADDON; </primary> </indexterm> As it has been mentioned in
+        <xref linkend="section_introduction"/> everything should be supported in
+        the kickstart first, then GUI and TUI pieces can come covering some (or
+        all) configuration options from the kickstart part. As these three parts
+        are more or less independent the Anaconda's addon API defines that they
+        should be separate subpackages of the top-level addon package
+        (i.e. subdirectories of the top-level directory) with the following
+        names: <package>ks</package>, <package>gui</package>,
+        <package>tui</package> and <package>categories</package>, with the
+        <package>ks</package> being the only compulsory one. The
+        <package>gui</package> and <package>tui</package> packages should then
+        contain <package> spokes </package> subpackages. The
+        <package>categories</package> package may contain module(s) defining
+        categories if the addon needs to define one or more, but this is not
+        recommended.
         <footnote>
           <para>
-            The <package> gui </package> package may also contain a <package>
-            categories </package> subpackage if the addon needs to define a new
-            category, but this is not recommended.
+            If addon really doesn't fit into any of the categories defined by
+            Anaconda, it may be a good idea a new (as generic as possible)
+            category to Anaconda so that other addons may use it too.
           </para>
         </footnote>
-        All these packages have to contain at least one module with an arbitrary
-        name defining classes inherited from one or more API defined classes. We
-        will get to those classes in <xref linkend="section_writing_addon"/>.
+        All these packages have to contain at least one module
+        with an arbitrary name defining classes inherited from one or more API
+        defined classes. We will get to those classes in <xref
+        linkend="section_writing_addon"/>.
         <important>
           <para>
             Do not forget to create all the <filename>__init__.py</filename>
@@ -894,7 +899,7 @@ _ = lambda x: x
 N_ = lambda x: x
 
 # the path to addons is in sys.path so we can import things from org_fedora_hello_world
-from org_fedora_hello_world.gui.categories.hello_world import HelloWorldCategory
+from org_fedora_hello_world.categories.hello_world import HelloWorldCategory
 from pyanaconda.ui.gui.spokes import NormalSpoke
 
 # export only the spoke, no helper functions, classes or constants
@@ -950,7 +955,7 @@ class HelloWorldSpoke(NormalSpoke):
         a further comment. The first one is the <varname>category</varname>
         attribute the value of which is the
         <classname>HelloWorldCategory</classname> class imported from the
-        <package>org_fedora_hello_world.gui.categories</package> module. We will
+        <package>org_fedora_hello_world.categories</package> module. We will
         get to the <classname>HelloWorldCategory</classname> definition later,
         but for now note what was mentioned in the comment just before the
         import:
@@ -1326,21 +1331,12 @@ class HelloWorldSpoke(NormalSpoke):
           <classname>NormalTUISpoke</classname> class overriding special
           arguments and methods defined by the API. Because the TUI is simpler
           than the GUI there are fewer such arguments, namely two &mdash;
-          <varname>title</varname> and <varname>category</varname>. The former
-          one has the same meaning and type as in the GUI case, but the latter
-          one has to be a string in text mode. Categories are handled in a
-          different way in the GUI and TUI code of the Anaconda installer.
-          <footnote>
-            <para>
-              which is likely to change in the future to sticking to the better
-              (GUI) way
-            </para>
-          </footnote>
+          <varname>title</varname> and <varname>category</varname>. These two
+          have the same meaning as in the case of the GUI spoke.
 
           However, categories are used only for grouping and ordering spokes on
           hubs in the text mode (their titles are not shown anywere), so the
-          easiest thing is to use some preexisting category (a new TUI category
-          would require a patch for the Anaconda installer).
+          easiest thing is to use some preexisting category.
         </para>
 
         <para>
@@ -1560,7 +1556,7 @@ class HelloWorldEditSpoke(EditTUISpoke):
     """Example class demonstrating usage of EditTUISpoke inheritance"""
 
     title = _("Hello World Edit")
-    category = "localization"
+    category = HelloWorldCategory
 
     # simple RE used to specify we only accept a single word as a valid input
     _valid_input = re.compile(r'&#92;w+')
