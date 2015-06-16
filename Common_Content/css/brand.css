@@ -1,0 +1,102 @@
+a:link {
+	color:#0066cc;
+}
+
+a:visited {
+	color:#6699cc;
+}
+
+h1,h2,h3,h4,h5,h6 {
+	color:#3c6eb4;
+}
+
+div.producttitle {
+	color:#3c6eb4;
+}
+
+.section h1.title {
+	color:#3c6eb4;
+}
+
+.formalpara div.title {
+	color: #3c6eb4;
+}
+
+table {
+    border:1px solid #aaa;
+    width: 100%;
+}
+
+table th {
+    background-color:#900;
+    text-align: left;
+    color: white;
+}
+
+table th p:first-child, table td p:first-child, table li p:first-child, table th div.para:first-child,
+table td div.para:first-child, table li div.para:first-child {
+    margin-top: 0px;
+    padding-top: 0px;
+    display: inline;
+}
+
+table tr.even td {
+    background-color:#f5f5f5;
+}
+
+/*.revhistory table th {
+	color:#3c6eb4;
+}*/
+
+.titlepage .edition {
+	color: #3c6eb4;
+}
+
+span.remark{
+    background-color: #ffff00;
+}
+
+.home{
+    color: #3c6eb4;
+}
+
+/*
+    Some styles taken from the old Publican 3 brand
+*/
+.revhistory table {
+    background-color:transparent;
+    border-color:#fff;
+    padding:0px;
+    margin: 0;
+    border-collapse:collapse;
+    border-style:none;
+}
+
+.revhistory td {
+    text-align :left;
+    padding:0px;
+    border: none;
+    border-top: 1px solid #fff;
+    font-weight: bold;
+}
+
+.revhistory .simplelist td {
+    font-weight: normal;
+}
+
+.revhistory .simplelist {
+    margin-bottom: 1.5em;
+    margin-left: 1em;
+}
+
+.revhistory table th {
+    display: none;
+}
+
+tr:nth-child(even) {
+    background-color: #eeeeee;
+}
+
+table table td {
+    background-color: white;
+}

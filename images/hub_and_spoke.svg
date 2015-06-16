@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="850.17737"
+   height="395.92694"
+   id="svg3344"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="/home/vpodzime/Documents/work/prezentace_DevConf/hub_and_spoke.png"
+   inkscape:export-xdpi="601.07001"
+   inkscape:export-ydpi="601.07001"
+   sodipodi:docname="New document 2">
+  <defs
+     id="defs3346">
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleOutL"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4651"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3207"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3209"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3211"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3213"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3215"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3217"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3219"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3221"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3223"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3225"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3227"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3229"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3231"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3233"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3235"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3237"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3239"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3241"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3243"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3245"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3247"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3249"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3251"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3253"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3255"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3257"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker3259"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3261"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.064381"
+     inkscape:cx="421.79745"
+     inkscape:cy="177.71983"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="10"
+     fit-margin-left="10"
+     fit-margin-right="10"
+     fit-margin-bottom="10"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="33"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3349">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-104.38364,-462.10782)">
+    <g
+       id="g74523"
+       transform="matrix(1.3945237,0,0,1.7874684,0.25059178,-403.4724)">
+      <rect
+         y="571"
+         x="619"
+         height="42"
+         width="57"
+         id="rect73848"
+         style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:none" />
+      <rect
+         style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect73850"
+         width="57"
+         height="42"
+         x="463"
+         y="571" />
+      <rect
+         y="571"
+         x="243"
+         height="42"
+         width="57"
+         id="rect73852"
+         style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:none" />
+      <rect
+         style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect73854"
+         width="57"
+         height="42"
+         x="83"
+         y="571" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.15426064;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#TriangleOutL)"
+         d="m 135.00001,593 100.4853,0"
+         id="path73866"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path73868"
+         d="m 289.99998,593 167.9543,0"
+         style="fill:none;stroke:#000000;stroke-width:1.15426052;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#TriangleOutL)" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.15426064;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#TriangleOutL)"
+         d="m 510.00001,593 103.89956,0"
+         id="path73870"
+         inkscape:connector-curvature="0" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text73878"
+         y="590"
+         x="111.58907"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           id="tspan73880"
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+           y="590"
+           x="111.58907"
+           sodipodi:role="line">SCREEN</tspan><tspan
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+           y="602.5"
+           x="111.58907"
+           sodipodi:role="line"
+           id="tspan73882">1</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="269.58908"
+         y="590"
+         id="text73884"
+         sodipodi:linespacing="125%"><tspan
+           id="tspan73888"
+           sodipodi:role="line"
+           x="269.58908"
+           y="590"
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">HUB</tspan><tspan
+           id="tspan73932"
+           sodipodi:role="line"
+           x="269.58908"
+           y="602.5"
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">1</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text73890"
+         y="590"
+         x="489.58908"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           id="tspan73892"
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+           y="590"
+           x="489.58908"
+           sodipodi:role="line">HUB</tspan><tspan
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+           y="602.5"
+           x="489.58908"
+           sodipodi:role="line"
+           id="tspan73894">2</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="645.58911"
+         y="590"
+         id="text73896"
+         sodipodi:linespacing="125%"><tspan
+           id="tspan73900"
+           sodipodi:role="line"
+           x="645.58911"
+           y="590"
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+           id="tspan74028"
+           sodipodi:role="line"
+           x="645.58911"
+           y="602.5"
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">14</tspan></text>
+      <g
+         transform="translate(0,52)"
+         style="opacity:0.47087384"
+         id="g74144">
+        <rect
+           y="461"
+           x="177"
+           height="42"
+           width="57"
+           id="rect73856"
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0" />
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="203.58908"
+           y="480"
+           id="text73902"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan73906"
+             sodipodi:role="line"
+             x="203.58908"
+             y="480"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+             sodipodi:role="line"
+             x="203.58908"
+             y="492.5"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             id="tspan73938">2</tspan></text>
+        <rect
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0"
+           id="rect73940"
+           width="57"
+           height="42"
+           x="243"
+           y="439" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text73942"
+           y="458"
+           x="269.58908"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="458"
+             x="269.58908"
+             sodipodi:role="line"
+             id="tspan73944">SCREEN</tspan><tspan
+             id="tspan73946"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="470.5"
+             x="269.58908"
+             sodipodi:role="line">3</tspan></text>
+        <rect
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0"
+           id="rect73948"
+           width="57"
+           height="42"
+           x="309"
+           y="461" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text73950"
+           y="480"
+           x="335.58908"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="480"
+             x="335.58908"
+             sodipodi:role="line"
+             id="tspan73952">SCREEN</tspan><tspan
+             id="tspan73954"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="492.5"
+             x="335.58908"
+             sodipodi:role="line">4</tspan></text>
+        <rect
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0"
+           id="rect73956"
+           width="57"
+           height="42"
+           x="177"
+           y="579" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text73958"
+           y="598"
+           x="203.58908"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="598"
+             x="203.58908"
+             sodipodi:role="line"
+             id="tspan73960">SCREEN</tspan><tspan
+             id="tspan73962"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="610.5"
+             x="203.58908"
+             sodipodi:role="line">5</tspan></text>
+        <rect
+           y="601"
+           x="243"
+           height="42"
+           width="57"
+           id="rect73964"
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0" />
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="271.58908"
+           y="620"
+           id="text73966"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan73968"
+             sodipodi:role="line"
+             x="271.58908"
+             y="620"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+             sodipodi:role="line"
+             x="271.58908"
+             y="632.5"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             id="tspan73970">6</tspan></text>
+        <rect
+           y="579"
+           x="309"
+           height="42"
+           width="57"
+           id="rect73972"
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0" />
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="337.58908"
+           y="598"
+           id="text73974"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan73976"
+             sodipodi:role="line"
+             x="337.58908"
+             y="598"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+             sodipodi:role="line"
+             x="337.58908"
+             y="610.5"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             id="tspan73978">7</tspan></text>
+        <rect
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0"
+           id="rect73980"
+           width="57"
+           height="42"
+           x="397"
+           y="461" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text73982"
+           y="480"
+           x="423.58908"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="480"
+             x="423.58908"
+             sodipodi:role="line"
+             id="tspan73984">SCREEN</tspan><tspan
+             id="tspan73986"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="492.5"
+             x="423.58908"
+             sodipodi:role="line">8</tspan></text>
+        <rect
+           y="439"
+           x="463"
+           height="42"
+           width="57"
+           id="rect73988"
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0" />
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="489.58908"
+           y="458"
+           id="text73990"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan73992"
+             sodipodi:role="line"
+             x="489.58908"
+             y="458"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+             sodipodi:role="line"
+             x="489.58908"
+             y="470.5"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             id="tspan73994">9</tspan></text>
+        <rect
+           y="461"
+           x="529"
+           height="42"
+           width="57"
+           id="rect73996"
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0" />
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="555.58911"
+           y="480"
+           id="text73998"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan74000"
+             sodipodi:role="line"
+             x="555.58911"
+             y="480"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+             sodipodi:role="line"
+             x="555.58911"
+             y="492.5"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             id="tspan74002">10</tspan></text>
+        <rect
+           y="579"
+           x="397"
+           height="42"
+           width="57"
+           id="rect74004"
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0" />
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="423.58908"
+           y="598"
+           id="text74006"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan74008"
+             sodipodi:role="line"
+             x="423.58908"
+             y="598"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass">SCREEN</tspan><tspan
+             sodipodi:role="line"
+             x="423.58908"
+             y="610.5"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             id="tspan74010">11</tspan></text>
+        <rect
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0"
+           id="rect74012"
+           width="57"
+           height="42"
+           x="463"
+           y="605" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text74014"
+           y="624"
+           x="489.58908"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="624"
+             x="489.58908"
+             sodipodi:role="line"
+             id="tspan74016">SCREEN</tspan><tspan
+             id="tspan74018"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="636.5"
+             x="489.58908"
+             sodipodi:role="line">12</tspan></text>
+        <rect
+           style="fill:none;stroke:#808080;stroke-width:2.30852127;stroke-miterlimit:4;stroke-dasharray:4.61704216, 4.61704216;stroke-dashoffset:0"
+           id="rect74020"
+           width="57"
+           height="42"
+           x="529"
+           y="579" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text74022"
+           y="598"
+           x="555.58911"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="598"
+             x="555.58911"
+             sodipodi:role="line"
+             id="tspan74024">SCREEN</tspan><tspan
+             id="tspan74026"
+             style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Overpass;-inkscape-font-specification:Overpass"
+             y="610.5"
+             x="555.58911"
+             sodipodi:role="line">13</tspan></text>
+      </g>
+      <path
+         inkscape:connector-curvature="0"
+         id="path74118"
+         d="m 271.955,570.505 0,-33.03052"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#TriangleOutL)"
+         d="m 271.955,613.21818 0,33.89324"
+         id="path74120"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="cccc"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         d="m 288.955,572.24737 0,-8.25763 49,-0.25763 0,-8.25763"
+         id="path74122"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path74124"
+         d="m 251.915,572.24737 0,-8.25763 -49,-0.25763 0,-8.25763"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         sodipodi:nodetypes="cccc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path74128"
+         d="m 288.955,612.90464 0,8.25763 49,0.25763 0,8.25763"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         sodipodi:nodetypes="cccc" />
+      <path
+         sodipodi:nodetypes="cccc"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         d="m 251.915,612.90464 0,8.25763 -49,0.25763 0,8.25763"
+         id="path74130"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         d="m 491.955,570.505 0,-33.03052"
+         id="path74132"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path74134"
+         d="m 491.955,613.21818 0,33.89324"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#TriangleOutL)" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path74136"
+         d="m 508.955,572.24737 0,-8.25763 49,-0.25763 0,-8.25763"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         sodipodi:nodetypes="cccc" />
+      <path
+         sodipodi:nodetypes="cccc"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         d="m 471.915,572.24737 0,-8.25763 -49,-0.25763 0,-8.25763"
+         id="path74138"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="cccc"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         d="m 508.955,612.90464 0,8.25763 49,0.25763 0,8.25763"
+         id="path74140"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path74142"
+         d="m 471.915,612.90464 0,8.25763 -49,0.25763 0,8.25763"
+         style="fill:none;stroke:#000000;stroke-width:1.14271808;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.28543603, 2.28543603;stroke-dashoffset:0;marker-end:url(#TriangleOutL)"
+         sodipodi:nodetypes="cccc" />
+    </g>
+  </g>
+</svg>

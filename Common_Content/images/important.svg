@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="48"
+   height="48"
+   id="svg5921"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="important.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/jfearn/Build/src/fedora/publican/trunk/publican-fedora/en-US/images/important.png"
+   inkscape:export-xdpi="111.32"
+   inkscape:export-ydpi="111.32">
+  <metadata
+     id="metadata2611">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="681"
+     inkscape:window-width="738"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     inkscape:zoom="11.5"
+     inkscape:cx="20"
+     inkscape:cy="20"
+     inkscape:window-x="0"
+     inkscape:window-y="51"
+     inkscape:current-layer="svg5921" />
+  <defs
+     id="defs5923">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 20 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="40 : 20 : 1"
+       inkscape:persp3d-origin="20 : 13.333333 : 1"
+       id="perspective2613" />
+  </defs>
+  <g
+     transform="matrix(0.4626799,0,0,0.4626799,-5.2934127,-3.3160376)"
+     id="g5485">
+    <path
+       d="M 29.97756,91.885882 L 55.586992,80.409826 L 81.231619,91.807015 L 78.230933,63.90468 L 96.995009,43.037218 L 69.531053,37.26873 L 55.483259,12.974592 L 41.510292,37.311767 L 14.064204,43.164717 L 32.892392,63.97442 L 29.97756,91.885882 z"
+       id="path6799"
+       style="fill:#f3de82;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.536215,56.538729 L 55.48324,12.974601 L 41.51028,37.311813 L 55.536215,56.538729 z"
+       id="path6824"
+       style="opacity:0.91005291;fill:#f9f2cb;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.57947,56.614318 L 78.241135,63.937979 L 96.976198,43.044318 L 55.57947,56.614318 z"
+       id="use6833"
+       style="opacity:1;fill:#d0bc64;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.523838,56.869126 L 55.667994,80.684281 L 81.379011,91.931065 L 55.523838,56.869126 z"
+       id="use6835"
+       style="opacity:1;fill:#e0c656;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.283346,56.742618 L 13.877363,43.200977 L 32.640089,64.069652 L 55.283346,56.742618 z"
+       id="use6831"
+       style="opacity:1;fill:#d1ba59;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.472076,56.869126 L 55.32792,80.684281 L 29.616903,91.931065 L 55.472076,56.869126 z"
+       id="use6837"
+       style="opacity:1;fill:#d2b951;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.57947,56.614318 L 96.976198,43.044318 L 69.504294,37.314027 L 55.57947,56.614318 z"
+       id="path7073"
+       style="opacity:1;fill:#f6e7a3;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.523838,56.869126 L 81.379011,91.931065 L 78.214821,64.046881 L 55.523838,56.869126 z"
+       id="path7075"
+       style="opacity:1;fill:#f6e7a3;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.283346,56.742618 L 41.341708,37.434209 L 13.877363,43.200977 L 55.283346,56.742618 z"
+       id="path7077"
+       style="opacity:1;fill:#f6e59d;fill-opacity:1;enable-background:new" />
+    <path
+       d="M 55.472076,56.869126 L 29.616903,91.931065 L 32.781093,64.046881 L 55.472076,56.869126 z"
+       id="path7079"
+       style="opacity:1;fill:#f3df8b;fill-opacity:1;enable-background:new" />
+  </g>
+</svg>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">6.3. Textual user interface</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-21-en-US-1-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="section_writing_addon.html" title="6. Writing an Anaconda addon" /><link rel="prev" href="advanced_features.html" title="6.2.2. Advanced features" /><link rel="next" href="section_deploying_and_testing.html" title="7. Deploying and testing an Anaconda addon" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="advanced_features.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="section_deploying_and_testing.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h3 class="title"><a id="section_tui">
+      ⁠</a>6.3. Textual user interface</h3></div></div></div><div class="para">
+				The <a class="xref" href="index.html#section_introduction">Section 1, “Introduction”</a> mentions that apart from the GUI installation, the Anaconda installer also supports text mode installation that may be the only choice on some hardware configurations. The previous <a class="xref" href="section_gui_support.html">Section 6.2, “Graphical user interface”</a> describes, how it is possible for an addon to define and implement graphical screens for the installer allowing user interaction. Now it's time to have a look at the text mode which is based on the Anaconda's <span class="emphasis"><em>simpleline</em></span> toolkit that is suitable for purely textual output without any "advanced" features like colours, fonts, cursor movement etc.
+			</div><div class="para">
+				Internally, there are three main classes in the <span class="emphasis"><em>simpleline</em></span> toolkit — <code class="classname">App</code>, <code class="classname">UIScreen</code> and <code class="classname">Widget</code>. Widgets, which are elemental units containing the information to be shown (printed) to the user, are placed on the UIScreens that are switched by a single instance of the <code class="classname">App</code> class. On top of those basic elements there are hubs, spokes and dialogs all containing various widgets similarly as in the GUI. So from the addon's perspective, the most important classes are the <code class="classname">NormalTUISpoke</code> and various other classes defined in the <span class="package">pyanaconda.ui.tui.spokes</span> package. All those classes are based on the <code class="classname">TUIObject</code> class which is an equivalent of the <code class="classname">GUIObject</code> class mentioned in the previous chapter.
+			</div><div class="para">
+				Creating a text spoke for an addon again means creating subpackages of the main addon's package. This time it has to be named <code class="filename">tui</code> and the directory for spokes has to be, surprisingly, named <code class="filename">spokes</code>. A TUI spoke is again a Python class this time inheriting from the <code class="classname">NormalTUISpoke</code> class overriding special arguments and methods defined by the API. Because the TUI is simpler than the GUI there are fewer such arguments, namely two — <code class="varname">title</code> and <code class="varname">category</code>. These two have the same meaning as in the case of the GUI spoke. However, categories are used only for grouping and ordering spokes on hubs in the text mode (their titles are not shown anywere), so the easiest thing is to use some preexisting category.
+			</div><div class="para">
+				Apart from the two arguments, the spoke class is expected to define (override) a few methods — <code class="methodname">__init__</code>, <code class="methodname">initialize</code>, <code class="methodname">refresh</code>, <code class="methodname">refresh</code>, <code class="methodname">apply</code>, <code class="methodname">execute</code>, <code class="methodname">input</code>, <code class="methodname">prompt</code> — and properties described in the <a class="xref" href="section_gui_support.html">Section 6.2, “Graphical user interface”</a> for the case of a GUI spoke. Let's have a look on a trivial TUI spoke defined in the Hello world addon. We could start with the methods:
+			</div><pre class="programlisting">    def __init__(self, app, data, storage, payload, instclass):
+        """
+        :see: pyanaconda.ui.tui.base.UIScreen
+        :see: pyanaconda.ui.tui.base.App
+        :param app: reference to application which is a main class for TUI
+                    screen handling, it is responsible for mainloop control
+                    and keeping track of the stack where all TUI screens are
+                    scheduled
+        :type app: instance of pyanaconda.ui.tui.base.App
+        :param data: data object passed to every spoke to load/store data
+                     from/to it
+        :type data: pykickstart.base.BaseHandler
+        :param storage: object storing storage-related information
+                        (disks, partitioning, bootloader, etc.)
+        :type storage: blivet.Blivet
+        :param payload: object storing packaging-related information
+        :type payload: pyanaconda.packaging.Payload
+        :param instclass: distribution-specific information
+        :type instclass: pyanaconda.installclass.BaseInstallClass
+
+        """
+
+        NormalTUISpoke.__init__(self, app, data, storage, payload, instclass)
+        self._entered_text = ""
+
+    def initialize(self):
+        """
+        The initialize method that is called after the instance is created.
+        The difference between __init__ and this method is that this may take
+        a long time and thus could be called in a separated thread.
+
+        :see: pyanaconda.ui.common.UIObject.initialize
+
+        """
+
+        NormalTUISpoke.initialize(self)
+
+    def refresh(self, args=None):
+        """
+        The refresh method that is called every time the spoke is displayed.
+        It should update the UI elements according to the contents of
+        self.data.
+
+        :see: pyanaconda.ui.common.UIObject.refresh
+        :see: pyanaconda.ui.tui.base.UIScreen.refresh
+        :param args: optional argument that may be used when the screen is
+                     scheduled (passed to App.switch_screen* methods)
+        :type args: anything
+        :return: whether this screen requests input or not
+        :rtype: bool
+
+        """
+
+        self._entered_text = self.data.addons.org_fedora_hello_world.text
+        return True
+
+    def apply(self):
+        """
+        The apply method that is called when the spoke is left. It should
+        update the contents of self.data with values set in the spoke.
+
+        """
+
+        self.data.addons.org_fedora_hello_world.text = self._entered_text
+
+    def execute(self):
+        """
+        The excecute method that is called when the spoke is left. It is
+        supposed to do all changes to the runtime environment according to
+        the values set in the spoke.
+
+        """
+
+        # nothing to do here
+        pass
+
+    def input(self, args, key):
+        """
+        The input method that is called by the main loop on user's input.
+
+        :param args: optional argument that may be used when the screen is
+                     scheduled (passed to App.switch_screen* methods)
+        :type args: anything
+        :param key: user's input
+        :type key: unicode
+        :return: if the input should not be handled here, return it, otherwise
+                 return True or False if the input was processed succesfully or
+                 not respectively
+        :rtype: bool|unicode
+
+        """
+
+        if key:
+            self._entered_text = key
+
+        # no other actions scheduled, apply changes
+        self.apply()
+
+        # close the current screen (remove it from the stack)
+        self.close()
+        return True
+
+    def prompt(self, args=None):
+        """
+        The prompt method that is called by the main loop to get the prompt
+        for this screen.
+
+        :param args: optional argument that can be passed to App.switch_screen*
+                     methods
+        :type args: anything
+        :return: text that should be used in the prompt for the input
+        :rtype: unicode|None
+
+        """
+
+        return _("Enter a new text or leave empty to use the old one: ")</pre><div class="para">
+				There is no need to override the <code class="methodname">__init__</code> method if it just calls the ancestor's <code class="methodname">__init__</code> method, but the comments in the example code describe the arguments passed to constructors of spoke classes in an understandable way. The <code class="methodname">initialize</code> method just sets up a default value for the spoke's internal attribute which is then updated by the <code class="methodname">refresh</code> method and used by the <code class="methodname">apply</code> method to update the kickstart data. The only differences from the GUI equivalents of those two methods are the return type of the <code class="methodname">refresh</code> method that is <span class="type">bool</span> instead of <span class="type">None</span> and an additional <code class="varname">args</code> argument it takes. The meaning of the returned value is explained in the comment — it tells the application (the single <code class="classname">App</code> class instance) whether that spoke requires input from user or not. The additional <code class="varname">args</code> argument is used for passing extra information to the spoke when it scheduled. Then there is also the <code class="methodname">execute</code> method with the same purpose as in the GUI and with the same <span class="emphasis"><em>pass</em></span> statement doing all that is needed in such a trivial case.
+			</div><div class="para">
+				The <code class="methodname">input</code> and <code class="methodname">prompt</code> methods are TUI-specific and as thier names suggest they are responsible for interaction with the user. The <code class="methodname">prompt</code> method should simply return the prompt that should be printed once the content of the spoke is printed. After a user enters some string in a reaction to the prompt, the entered string is passed to the <code class="methodname">input</code> method for processing. The <code class="methodname">input</code> method usually needs to parse the input and take some actions based on its type and value. Since our spoke just asks for some value, the value is simply stored in an internal attribute. But typically there are some non-trivial actions done like accepting the 'c' or 'r' inputs for continuing or refreshing, respectively, converting numbers into integers and showing additional screens or toggling bool values based on them etc. In contrast to the GUI code, the <code class="methodname">apply</code> method is not called automatically when leaving the spoke, so we need to call it explicitly from the <code class="methodname">input</code> method. The same applies to closing (hiding) the spoke's screen done by calling the <code class="methodname">close</code> method of the spoke. If we want to show another screen (need some additional info from user entered in a different spoke, dialog, etc.) we can also instantiate another <code class="classname">TUIObject</code> here and call one of the <code class="methodname">self.app.switch_screen*</code> methods of the <code class="classname">App</code>. The last interesting thing about the <code class="methodname">input</code> method is its return value. It has to be either <code class="varname">INPUT_PROCESSED</code> or <code class="varname">INPUT_DISCARDED</code> constant (both defined in the <span class="package">pyanaconda.constants_text</span> module) or the input string itself in case such an input should be processed by some other screen.
+			</div><div class="para">
+				Since the restrictions of the text user interface are quite strong the TUI spokes typically have a very similar structure — a list of checkboxes or entries that should be (un)checked or populated by the user. The previous paragraphs show the imperative way of implementing such TUI spoke where the spoke's methods handle printing and processing of the available and provided data. However, there is a different, simpler way of doing that by using the declarative <code class="classname">EditTUISpoke</code> class from the <span class="package">pyanaconda.ui.tui.spokes</span> package. By inheriting from this class, it is possible to implement a typical TUI spoke by just specifying fields and attributes that should be set on the spoke. The following code defines an example spoke implemented that way:
+			</div><pre class="programlisting">class _EditData(object):
+    """Auxiliary class for storing data from the example EditSpoke"""
+
+    def __init__(self):
+        """Trivial constructor just defining the fields that will store data"""
+
+        self.checked = False
+        self.shown_input = ""
+        self.hidden_input = ""
+
+class HelloWorldEditSpoke(EditTUISpoke):
+    """Example class demonstrating usage of EditTUISpoke inheritance"""
+
+    title = _("Hello World Edit")
+    category = HelloWorldCategory
+
+    # simple RE used to specify we only accept a single word as a valid input
+    _valid_input = re.compile(r'\w+')
+
+    # special class attribute defining spoke's entries as:
+    # Entry(TITLE, ATTRIBUTE, CHECKING_RE or TYPE, SHOW_FUNC or SHOW)
+    # where:
+    #   TITLE specifies descriptive title of the entry
+    #   ATTRIBUTE specifies attribute of self.args that should be set to the
+    #             value entered by the user (may contain dots, i.e. may specify
+    #             a deep attribute)
+    #   CHECKING_RE specifies compiled RE used for deciding about
+    #               accepting/rejecting user's input
+    #   TYPE may be one of EditTUISpoke.CHECK or EditTUISpoke.PASSWORD used
+    #        instead of CHECKING_RE for simple checkboxes or password entries,
+    #        respectively
+    #   SHOW_FUNC is a function taking self and self.args and returning True or
+    #             False indicating whether the entry should be shown or not
+    #   SHOW is a boolean value that may be used instead of the SHOW_FUNC
+    #
+    #   :see: pyanaconda.ui.tui.spokes.EditTUISpoke
+    edit_fields = [
+        Entry("Simple checkbox", "checked", EditTUISpoke.CHECK, True),
+        Entry("Always shown input", "shown_input", _valid_input, True),
+        Entry("Conditioned input", "hidden_input", _valid_input,
+              lambda self, args: bool(args.shown_input)),
+        ]
+
+    def __init__(self, app, data, storage, payload, instclass):
+        EditTUISpoke.__init__(self, app, data, storage, payload, instclass)
+
+        # just populate the self.args attribute to have a store for data
+        # typically self.data or a subtree of self.data is used as self.args
+        self.args = _EditData()
+
+    @property
+    def completed(self):
+        # completed if user entered something non-empty to the Conditioned input
+        return bool(self.args.hidden_input)
+
+    @property
+    def status(self):
+        return "Hidden input %s" % ("entered" if self.args.hidden_input
+                                    else "not entered")
+
+    def apply(self):
+        # nothing needed here, values are set in the self.args tree
+        pass</pre><div class="para">
+				The auxiliary class <code class="classname">_EditData</code> just serves as a data container that is used for storing values entered by the user. The <code class="classname">HelloWorldEditSpoke</code> defines a simple spoke with one checkbox and two entries (all of which are instances of the <code class="classname">EditTUISpokeEntry</code> class imported as the <code class="classname">Entry</code> class). The first one is shown every time the spoke is displayed and the second one that is shown only if there is some non-empty value set in the first one. The comments in the example code should be enough explanatory to guide reader through the declarative definition of a TUI spoke by using the <code class="classname">EditTUISpoke</code> class.
+			</div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="advanced_features.html"><strong>Prev</strong>6.2.2. Advanced features</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="section_deploying_and_testing.html"><strong>Next</strong>7. Deploying and testing an Anaconda addon</a></li></ul></body></html>

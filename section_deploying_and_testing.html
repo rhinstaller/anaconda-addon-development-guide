@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">7. Deploying and testing an Anaconda addon</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-21-en-US-1-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="index.html" title="Anaconda Addon Development Guide" /><link rel="prev" href="section_tui.html" title="6.3. Textual user interface" /><link rel="next" href="section_final_words.html" title="8. Addons welcomed" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="section_tui.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="section_final_words.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h2 class="title"><a id="section_deploying_and_testing">
+      ⁠</a>7. Deploying and testing an Anaconda addon</h2></div></div></div><div class="para">
+			As was mentioned in the previous section, there are some packages required for development of an Anaconda addon. In particular the <span class="package">anaconda-widgets</span> and <span class="package">anaconda-widgets-devel</span> packages that contain the widgets, glade specifications etc. and the <span class="package">anaconda</span> package that contains the <span class="package">pyanaconda</span> Python package (needed for running pylint checks and so on).
+		</div><div class="para">
+			To test a newly created addon one needs to put it in the installation environment and let the Anaconda installer collect addon's classes and definitions. Addons are collected from the <code class="filename">/usr/share/anaconda/addons/</code> directory, that is expected to contain addons' Python packages (directory trees). The easiest way to achieve that is to create the <code class="filename">usr/share/anaconda/addons/</code> directory tree somewhere, place a copy of the addon's package into it and then run the following command:
+		</div><pre class="programlisting">$ find . |cpio -c -o |gzip -9 &gt; addon_updates.img</pre><div class="para">
+			The result is a gzipped cpio archive, but at the same time a so-called <span class="emphasis"><em>updates image</em></span> that can be uploaded to a web server or copied to a USB drive and used to update the installation environment. If a boot option formatted as <span class="emphasis"><em>"updates=UPDATES_IMAGE_URL"</em></span> is used when booting into the installer, Anaconda fetches the updates image, and unpacks it to the installation environment. <a id="idm242239944400">
+      ⁠</a><a xmlns:d="http://docbook.org/ns/docbook" href="#ftn.idm242239944400" class="footnote"><sup class="footnote">[7]</sup></a> If everything goes well, all addon's classes are collected by the installer, the kickstart section (if any) is passed to the addon to process, spokes are shown on the hub etc.
+		</div><div class="para">
+			Once an addon is tested and ready to be deployed it should be packaged as a Fedora package  to facilitate creation of the installation images containing the addon (so-called <span class="emphasis"><em>composes</em></span> <a id="compose" class="indexterm"></a>. That requires writing a so-called <span class="emphasis"><em>spec</em></span><a id="spec" class="indexterm"></a> file which defines and describes an RPM package. The basic structure of an addon spec file may look like this:
+		</div><pre class="programlisting">Name:           example-anaconda-addon
+Version:        0.1
+Release:        1%{?dist}
+Summary:        Anaconda addon useful for something in the installation process
+
+License:        GPLv2+
+URL:            https://git.fedorahosted.org/cgit/example-anaconda-addon.git
+
+Source0:        %{name}-%{version}.tar.gz
+
+BuildArch:      noarch
+BuildRequires:	python2-devel
+BuildRequires:  anaconda &gt;= 19
+Requires:       anaconda &gt;= 19
+
+%description
+This is an addon that brings some useful additional functionality to the
+Anaconda installer.
+
+%prep
+%setup -q
+
+%build
+
+%check
+make test
+
+%install
+make install DESTDIR=%{buildroot}
+
+%files
+%{_datadir}/anaconda/addons/org_fedora_example
+
+%doc COPYING ChangeLog README
+
+%changelog
+* Mon Jan 6 2014 Great Author &lt;great.author@example.com&gt; - 0.1-1
+- Initial RPM for the example-anaconda-addon</pre><div class="para">
+			Such spec file makes use of the <code class="command">make</code> utility with the following example Makefile: <a id="Makefile" class="indexterm"></a>
+		</div><pre class="programlisting">NAME = example-anaconda-addon
+
+VERSION = 0.1
+
+ADDON = org_fedora_example
+TESTS = tests
+
+FILES = $(ADDON) \
+	$(TESTS) \
+	COPYING \
+	Makefile \
+	README
+
+EXCLUDES = \
+	*.pyc
+
+all:
+	@echo "usage: make dist"
+	@echo "       make test"
+	@echo "       make install"
+	@echo "       make uninstall"
+
+DISTNAME = $(NAME)-$(VERSION)
+ADDONDIR = /usr/share/anaconda/addons/
+DISTBALL = $(DISTNAME).tar.gz
+
+install:
+	mkdir -p $(DESTDIR)$(ADDONDIR)
+	cp -rv $(ADDON) $(DESTDIR)$(ADDONDIR)
+
+uninstall:
+	rm -rfv $(DESTDIR)$(ADDONDIR)
+
+dist:
+	rm -rf $(DISTNAME)
+	mkdir -p $(DISTNAME)
+	@if test -d ".git"; \
+	then \
+		echo Creating ChangeLog &amp;&amp; \
+		( cd "$(top_srcdir)" &amp;&amp; \
+		  echo '# Generate automatically. Do not edit.'; echo; \
+		  git log --stat --date=short ) &gt; ChangeLog.tmp \
+		&amp;&amp; mv -f ChangeLog.tmp $(DISTNAME)/ChangeLog \
+		|| ( rm -f ChangeLog.tmp ; \
+		     echo Failed to generate ChangeLog &gt;&amp;2 ); \
+	else \
+		echo A git clone is required to generate a ChangeLog &gt;&amp;2; \
+	fi
+	for file in $(FILES); do \
+		cp -rpv $$file $(DISTNAME)/$$file; \
+	done
+	for excl in $(EXCLUDES); do \
+		find $(DISTNAME) -name "$$excl" -delete; \
+	done
+	tar -czvf $(DISTBALL) $(DISTNAME)
+	rm -rf $(DISTNAME)
+
+test:
+	PYTHONPATH=. nosetests --processes=-1 -vw tests/</pre><div class="footnotes"><br /><hr /><div id="ftn.idm242239944400" class="footnote"><div class="para"><a href="#idm242239944400" class="para"><sup class="para">[7] </sup></a>
+				overwriting the files that already exist with the files from the updates image (which is how the Anaconda developers use those files for testing patches)
+			</div></div></div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="section_tui.html"><strong>Prev</strong>6.3. Textual user interface</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="section_final_words.html"><strong>Next</strong>8. Addons welcomed</a></li></ul></body></html>

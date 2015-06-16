@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">6.2. Graphical user interface</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-21-en-US-1-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="section_writing_addon.html" title="6. Writing an Anaconda addon" /><link rel="prev" href="section_writing_addon.html" title="6. Writing an Anaconda addon" /><link rel="next" href="advanced_features.html" title="6.2.2. Advanced features" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="section_writing_addon.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="advanced_features.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h3 class="title"><a id="section_gui_support">
+      ⁠</a>6.2. Graphical user interface</h3></div></div></div><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h4 class="title"><a id="basic_features">
+      ⁠</a>6.2.1. Basic features</h4></div></div></div><div class="para">
+					Since the textual interface uses a custom toolkit developed for the Anaconda installer, let's start with the Graphical user interface using standard Gtk toolkit that should be more familiar to developers. Again, first we need a subdirectory (subpackage) in the addon's top-level directory (package). The one for the GUI code must be named <code class="filename">gui</code> and since there are more types of objects it can provide, it needs to have subdirectories itself. We will start with the most important and most common one — <code class="filename">spokes</code>. As it was described in the <a class="xref" href="section_writing_addon.html#section_kickstart_support">Section 6.1, “Kickstart support”</a> every part of the addon has to contain at least one module with a definition of a class inherited from a particular class defined by the API. In case of the kickstart support this class was the <code class="classname">AddonData</code> class in case of the GUI support there are multiple such classes. But the only recommended one for an addon is the <code class="classname">NormalSpoke</code> class defined in the <span class="package">pyanaconda.ui.gui.spokes</span> package. As its name suggests it is a class for the <span class="emphasis"><em>normal spoke</em></span> screen described in the <a class="xref" href="section_hub_and_spoke.html">Section 3, “Hub&amp;Spoke model”</a>. To implement a new class inherited from the <code class="classname">NormalSpoke</code> class we need to define the folowing class attributes required by the API:
+				</div><div xmlns:d="http://docbook.org/ns/docbook" class="itemizedlist"><ul><li class="listitem"><div class="para">
+							<code class="varname">builderObjects</code> that should list all top-level objects from the spoke's <code class="filename">.glade</code> file that should be, with their children objects (recursively), exposed to the spoke or should be an empty list if everything should be exposed to the spoke (not recommended),
+						</div></li><li class="listitem"><div class="para">
+							<code class="varname">mainWidgetName</code> containing the id of the main window widget <a id="idm242240074240">
+      ⁠</a><a href="#ftn.idm242240074240" class="footnote"><sup class="footnote">[5]</sup></a> as defined in the <code class="filename">.glade</code> file,
+						</div></li><li class="listitem"><div class="para">
+							<code class="varname">uiFile</code> containing the name of the <code class="filename">.glade</code> file,
+						</div></li><li class="listitem"><div class="para">
+							<code class="varname">category</code> containing the class of the category the spoke belongs to,
+						</div></li><li class="listitem"><div class="para">
+							<code class="varname">icon</code> containing the identifier of the icon that will be used for the spoke on the hub and
+						</div></li><li class="listitem"><div class="para">
+							<code class="varname">title</code> defining the title that will be used for the spoke on the hub.
+						</div></li></ul></div><div class="para">
+					The code with all those definitions will then look like this:
+				</div><pre class="programlisting"># will never be translated
+_ = lambda x: x
+N_ = lambda x: x
+
+# the path to addons is in sys.path so we can import things from org_fedora_hello_world
+from org_fedora_hello_world.categories.hello_world import HelloWorldCategory
+from pyanaconda.ui.gui.spokes import NormalSpoke
+
+# export only the spoke, no helper functions, classes or constants
+__all__ = ["HelloWorldSpoke"]
+
+class HelloWorldSpoke(NormalSpoke):
+    """
+    Class for the Hello world spoke. This spoke will be in the Hello world
+    category and thus on the Summary hub. It is a very simple example of
+    a unit for the Anaconda's graphical user interface.
+
+    :see: pyanaconda.ui.common.UIObject
+    :see: pyanaconda.ui.common.Spoke
+    :see: pyanaconda.ui.gui.GUIObject
+
+    """
+
+    ### class attributes defined by API ###
+
+    # list all top-level objects from the .glade file that should be exposed
+    # to the spoke or leave empty to extract everything
+    builderObjects = ["helloWorldSpokeWindow", "buttonImage"]
+
+    # the name of the main window widget
+    mainWidgetName = "helloWorldSpokeWindow"
+
+    # name of the .glade file in the same directory as this source
+    uiFile = "hello_world.glade"
+
+    # category this spoke belongs to
+    category = HelloWorldCategory
+
+    # spoke icon (will be displayed on the hub)
+    # preferred are the -symbolic icons as these are used in Anaconda's spokes
+    icon = "face-cool-symbolic"
+
+    # title of the spoke (will be displayed on the hub)
+    title = N_("_HELLO WORLD")</pre><div class="para">
+					In the begining two common functions for translations are defined, but with the unusual definition for the <code class="function">_</code> function. This is caused by the fact that our addon is not meant to have translations. Then we can again see the usage of the <code class="varname">__all__</code> variable to export only the spoke class  followed by the first lines of its definition including the definitions of attributes mentioned above. Their values are referencing the widgets defined in the <code class="filename">org_fedora_hello_world/gui/spokes/hello.glade</code> file included in the Hello world addon's sources (if you want to open the file, see the begining of the <a class="xref" href="section_deploying_and_testing.html">Section 7, “Deploying and testing an Anaconda addon”</a> that lists the packages that are needed). Only two of the attributes deserve a further comment. The first one is the <code class="varname">category</code> attribute the value of which is the <code class="classname">HelloWorldCategory</code> class imported from the <span class="package">org_fedora_hello_world.categories</span> module. We will get to the <code class="classname">HelloWorldCategory</code> definition later, but for now note what was mentioned in the comment just before the import: 
+					<div xmlns:d="http://docbook.org/ns/docbook" class="important"><div class="admonition_header"><p><strong>Important</strong></p></div><div class="admonition"><div class="para">
+							The path to addons is in sys.path so things can be imported from the org_fedora_hello_world package.
+						</div></div></div>
+					 The second attribute that deserves a comment is the <code class="varname">title</code> attribute whose definition contains two underscores. The former one is part of the <code class="function">N_</code> function name that marks the string for translation, but returns the non-translated version of the string (translation is done later). The latter one is part of the title itself and makes the spoke reachable from the hub with the Alt+H keyboard shortcut.
+				</div><div class="para">
+					What usually follows the header of the class definition and the class attributes definitions is the constructor that initializes an instance of the class. In case of the Anaconda installer's GUI objects there are two methods initializing a new instance — common Python's <code class="methodname">__init__</code> method and the <code class="methodname">initialize</code> method. The reason for two such functions is that the GUI objects may be created in memory at one time and fully initialized (which can take a longer time) at a different time. Thus the <code class="methodname">__init__</code> method should only call the parent's <code class="methodname">__init__</code> method and e.g. initialize non-GUI attributes. On the other hand the <code class="methodname">initialize</code> method that is called when the installer's graphical user interface initializes should finish the full initialization of the spoke. This is how these two methods look in our case (note the number and description of the arguments passed to the <code class="methodname">__init__</code> method):
+				</div><pre class="programlisting">    def __init__(self, data, storage, payload, instclass):
+        """
+        :see: pyanaconda.ui.common.Spoke.__init__
+        :param data: data object passed to every spoke to load/store data
+                     from/to it
+        :type data: pykickstart.base.BaseHandler
+        :param storage: object storing storage-related information
+                        (disks, partitioning, bootloader, etc.)
+        :type storage: blivet.Blivet
+        :param payload: object storing packaging-related information
+        :type payload: pyanaconda.packaging.Payload
+        :param instclass: distribution-specific information
+        :type instclass: pyanaconda.installclass.BaseInstallClass
+
+        """
+
+        NormalSpoke.__init__(self, data, storage, payload, instclass)
+
+    def initialize(self):
+        """
+        The initialize method that is called after the instance is created.
+        The difference between __init__ and this method is that this may take
+        a long time and thus could be called in a separated thread.
+
+        :see: pyanaconda.ui.common.UIObject.initialize
+
+        """
+
+        NormalSpoke.initialize(self)
+        self._entry = self.builder.get_object("textEntry")</pre><div class="para">
+					Both methods are very simple, but still there are few things deserving a comment. The most important one is the <code class="varname">data</code> parametr passed to the <code class="methodname">__init__</code> method. It is the in-memory tree-like representation of the kickstart file where all the data is stored. In one of the ancestors' <code class="methodname">__init__</code> methods it is stored in the <code class="varname">self.data</code> attribute so we can read and modify it in all other methods of the class. Since we have defined the <code class="classname">HelloWorldData</code> class in <a class="xref" href="section_writing_addon.html#section_kickstart_support">Section 6.1, “Kickstart support”</a> there is a subtree in <code class="varname">self.data</code> for our addon and its root (an instance of the <code class="classname">HelloWorldData</code>) is available as <code class="varname">self.data.addons.org_fedora_hello_world</code>. One of the other things an ancestor's <code class="methodname">__init__</code> does is initializing an instance of the <code class="classname">GtkBuilder</code> with the spoke's <code class="filename">.glade</code> file and storing it as <code class="varname">self.builder</code>. This is used in the <code class="methodname">initialize</code> method to get the <code class="classname">GtkTextEntry</code> used to show and modify the text from the kickstart file's %addon section.
+				</div><div class="para">
+					The <code class="methodname">__init__</code> and <code class="methodname">initialize</code> methods are the two methods that play their roles when the spoke is created. However, the main role of the spoke is to be visited by user who wants to change or review some values it shows and sets. There are three methods — <code class="methodname">refresh</code>, <code class="methodname">apply</code> and <code class="methodname">execute</code> — that handle things that need to be done when the spoke is entered and left. The <code class="methodname">refresh</code> method is called when the spoke is about to be visited by the user and its responsibility is to refresh the spoke's state (mainly it's UI elements) to reflect the current values stored in the <code class="varname">self.data</code> structure. The <code class="methodname">apply</code> and <code class="methodname">execute</code> methods are called when the spoke is left and they should store values set in the UI elements to the <code class="varname">self.data</code> structure and do all runtime changes the spoke requires based on its current state, respectively.
+				</div><div class="para">
+					The implementations of those three functions are very simple in the Hello world addon:
+				</div><pre class="programlisting">    def refresh(self):
+        """
+        The refresh method that is called every time the spoke is displayed.
+        It should update the UI elements according to the contents of
+        self.data.
+
+        :see: pyanaconda.ui.common.UIObject.refresh
+
+        """
+
+        self._entry.set_text(self.data.addons.org_fedora_hello_world.text)
+
+    def apply(self):
+        """
+        The apply method that is called when the spoke is left. It should
+        update the contents of self.data with values set in the GUI elements.
+
+        """
+
+        self.data.addons.org_fedora_hello_world.text = self._entry.get_text()
+
+    def execute(self):
+        """
+        The excecute method that is called when the spoke is left. It is
+        supposed to do all changes to the runtime environment according to
+        the values set in the GUI elements.
+
+        """
+
+        # nothing to do here
+        pass</pre><div class="para">
+					So far we have covered methods that can be used to instantiate and visit spoke. It may seem like everything that is needed, but not every spoke can be visited anytime (e.g. What would be the point of software selection being shown before the repository is set?) and while values shown and controlled by some spokes are crucial to the installation process and cannot be omitted, some spokes allow modification of optional values with minor effect on the installed system. That's why all spokes have the <span class="property">ready</span>, <span class="property">completed</span> and <span class="property">mandatory</span> properties. As their names suggest, these properties determine if the spoke is ready to be visited, if the spoke is completed (i.e. all values it requires to be set are set) and if the spoke is mandatory to be completed for the installation to continue. All these attributes of the spoke need to be dynamically determined based on the current state of the installer/installation process. Here comes the trivial implementation of those properties from the Hello world addon which requires some value to be set in the <code class="classname">HelloWorldData</code>'s <code class="varname">text</code> attribute:
+				</div><pre class="programlisting">    @property
+    def ready(self):
+        """
+        The ready property that tells whether the spoke is ready (can be visited)
+        or not. The spoke is made (in)sensitive based on the returned value.
+
+        :rtype: bool
+
+        """
+
+        # this spoke is always ready
+        return True
+
+    @property
+    def completed(self):
+        """
+        The completed property that tells whether all mandatory items on the
+        spoke are set, or not. The spoke will be marked on the hub as completed
+        or uncompleted acording to the returned value.
+
+        :rtype: bool
+
+        """
+
+        return bool(self.data.addons.org_fedora_hello_world.text)
+
+    @property
+    def mandatory(self):
+        """
+        The mandatory property that tells whether the spoke is mandatory to be
+        completed to continue in the installation process.
+
+        :rtype: bool
+
+        """
+
+        # this is an optional spoke that is not mandatory to be completed
+        return False</pre><div class="para">
+					With those three properties defined, a spoke can tell users whether they may, have to or cannot visit the spoke. Nevertheless, users seeing the hub need to decide whether to visit the spoke or not. That's why every spoke also has the <span class="property">status</span> property, which is supposed to provide a short (one-line) summary describing values set on the spoke. Since the only value managed by the spoke is the text it shows, allows to edit and stores in the <code class="varname">self.data</code> structure, it is only logical to use that text as the status. Also, the status should warn user if no text is set:
+				</div><pre class="programlisting">    @property
+    def status(self):
+        """
+        The status property that is a brief string describing the state of the
+        spoke. It should describe whether all values are set and if possible
+        also the values themselves. The returned value will appear on the hub
+        below the spoke's title.
+
+        :rtype: str
+
+        """
+
+        text = self.data.addons.org_fedora_hello_world.text
+
+        # If --reverse was specified in the kickstart, reverse the text
+        if self.data.addons.org_fedora_hello_world.reverse:
+            text = text[::-1]
+
+        if text:
+            return _("Text set: %s") % text
+        else:
+            return _("Text not set")</pre><div class="para">
+					And that's it! Less than 60 lines of code (the real code lines) are needed to implement the basic GUI of an addon. Of course, it is a trivial addon that does nothing useful, but anything else is just a common Python Gtk programming with some minor specific restrictions. For example, as was mentioned in the begining of this section, every spoke has to have its main window — an instance of the <code class="classname">SpokeWindow</code> widget. This widget (together with some more Anaconda-specific widgets) exists in the <span class="package">anaconda-widgets</span> package and files needed for development (e.g. Glade definitions) live in the <span class="package">anaconda-widgets-devel</span> package.
+				</div></div><div class="footnotes"><br /><hr /><div id="ftn.idm242240074240" class="footnote"><div class="para"><a href="#idm242240074240" class="para"><sup class="para">[5] </sup></a>
+								an instance of the SpokeWindow widget which is a custom widget created for the Anaconda installer
+							</div></div></div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="section_writing_addon.html"><strong>Prev</strong>6. Writing an Anaconda addon</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="advanced_features.html"><strong>Next</strong>6.2.2. Advanced features</a></li></ul></body></html>

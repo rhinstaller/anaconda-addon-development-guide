@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="48"
+   height="48"
+   id="svg5921"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="warning.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/jfearn/Build/src/fedora/publican/trunk/publican-fedora/en-US/images/warning.png"
+   inkscape:export-xdpi="111.32"
+   inkscape:export-ydpi="111.32">
+  <metadata
+     id="metadata2482">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="910"
+     inkscape:window-width="1284"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     inkscape:zoom="11.5"
+     inkscape:cx="20"
+     inkscape:cy="20"
+     inkscape:window-x="0"
+     inkscape:window-y="51"
+     inkscape:current-layer="svg5921" />
+  <defs
+     id="defs5923">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 20 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="40 : 20 : 1"
+       inkscape:persp3d-origin="20 : 13.333333 : 1"
+       id="perspective2484" />
+  </defs>
+  <g
+     transform="matrix(0.4536635,0,0,0.4536635,-5.1836431,-4.6889387)"
+     id="layer1">
+    <g
+       transform="translate(2745.6887,-1555.5977)"
+       id="g8304"
+       style="enable-background:new">
+      <path
+         d="M -1603,1054.4387 L -1577.0919,1027.891 L -1540,1027.4387 L -1513.4523,1053.3468 L -1513,1090.4387 L -1538.9081,1116.9864 L -1576,1117.4387 L -1602.5477,1091.5306 L -1603,1054.4387 z"
+         transform="matrix(0.8233528,8.9983906e-3,-8.9983906e-3,0.8233528,-1398.5561,740.7914)"
+         id="path8034"
+         style="opacity:1;fill:#efd259;fill-opacity:1;stroke:#efd259;stroke-opacity:1" />
+      <path
+         d="M -1603,1054.4387 L -1577.0919,1027.891 L -1540,1027.4387 L -1513.4523,1053.3468 L -1513,1090.4387 L -1538.9081,1116.9864 L -1576,1117.4387 L -1602.5477,1091.5306 L -1603,1054.4387 z"
+         transform="matrix(0.6467652,7.0684723e-3,-7.0684723e-3,0.6467652,-1675.7492,927.16391)"
+         id="path8036"
+         style="opacity:1;fill:#a42324;fill-opacity:1;stroke:#a42324;stroke-opacity:1" />
+      <path
+         d="M -2686.7886,1597.753 C -2686.627,1596.5292 -2686.5462,1595.6987 -2686.5462,1595.218 C -2686.5462,1593.1637 -2688.0814,1592.0711 -2690.9899,1592.0711 C -2693.8985,1592.0711 -2695.4336,1593.12 -2695.4336,1595.218 C -2695.4336,1595.961 -2695.3528,1596.7914 -2695.1912,1597.753 L -2692.929,1614.4491 L -2689.0508,1614.4491 L -2686.7886,1597.753"
+         id="path8038"
+         style="font-size:107.13574219px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Charter" />
+      <path
+         d="M -2690.9899,1617.8197 C -2693.6124,1617.8197 -2695.8118,1619.9346 -2695.8118,1622.6416 C -2695.8118,1625.3486 -2693.6124,1627.4635 -2690.9899,1627.4635 C -2688.2829,1627.4635 -2686.168,1625.264 -2686.168,1622.6416 C -2686.168,1619.9346 -2688.2829,1617.8197 -2690.9899,1617.8197"
+         id="path8040"
+         style="font-size:107.13574219px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Charter" />
+    </g>
+  </g>
+</svg>

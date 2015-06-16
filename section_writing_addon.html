@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">6. Writing an Anaconda addon</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-21-en-US-1-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="index.html" title="Anaconda Addon Development Guide" /><link rel="prev" href="section_addon_structure.html" title="5. Addon structure" /><link rel="next" href="section_gui_support.html" title="6.2. Graphical user interface" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="section_addon_structure.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="section_gui_support.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h2 class="title"><a id="section_writing_addon">
+      ⁠</a>6. Writing an Anaconda addon</h2></div></div></div><div class="para">
+			We know how the addon's tree-like structure should look like, but obviously the actual work needs to be done in the leafs, the addon's modules. Instead of a lot of words describing how such modules should look like and what they should contain, let's create a simple addon step by step as a practical example. To make it obvious it is just a simple example, we will call it <span class="emphasis"><em>Hello world addon</em></span>.<a id="idx_hello_world_addon" class="indexterm"></a> To get an overall view on the addon and the code it is recommended to clone the <a href="https://github.com/vpodzime/hello-world-anaconda-addon.git"> Hello world addon's git repository</a> or if it is not possible, at least use the web interface to open the source files. The same applies to the <a href="http://git.fedorahosted.org/git/anaconda.git">Anaconda's git repository</a> as the installer's sources will be referred many times in the following text.<a id="idx_anaconda_git" class="indexterm"></a>
+		</div><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h3 class="title"><a id="section_kickstart_support">
+      ⁠</a>6.1. Kickstart support</h3></div></div></div><div class="para">
+				First we need the directories as described in the <a class="xref" href="section_addon_structure.html">Section 5, “Addon structure”</a> — the top-level directory giving the addon its name (in this case <code class="filename">org_fedora_hello_world</code>) and the directories for separate parts providing code for kickstart, GUI and TUI support. As it was already mentioned many times (intentionally) kickstart support is the most important one so let's start with that part. Its subpackage name is expected to be <span class="package">ks</span> and we will thus need a directory named <code class="filename">ks</code> under the addon's top-level directory <code class="filename">org_fedora_hello_world</code>. In that directory there has to be the <code class="filename">__init__.py</code> file and at least one Python module with arbitrary name. Let's use <code class="filename">hello_world.py</code> which conforms to<a href="http://www.python.org/dev/peps/pep-0008/#package-and-module-names"> Python's conventions for module names</a>. That brings us to the coding style questions that should be answer before we start with any actual code. The general rule is to follow Python's <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a> and <a href="http://www.python.org/dev/peps/pep-0257/">PEP 257</a> (docstring conventions). There is no consensus on the format of the actual content of docstrings in the Anaconda installer. Anything that is well human-readable is okay only if the addon is supposed to have a documentation generated automatically, docstrings should, of course, follow the rules of the toolkit used to generate the documentation. But let's get back to the module with code providing Hello world addon's support for kickstart. The reason why it can have an arbitrary name is that the Anaconda installer looks in all files in the particular directory and collects classes that are inherited from a particular class defined by the API. The same rules apply to all of the <code class="filename">ks</code>, <code class="filename">gui/spokes</code> and <code class="filename">tui/spokes</code> directories containing modules. For the kickstart part of the addon the key class is the <code class="classname">AddonData</code> class defined in the <span class="package">pyanaconda.addons</span> module that represents an object for parsing and storing data from the kickstart file. The part of a kickstart file containing data for an addon has the following format: 
+<pre class="programlisting">%addon ADDON_NAME [arguments]
+first line
+second line
+...
+%end</pre>
+				 Such sequence of lines is called <span class="emphasis"><em>a section</em></span>. The percent sign followed by the keyword <span class="emphasis"><em>addon</em></span> marks the beginning of addon section while <span class="emphasis"><em>%end</em></span> marks its end. In place of the string <span class="emphasis"><em>ADDON_NAME</em></span> there should be a name of a real addon (like <span class="emphasis"><em>org_fedora_hello_world</em></span> in our case). Any additional <span class="emphasis"><em>arguments</em></span> on the addon line will be passed as a list to an instance of the addon's class inherited from the <code class="classname">AddonData</code> class. The content between the two lines starting with the percent sign is passed to the instance of the addon's class one line at a time. To make the code as simple as possible, the Hello world addon will just squash the lines passed in a kickstart file to a single line separating the original lines with a space. We know that our addon needs a class inherited from the <code class="classname">AddonData</code> with a method handling the <span class="emphasis"><em>%addon</em></span> argument list and with a method handling lines inside a kickstart <span class="emphasis"><em>%addon</em></span> section. A quick look into the <code class="filename">pyanaconda/addons.py</code> shows these two methods: <code class="methodname">handle_header</code> takes a list of arguments and the current line numbers (for error reporting), and <code class="methodname">handle_line</code> takes a single line of content. Let's have a look at the code implementing what we have covered so far.
+			</div><pre class="programlisting">from pyanaconda.addons import AddonData
+from pykickstart.options import KSOptionParser
+
+# export HelloWorldData class to prevent Anaconda's collect method from taking
+# AddonData class instead of the HelloWorldData class
+# :see: pyanaconda.kickstart.AnacondaKSHandler.__init__
+__all__ = ["HelloWorldData"]
+
+HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"
+
+class HelloWorldData(AddonData):
+    """
+    Class parsing and storing data for the Hello world addon.
+
+    :see: pyanaconda.addons.AddonData
+
+    """
+
+    def __init__(self, name):
+        """
+        :param name: name of the addon
+        :type name: str
+
+        """
+
+        AddonData.__init__(self, name)
+        self.text = ""
+        self.reverse = False
+
+    def handle_header(self, lineno, args):
+        """
+        The handle_header method is called to parse additional arguments in the
+        %addon section line.
+
+        :param lineno: the current linenumber in the kickstart file
+        :type lineno: int
+        :param args: any additional arguments after %addon &lt;name&gt;
+        :type args: list
+        """
+
+        op = KSOptionParser()
+        op.add_option("--reverse", action="store_true", default=False,
+                dest="reverse", help="Reverse the display of the addon text")
+        (opts, extra) = op.parse_args(args=args, lineno=lineno)
+
+        # Reject any additional arguments.
+        if extra:
+            msg = "Unhandled arguments on %%addon line for %s" % self.name
+            if lineno != None:
+                raise KickstartParseError(formatErrorMsg(lineno, msg=msg))
+            else:
+                raise KickstartParseError(msg)
+
+        # Store the result of the option parsing
+        self.reverse = opts.reverse
+
+    def handle_line(self, line):
+        """
+        The handle_line method that is called with every line from this addon's
+        %addon section of the kickstart file.
+
+        :param line: a single line from the %addon section
+        :type line: str
+
+        """
+
+        # simple example, we just append lines to the text attribute
+        if self.text is "":
+            self.text = line.strip()
+        else:
+            self.text += " " + line.strip()</pre><div class="para">
+				First few lines of the code describe what could be summed up as the following rule: 
+				<div xmlns:d="http://docbook.org/ns/docbook" class="important"><div class="admonition_header"><p><strong>Important</strong></p></div><div class="admonition"><div class="para">
+						Use <code class="varname">__all__</code> variables in modules as it is needed for Anaconda's method for collecting classes to work properly.
+					</div></div></div>
+				 Then there is a definition of the <code class="classname">HelloWorldData</code> class inherited from the <code class="classname">AddonData</code> class with its <code class="methodname">__init__</code> method calling the parent's <code class="methodname">__init__</code> method and initializing the attributes <span class="property">self.text</span> to an empty string and <span class="property">self.reverse</span> to False. <span class="property">self.reverse</span> is populated in the <code class="methodname">handle_header</code> method, and <span class="property">self.text</span> is populated in the <code class="methodname">handle_line</code> method. <code class="methodname">handle_header</code> uses an instance of the <code class="classname">KSOptionParser</code> class provided by pykickstart to parse the additional arguments on the <span class="emphasis"><em>%addon</em></span> line, and <code class="methodname">handle_line</code> strips the content lines (removes white space characters at the beginning and the end) and appends them to <span class="property">self.text</span>.
+			</div><div class="para">
+				So far our code covers the first phase of the data life cycle in the installation process where data from the kickstart file has to be read. The second phase of the life cycle is updating data with values from the UI which will be covered in the UI code. Then data is used to drive the actual installation process. This is done by two methods with predefined names — <code class="methodname">setup</code> and <code class="methodname">execute</code>. The former one is called before the installation transaction starts and should do all changes of the runtime environment an addons needs to do. The later one is called at the end of the transaction and should do all changes to the newly installed (target) system an addon is supposed to do. Again, to make the code as simple as possible, these two methods will be minimalistic. We will need to prepend few imports and a constant definition to the begining of the source file:
+			</div><pre class="programlisting">import os.path
+
+from pyanaconda.addons import AddonData
+from pyanaconda.iutil import getSysroot
+
+from pykickstart.options import KSOptionParser
+from pykickstart.errors import KickstartParseError, formatErrorMsg
+
+HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</pre><div class="para">
+				And this is how the two methods will look:
+			</div><pre class="programlisting">    def setup(self, storage, ksdata, instclass):
+        """
+        The setup method that should make changes to the runtime environment
+        according to the data stored in this object.
+
+        :param storage: object storing storage-related information
+                        (disks, partitioning, bootloader, etc.)
+        :type storage: blivet.Blivet instance
+        :param ksdata: data parsed from the kickstart file and set in the
+                       installation process
+        :type ksdata: pykickstart.base.BaseHandler instance
+        :param instclass: distribution-specific information
+        :type instclass: pyanaconda.installclass.BaseInstallClass
+
+        """
+
+        # no actions needed in this addon
+        pass
+
+    def execute(self, storage, ksdata, instclass, users):
+        """
+        The execute method that should make changes to the installed system. It
+        is called only once in the post-install setup phase.
+
+        :see: setup
+        :param users: information about created users
+        :type users: pyanaconda.users.Users instance
+
+        """
+
+        hello_file_path = os.path.normpath(getSysroot() + HELLO_FILE_PATH)
+        with open(hello_file_path, "w") as fobj:
+            fobj.write("%s\n" % self.text)
+</pre><div class="para">
+				It should be easy to find out that the <code class="methodname">setup</code> method does nothing and the <code class="methodname">execute</code> method just writes the stored text to a file created in the target system's root (<code class="filename">/</code>) directory. The most important information delivered by the code above is the number and meaning of the arguments passed to those two methods as described in the docstrings.
+			</div><div class="para">
+				That brings us to the last phase of the data life cycle and also the last piece of the code needed in the module providing a kickstart support. At the end of the installation a new kickstart file with the values set in the original kickstart file or during the installation process is written out to the target system's <code class="filename">/root</code> directory. It is done by calling the <code class="methodname">__str__</code> recursively on the tree-like structure storing the data which means that our class inherited from the <code class="classname">AddonData</code> class needs to define its own <code class="methodname">__str__</code> method returning its stored data in the format that could be parsed again if the resulting kickstart file was used to install another similar system. It should be obvious how the <code class="methodname">__str__</code> method should look like in our case:
+			</div><pre class="programlisting">    def __str__(self):
+        """
+        What should end up in the resulting kickstart file, i.e. the %addon
+        section containing string representation of the stored data.
+
+        """
+
+        addon_str = "%%addon %s" % self.name
+
+        if self.reverse:
+            addon_str += " --reverse"
+
+        addon_str += "\n%s\n%%end\n" % self.text
+        return addon_str</pre><div class="para">
+				By adding this method method we have everything that is needed for a kickstart support done and at the same time we have everything that an addon needs to implement to become a valid addon. Thus we could finish here and start enjoying the warm feeling of writing a new piece of the OS installer. And, believe it or not, we only needed 36 lines of code (not counting the docstrings and comments) to do that. But try to explain how great this is to a majority of people who don't like writing kickstart files and instead prefer clicking on buttons, filling in text entries and so on. To make our code reachable for such people we need to create a user interface for it.
+			</div></div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="section_addon_structure.html"><strong>Prev</strong>5. Addon structure</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="section_gui_support.html"><strong>Next</strong>6.2. Graphical user interface</a></li></ul></body></html>
