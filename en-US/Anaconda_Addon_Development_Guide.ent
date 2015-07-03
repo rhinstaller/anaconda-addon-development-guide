@@ -5,4 +5,5 @@
 <!ENTITY FEDORA "Fedora">
 <!ENTITY RHEL "RHEL">
 <!ENTITY HWADDON "Hello world addon">
+<!ENTITY PRODVER "22">
 <!ENTITY BZURL "<ulink url='https://bugzilla.redhat.com/enter_bug.cgi?product=&PRODUCT;&amp;component=&BOOKID;'>http://bugzilla.redhat.com/</ulink>">
