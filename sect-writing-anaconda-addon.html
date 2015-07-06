@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">6. Writing an Anaconda add-on</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-22-en-US-2-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="index.html" title="Anaconda Addon Development Guide" /><link rel="prev" href="sect-anaconda-addon-structure.html" title="5. Anaconda Add-on Structure" /><link rel="next" href="sect-anaconda-addon-gui-support.html" title="6.2. Graphical user interface" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-structure.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="sect-anaconda-addon-gui-support.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h2 class="title"><a id="sect-writing-anaconda-addon">
+      ⁠</a>6. Writing an Anaconda add-on</h2></div></div></div><div class="para">
+			The sections below will demonstrate the process writing and testing a sample add-on called Hello World. This sample add-on will support all interfaces (Kickstart, GUI and TUI). Sources for this sample add-on are available on GitHub in the <a href="https://github.com/rhinstaller/hello-world-anaconda-addon">rhinstaller/hello-world-anaconda-addon</a> repository; it is recommended to clone this repository or at least open the sources in the web interface.
+		</div><div class="para">
+			Another repository to review is <a href="https://github.com/rhinstaller/anaconda">rhinstaller/anaconda</a>, which contains the installer source code; it will be referred to in several parts of this section as well.
+		</div><div class="para">
+			Before you begin developing the add-on itself, start by creating its directory structure as described in <a class="xref" href="sect-anaconda-addon-structure.html">Section 5, “Anaconda Add-on Structure”</a>. Then, continue with <a class="xref" href="sect-writing-anaconda-addon.html#sect-anaconda-addon-kickstart-support">Section 6.1, “Kickstart Support”</a>, as Kickstart support is mandatory for all add-ons. After that, you can optionally continue with <a class="xref" href="sect-anaconda-addon-gui-support.html">Section 6.2, “Graphical user interface”</a> and <a class="xref" href="sect-anaconda-addon-tui-support.html">Section 6.3, “Text User Interface”</a> if needed.
+		</div><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h3 class="title"><a id="sect-anaconda-addon-kickstart-support">
+      ⁠</a>6.1. Kickstart Support</h3></div></div></div><div class="para">
+				Kickstart support is always the first part of any add-on that should be developed. Other packages - support for the graphical and text-based interface - will depend on it. To begin, navigate to the <code class="filename">org_fedora_hello_world/ks/</code> directory you have created previously, make sure it contains an <code class="filename">__init__.py</code> file, and add another Python script named <code class="filename">hello_world.py</code>.
+			</div><div class="para">
+				Unlike built-in Kickstart commands, add-ons are used in their own <em class="firstterm">sections</em>. Each use of an add-on in a Kickstart file begins with an <code class="command">%addon</code> statement and is closed by <code class="command">%end</code>. The <code class="command">%addon</code> line also contains the name of the add-on (such as <code class="command">%addon org_fedora_hello_world</code>) and optionally a list of arguments, if the add-on supports them.
+			</div><div class="para">
+				An example use of an add-on in a Kickstart file looks like the example below:
+			</div><div class="example"><a id="exam-addon-kickstart-definition">
+      ⁠</a><p class="title"><strong>Example 2. Using an Add-on in a Kickstart File</strong></p><div class="example-contents"><pre class="programlisting">
+%addon ADDON_NAME [arguments]
+first line
+second line
+...
+%end
+</pre></div></div><div class="para">
+				The key class for Kickstart support in add-ons is called <code class="classname">AddonData</code>. This class is defined in <span class="package">pyanaconda.addons</span> and represents an object for parsing and storing data from a Kickstart file.
+			</div><div class="para">
+				Arguments are passed as a list to an instance of the add-on class inherited from the <code class="classname">AddonData</code> class. Anything between the first and last line is passed to the add-on's class one line at a time. To keep the example Hello World add-on simple, it will merge all lines in this block into a single line and separate the original lines with a space.
+			</div><div class="para">
+				The example add-on requires a class inherited from <code class="classname">AddonData</code> with a method for handling the list of arguments from the <code class="command">%addon</code> line, and a method for handling lines inside the section. The <a href="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/addons.py"><code class="filename">pyanaconda/addons.py</code></a> module contains two methods which can be used for this:
+			</div><div xmlns:d="http://docbook.org/ns/docbook" class="itemizedlist"><ul><li class="listitem"><div class="para">
+						<code class="methodname">handle_header</code> - takes a list of arguments from the <code class="command">%addon</code> line (and line numbers for error reporting)
+					</div></li><li class="listitem"><div class="para">
+						<code class="methodname">handle_line</code> - takes a single line of content from between the <code class="command">%addon</code> and <code class="command">%end</code> statements
+					</div></li></ul></div><div class="para">
+				The example below demonstrates a Hello World add-on which uses the methods described above:
+			</div><div class="example"><a id="exam-kickstart-header-line">
+      ⁠</a><p class="title"><strong>Example 3. Using handle_header and handle_line</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">from</span> pyanaconda.addons <span xmlns="" class="perl_Char">import</span> AddonData
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">from</span> pykickstart.options <span xmlns="" class="perl_Char">import</span> KSOptionParser
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment"># export HelloWorldData class to prevent Anaconda's collect method from taking</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment"># AddonData class instead of the HelloWorldData class</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment"># :see: pyanaconda.kickstart.AnacondaKSHandler.__init__</span>
+<span xmlns="" class="line">​</span>__all__ <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_Char">[</span><span xmlns="" class="perl_String">"HelloWorldData"</span><span xmlns="" class="perl_Char">]</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>HELLO_FILE_PATH <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">"/root/hello_world_addon_output.txt"</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">class</span> HelloWorldData<span xmlns="" class="perl_Char">(AddonData):</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">    Class parsing and storing data for the Hello world addon.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">    :see: pyanaconda.addons.AddonData</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">    """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> __init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, name<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param name: name of the addon</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type name: str</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        AddonData.__init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, name<span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.text <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">""</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.reverse <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_Others">False</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> handle_header<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, lineno, args<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The handle_header method is called to parse additional arguments in the</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        %addon section line.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param lineno: the current linenumber in the kickstart file</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type lineno: int</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param args: any additional arguments after %addon &lt;name&gt;</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type args: list</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        op <span xmlns="" class="perl_Char">=</span> KSOptionParser<span xmlns="" class="perl_Char">()</span>
+<span xmlns="" class="line">​</span>        op.add_option<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"--reverse"</span>, action<span xmlns="" class="perl_Char">=</span><span xmlns="" class="perl_String">"store_true"</span>, default<span xmlns="" class="perl_Char">=</span><span xmlns="" class="perl_Others">False</span>,
+<span xmlns="" class="line">​</span>                dest<span xmlns="" class="perl_Char">=</span><span xmlns="" class="perl_String">"reverse"</span>, help<span xmlns="" class="perl_Char">=</span><span xmlns="" class="perl_String">"Reverse the display of the addon text"</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">(opts</span>, extra<span xmlns="" class="perl_Char">)</span> <span xmlns="" class="perl_Char">=</span> op.parse_args<span xmlns="" class="perl_Char">(args=args</span>, lineno<span xmlns="" class="perl_Char">=lineno)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># Reject any additional arguments.</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">if</span> extra<span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>            msg <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">"Unhandled arguments on %</span><span xmlns="" class="perl_Char">%a</span><span xmlns="" class="perl_String">ddon line for </span><span xmlns="" class="perl_Char">%s</span><span xmlns="" class="perl_String">"</span> <span xmlns="" class="perl_Char">%</span> <span xmlns="" class="perl_Others">self</span>.name
+<span xmlns="" class="line">​</span>            <span xmlns="" class="perl_Keyword">if</span> lineno <span xmlns="" class="perl_Char">!=</span> <span xmlns="" class="perl_Others">None</span><span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>                <span xmlns="" class="perl_Keyword">raise</span> KickstartParseError<span xmlns="" class="perl_Char">(formatErrorMsg(lineno</span>, msg<span xmlns="" class="perl_Char">=msg))</span>
+<span xmlns="" class="line">​</span>            <span xmlns="" class="perl_Keyword">else</span><span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>                <span xmlns="" class="perl_Keyword">raise</span> KickstartParseError<span xmlns="" class="perl_Char">(msg)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># Store the result of the option parsing</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.reverse <span xmlns="" class="perl_Char">=</span> opts.reverse
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> handle_line<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, line<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The handle_line method that is called with every line from this addon's</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        %addon section of the kickstart file.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param line: a single line from the %addon section</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type line: str</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># simple example, we just append lines to the text attribute</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">if</span> <span xmlns="" class="perl_Others">self</span>.text <span xmlns="" class="perl_Keyword">is</span> <span xmlns="" class="perl_String">""</span><span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>            <span xmlns="" class="perl_Others">self</span>.text <span xmlns="" class="perl_Char">=</span> line.strip<span xmlns="" class="perl_Char">()</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">else</span><span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>            <span xmlns="" class="perl_Others">self</span>.text <span xmlns="" class="perl_Char">+=</span> <span xmlns="" class="perl_String">" "</span> <span xmlns="" class="perl_Char">+</span> line.strip<span xmlns="" class="perl_Char">()</span></pre></div></div><div class="para">
+				The example begins by importing necessary methods and defining an <code class="varname">__all__</code> variable which is necessary to prevent <span class="application"><strong>Anaconda</strong></span>'s collect method from taking the <code class="classname">AddonData</code> class instead of add-on specific <code class="classname">HelloWorldData</code>.
+			</div><div class="para">
+				Then, the example shows a definition of the <code class="classname">HelloWorldData</code> class inherited from <code class="classname">AddonData</code> with its <code class="methodname">__init__</code> method calling the parent's <code class="methodname">__init__</code> and initializing the attributes <code class="varname">self.text</code> and <code class="varname">self.reverse</code> to <code class="literal">False</code>.
+			</div><div class="para">
+				The <code class="varname">self.reverse</code> attribute is populated in the <code class="methodname">handle_header</code> method, and the <code class="varname">self.text</code> is populated in <code class="methodname">handle_line</code>. The <code class="methodname">handle_header</code> method uses an instance of the <code class="classname">KSOptionParser</code> provided by <code class="systemitem">pykickstart</code> to parse additional options used on the <code class="command">%addon</code> line, and <code class="methodname">handle_line</code> strips the content lines of white space at the beginning and end of each line, and appends them to <code class="varname">self.text</code>.
+			</div><div class="para">
+				The code above covers the first phase of the data life cycle in the installation process: it reads data from the Kickstart file. The next step is to use this data to drive the installation process. Two predefined methods are available for this purpose:
+			</div><div xmlns:d="http://docbook.org/ns/docbook" class="itemizedlist"><ul><li class="listitem"><div class="para">
+						<code class="methodname">setup</code> - called before the installation transaction starts and used to make changes to the installation runtime environment
+					</div></li><li class="listitem"><div class="para">
+						<code class="methodname">execute</code> - called at the end of the transaction and used to make changes to the target system
+					</div></li></ul></div><div class="para">
+				To use these two methods, you must add some new imports and a constant to your module, as shown in the following example:
+			</div><div class="example"><a id="exam-kickstart-setup-execute-prepend">
+      ⁠</a><p class="title"><strong>Example 4. Importing the setup and execute Methods</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">import</span> os.path
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">from</span> pyanaconda.addons <span xmlns="" class="perl_Char">import</span> AddonData
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">from</span> pyanaconda.constants <span xmlns="" class="perl_Char">import</span> getSysRoot
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">from</span> pykickstart.options <span xmlns="" class="perl_Char">import</span> KSOptionParser
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Char">from</span> pykickstart.errors <span xmlns="" class="perl_Char">import</span> KickstartParseError, formatErrorMsg
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>HELLO_FILE_PATH <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">"/root/hello_world_addon_output.txt"</span></pre></div></div><div class="para">
+				An updated example of the Hello World add-ons with the <code class="methodname">setup</code> and <code class="methodname">execute</code> methods included is below:
+			</div><div class="example"><a id="exam-kickstart-setup-execute">
+      ⁠</a><p class="title"><strong>Example 5. Using the setup and execute Methods</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> setup<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, storage, ksdata, instclass<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The setup method that should make changes to the runtime environment</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        according to the data stored in this object.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param storage: object storing storage-related information</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                        (disks, partitioning, bootloader, etc.)</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type storage: blivet.Blivet instance</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param ksdata: data parsed from the kickstart file and set in the</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                       installation process</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type ksdata: pykickstart.base.BaseHandler instance</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param instclass: distribution-specific information</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type instclass: pyanaconda.installclass.BaseInstallClass</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># no actions needed in this addon</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">pass</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> execute<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, storage, ksdata, instclass, users<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The execute method that should make changes to the installed system. It</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        is called only once in the post-install setup phase.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :see: setup</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param users: information about created users</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type users: pyanaconda.users.Users instance</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        hello_file_path <span xmlns="" class="perl_Char">=</span> os.path.normpath<span xmlns="" class="perl_Char">(getSysroot()</span> <span xmlns="" class="perl_Char">+</span> HELLO_FILE_PATH<span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        with <span xmlns="" class="perl_DataType">open</span><span xmlns="" class="perl_Char">(hello_file_path</span>, <span xmlns="" class="perl_String">"w"</span><span xmlns="" class="perl_Char">)</span> <span xmlns="" class="perl_Char">as</span> fobj<span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>            fobj.write<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"</span><span xmlns="" class="perl_Char">%s</span><span xmlns="" class="perl_String">\n"</span> <span xmlns="" class="perl_Char">%</span> <span xmlns="" class="perl_Others">self</span>.text<span xmlns="" class="perl_Char">)</span></pre></div></div><div class="para">
+				In the above example, the <code class="methodname">setup</code> method does nothing; the Hello World add-on does not make any changes to the installation runtime environment. The <code class="methodname">execute</code> method writes stored text into a file created in the target system's root (<code class="filename">/</code>) directory.
+			</div><div class="para">
+				The most important information in the above example is the amount and meaning of the arguments passed to the two new methods; these are described in docstrings within the example.
+			</div><div class="para">
+				The final phase of the data life cycle, as well as the last part of the code needed in a module providing Kickstart support, is generating a new Kickstart file, which includes values set at installation time, at the end of the installation process as described in <a class="xref" href="sect-anaconda-addon-architecture.html">Section 2, “Architecture of Anaconda”</a>. This is performed by calling the <code class="methodname">__str__</code> method recursively on the tree-like structure storing installation data, which means that the class inherited from <code class="classname">AddonData</code> must define its own <code class="methodname">__str__</code> method which returns its stored data in valid Kickstart syntax. This returned data must be possible to parse again using <code class="systemitem">pykickstart</code>.
+			</div><div class="para">
+				In the Hello World example, the <code class="methodname">__str__</code> method will be similar to the following example:
+			</div><div class="example"><a id="exam-kickstart-str">
+      ⁠</a><p class="title"><strong>Example 6. Defining a __str__ Method</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> __str__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        What should end up in the resulting kickstart file, i.e. the %addon</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        section containing string representation of the stored data.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        addon_str <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">"%</span><span xmlns="" class="perl_Char">%a</span><span xmlns="" class="perl_String">ddon </span><span xmlns="" class="perl_Char">%s</span><span xmlns="" class="perl_String">"</span> <span xmlns="" class="perl_Char">%</span> <span xmlns="" class="perl_Others">self</span>.name
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">if</span> <span xmlns="" class="perl_Others">self</span>.reverse<span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>            addon_str <span xmlns="" class="perl_Char">+=</span> <span xmlns="" class="perl_String">" --reverse"</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        addon_str <span xmlns="" class="perl_Char">+=</span> <span xmlns="" class="perl_String">"\n</span><span xmlns="" class="perl_Char">%s</span><span xmlns="" class="perl_String">\n%</span><span xmlns="" class="perl_Char">%e</span><span xmlns="" class="perl_String">nd\n"</span> <span xmlns="" class="perl_Char">%</span> <span xmlns="" class="perl_Others">self</span>.text
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">return</span> addon_str</pre></div></div><div class="para">
+				Once your Kickstart support module contains all necessary methods (<code class="methodname">handle_header</code>, <code class="methodname">handle_line</code>, <code class="methodname">setup</code>, <code class="methodname">execute</code> and <code class="methodname">__str__</code>), it becomes a valid <span class="application"><strong>Anaconda</strong></span> add-on. You can continue with the following sections to add support for the graphical and text-based user interfaces, or you can continue with <a class="xref" href="sect-anaconda-addon-deploying-testing.html">Section 7, “Deploying and Testing an Anaconda Add-on”</a> and test the add-on.
+			</div></div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-structure.html"><strong>Prev</strong>5. Anaconda Add-on Structure</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect-anaconda-addon-gui-support.html"><strong>Next</strong>6.2. Graphical user interface</a></li></ul></body></html>

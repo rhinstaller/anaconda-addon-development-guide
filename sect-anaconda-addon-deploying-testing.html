@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">7. Deploying and Testing an Anaconda Add-on</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-22-en-US-2-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="index.html" title="Anaconda Addon Development Guide" /><link rel="prev" href="sect-anaconda-addon-tui-support.html" title="6.3. Text User Interface" /><link rel="next" href="sect-addons-welcome.html" title="8. Add-ons Welcome" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-tui-support.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="sect-addons-welcome.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h2 class="title"><a id="sect-anaconda-addon-deploying-testing">
+      ⁠</a>7. Deploying and Testing an Anaconda Add-on</h2></div></div></div><div class="para">
+			As mentioned previously, there are some packages required for development of an Anaconda ad-don. In particular, the <span class="package">anaconda-widgets</span> and <span class="package">anaconda-widgets-devel</span> packages that contain the widgets, glade specifications etc. and the <span class="package">anaconda</span> package that contains the <span class="package">pyanaconda</span> Python package (needed for running pylint checks and so on).
+		</div><div class="para">
+			To test a newly created add-on, you must place it into the installer runtime environment and let <span class="application"><strong>Anaconda</strong></span> collect the add-on classes and definitions. Add-ons are collected from the <code class="filename">/usr/share/anaconda/addons/</code> directory, which is expected to contain your add-ons Python packages (directory trees).
+		</div><div class="para">
+			The most simple way to load your add-on is to create an identical directory structure somewhere on your system (e.g. <code class="filename">~/temp/usr/share/anaconda/addons/</code>), place a copy of your add-on's package into it, and then execute the following command:
+		</div><pre class="screen"><code class="prompt">$</code> <code class="command">find . | cpio -c -o | gzip -9 &gt; addon_updates.img</code></pre><div class="para">
+			The command creates an archive which can be used as a so-called <em class="firstterm">updates image</em>. This image can then be placed on a web server or copied to a USB flash drive, and then loaded from the boot menu using the <code class="option">inst.updates=</code> boot option. The image will then be loaded and its contents will be used to add or replace any files in the installation environment. <a id="idm242211928144">
+      ⁠</a><a xmlns:d="http://docbook.org/ns/docbook" href="#ftn.idm242211928144" class="footnote"><sup class="footnote">[5]</sup></a>
+		</div><div class="para">
+			For information about boot options, see the <a href="https://docs.fedoraproject.org/en-US/Fedora/22/html/Installation_Guide/chap-anaconda-boot-options.html">Fedora Installation Guide</a>.
+		</div><a id="idm242211925552" class="indexterm"></a><a id="idm242211924592" class="indexterm"></a><div class="para">
+			Once an add-on is tested and ready for deployment, you should package it as a Fedora package to facilitate the creation of installation images containing your add-on (so-called <em class="firstterm">composes</em>). This requires you to write a <em class="firstterm">spec file</em> which defines and describes the RPM package.
+		</div><div class="para">
+			Below is an example of a basic spec file for an add-on:
+		</div><div class="example"><a id="exam-addon-specfile">
+      ⁠</a><p class="title"><strong>Example 15. Sample RPM Spec File</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">Name</span>:           example-anaconda-addon
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">Version</span>:        <span xmlns="" class="perl_DecVal">0</span>.<span xmlns="" class="perl_DecVal">1</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">Release</span>:        <span xmlns="" class="perl_DecVal">1</span><span xmlns="" class="perl_String">%</span><span xmlns="" class="perl_Keyword">{?dist}</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">Summary</span>:        Anaconda addon useful for something in the installation process
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">License</span>:        GPLv2+
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">URL</span>:            https://git.fedorahosted.org/cgit/example-anaconda-addon.git
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">Source0</span>:        <span xmlns="" class="perl_String">%</span><span xmlns="" class="perl_Keyword">{name}</span>-<span xmlns="" class="perl_String">%</span><span xmlns="" class="perl_Keyword">{version}</span>.tar.gz
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">BuildArch</span>:      noarch
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">BuildRequires</span>:  python2-devel
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">BuildRequires</span>:  anaconda &gt;= <span xmlns="" class="perl_DecVal">19</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">Requires</span>:       anaconda &gt;= <span xmlns="" class="perl_DecVal">19</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%description</span>
+<span xmlns="" class="line">​</span>This is an addon that brings some useful additional functionality to the
+<span xmlns="" class="line">​</span>Anaconda installer.
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%prep</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%setup</span> -q
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%build</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%check</span>
+<span xmlns="" class="line">​</span>make test
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%install</span>
+<span xmlns="" class="line">​</span>make install DESTDIR=<span xmlns="" class="perl_String">%</span><span xmlns="" class="perl_Keyword">{buildroot}</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%files</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%</span><span xmlns="" class="perl_Keyword">{_datadir}</span>/anaconda/addons/org_fedora_example
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%doc</span> COPYING ChangeLog README
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">%changelog</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">* Mon Jan 6 2014 Great Author &lt;great.author@example.com&gt; - 0.1-1</span>
+<span xmlns="" class="line">​</span>- Initial RPM for the example-anaconda-addon
+</pre></div></div><a id="Makefile" class="indexterm"></a><div class="para">
+			The above spec file makes use of the <code class="command">make</code> utility with the following example Makefile:
+		</div><div class="example"><a id="exam-addon-example-makefile">
+      ⁠</a><p class="title"><strong>Example 16. Sample Makefile</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">NAME </span><span xmlns="" class="perl_String">= example-anaconda-addon</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">VERSION </span><span xmlns="" class="perl_String">= 0.1</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">ADDON </span><span xmlns="" class="perl_String">= org_fedora_example</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">TESTS </span><span xmlns="" class="perl_String">= tests</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">FILES </span><span xmlns="" class="perl_String">= </span><span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">ADDON</span><span xmlns="" class="perl_Char">) \</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">        </span><span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">TESTS</span><span xmlns="" class="perl_Char">) \</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">        COPYING </span><span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">        Makefile </span><span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">        README</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">EXCLUDES </span><span xmlns="" class="perl_String">= </span><span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">        *.pyc</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DecVal">all:</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">@</span><span xmlns="" class="perl_BaseN">echo</span> <span xmlns="" class="perl_String">"usage: make dist"</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">@</span><span xmlns="" class="perl_BaseN">echo</span> <span xmlns="" class="perl_String">"       make test"</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">@</span><span xmlns="" class="perl_BaseN">echo</span> <span xmlns="" class="perl_String">"       make install"</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">@</span><span xmlns="" class="perl_BaseN">echo</span> <span xmlns="" class="perl_String">"       make uninstall"</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">DISTNAME </span><span xmlns="" class="perl_String">= </span><span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">NAME</span><span xmlns="" class="perl_Char">)-$(</span><span xmlns="" class="perl_DataType">VERSION</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">ADDONDIR </span><span xmlns="" class="perl_String">= /usr/share/anaconda/addons/</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DataType">DISTBALL </span><span xmlns="" class="perl_String">= </span><span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">).</span><span xmlns="" class="perl_String">tar.gz</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DecVal">install:</span>
+<span xmlns="" class="line">​</span>        mkdir -p <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DESTDIR</span><span xmlns="" class="perl_Char">)$(</span><span xmlns="" class="perl_DataType">ADDONDIR</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        cp -rv <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">ADDON</span><span xmlns="" class="perl_Char">)</span> <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DESTDIR</span><span xmlns="" class="perl_Char">)$(</span><span xmlns="" class="perl_DataType">ADDONDIR</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DecVal">uninstall:</span>
+<span xmlns="" class="line">​</span>        rm -rfv <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DESTDIR</span><span xmlns="" class="perl_Char">)$(</span><span xmlns="" class="perl_DataType">ADDONDIR</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DecVal">dist:</span>
+<span xmlns="" class="line">​</span>        rm -rf <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        mkdir -p <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">@</span><span xmlns="" class="perl_BaseN">if</span> test -d <span xmlns="" class="perl_String">".git"</span><span xmlns="" class="perl_Char">;</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>        then <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                echo Creating ChangeLog &amp;&amp; <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                <span xmlns="" class="perl_Char">(</span> cd <span xmlns="" class="perl_String">"$(top_srcdir)"</span> &amp;&amp; <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                  echo <span xmlns="" class="perl_Comment">'# Generate automatically. Do not edit.'; echo; \</span>
+<span xmlns="" class="line">​</span>                  git log --stat --<span xmlns="" class="perl_DataType">date</span><span xmlns="" class="perl_String">=short ) &gt; ChangeLog.tmp </span><span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">                &amp;&amp; mv -f ChangeLog.tmp </span><span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span><span xmlns="" class="perl_String">/ChangeLog </span><span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_String">                || ( rm -f ChangeLog.tmp </span><span xmlns="" class="perl_Char">;</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                     echo Failed to generate ChangeLog &gt;&amp;2 <span xmlns="" class="perl_Char">);</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">else</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                echo A git clone is required to generate a ChangeLog &gt;&amp;2<span xmlns="" class="perl_Char">;</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>        fi
+<span xmlns="" class="line">​</span>        for file in <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">FILES</span><span xmlns="" class="perl_Char">);</span> do <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                cp -rpv <span xmlns="" class="perl_Char">$$</span>file <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span>/<span xmlns="" class="perl_Char">$$</span>file<span xmlns="" class="perl_Char">;</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>        done
+<span xmlns="" class="line">​</span>        for excl in <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">EXCLUDES</span><span xmlns="" class="perl_Char">);</span> do <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>                find <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span> -name <span xmlns="" class="perl_String">"$$excl"</span> -delete<span xmlns="" class="perl_Char">;</span> <span xmlns="" class="perl_Char">\</span>
+<span xmlns="" class="line">​</span>        done
+<span xmlns="" class="line">​</span>        tar -czvf <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTBALL</span><span xmlns="" class="perl_Char">)</span> <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        rm -rf <span xmlns="" class="perl_Char">$(</span><span xmlns="" class="perl_DataType">DISTNAME</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_DecVal">test:</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_DataType">PYTHONPATH</span><span xmlns="" class="perl_String">=. nosetests --processes=-1 -vw tests/</span>
+</pre></div></div><div class="footnotes"><br /><hr /><div id="ftn.idm242211928144" class="footnote"><div class="para"><a href="#idm242211928144" class="para"><sup class="para">[5] </sup></a>
+				overwriting the files that already exist with the files from the updates image (which is how the Anaconda developers use those files for testing patches)
+			</div></div></div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-tui-support.html"><strong>Prev</strong>6.3. Text User Interface</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect-addons-welcome.html"><strong>Next</strong>8. Add-ons Welcome</a></li></ul></body></html>

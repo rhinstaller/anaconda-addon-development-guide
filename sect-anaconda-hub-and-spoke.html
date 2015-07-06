@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">3. The Hub &amp; Spoke model</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-22-en-US-2-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="index.html" title="Anaconda Addon Development Guide" /><link rel="prev" href="sect-anaconda-addon-architecture.html" title="2. Architecture of Anaconda" /><link rel="next" href="sect-anaconda-threads-communication.html" title="4. Threads and Communication" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-architecture.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="sect-anaconda-threads-communication.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h2 class="title"><a id="sect-anaconda-hub-and-spoke">
+      ⁠</a>3. The Hub &amp; Spoke model</h2></div></div></div><div class="para">
+			One of the notable differences between <span class="application"><strong>Anaconda</strong></span> and most other operating system installers is its non-linear nature, also known as the <em class="firstterm">hub and spoke</em> model.
+		</div><div class="para">
+			The hub and spoke model of <span class="application"><strong>Anaconda</strong></span> has several advantages, including:
+		</div><div xmlns:d="http://docbook.org/ns/docbook" class="itemizedlist"><ul><li class="listitem"><div class="para">
+					users are not forced to go through the screens in some strictly defined order
+				</div></li><li class="listitem"><div class="para">
+					users are not forced to visit every screen no matter if they understand what the options configured in it mean or not
+				</div></li><li class="listitem"><div class="para">
+					it is good for the transactional mode where all desired values can be set while nothing is actually happening to the underlying machine until a special button is clicked
+				</div></li><li class="listitem"><div class="para">
+					it provides way to show an overview of the configured values
+				</div></li><li class="listitem"><div class="para">
+					it has a great support for extensibility, because additional spokes can be put on hubs without need to reorder anything and resolve some complex ordering dependencies
+				</div></li><li class="listitem"><div class="para">
+					it can be used for both graphical and text mode of the installer
+				</div></li></ul></div><div class="para">
+			The diagram below shows the installer layout as well as possible interactions between <em class="firstterm">hubs</em> and <em class="firstterm">spokes</em> (screens):
+		</div><div class="figure"><a id="figu-anaconda-hub-and-spoke">
+      ⁠</a><div class="figure-contents"><div class="mediaobject"><object data="images/hub_and_spoke.svg" type="image/svg+xml"><img src="images/hub_and_spoke.png" alt="" /></object></div></div><p class="title"><strong>Figure 1. Diagram of the hub and spoke model</strong></p></div><div class="para">
+			In the diagram, screens 2-13 are called <em class="firstterm">normal spokes</em>, and screens 1 and 14 are <em class="firstterm">standalone spokes</em>. Standalone spokes are a type of screen which is a type of screen that should be used only in case it has to be visited before (or after) the following (or previous) standalone spoke or hub. This may be, for example, the <span class="guilabel"><strong>Welcome</strong></span> screen at the beginning of the installation which prompts you to choose your language for the rest of the installation.
+		</div><div xmlns:d="http://docbook.org/ns/docbook" class="note"><div class="admonition_header"><p><strong>Note</strong></p></div><div class="admonition"><div class="para">
+				Screens mentioned in the rest of this section are screens from the installer's graphical interface (GUI).
+			</div></div></div><div class="para">
+			Central points of the hub and spoke model are <em class="firstterm">hubs</em>. There are two hubs by default:
+		</div><div xmlns:d="http://docbook.org/ns/docbook" class="itemizedlist"><ul><li class="listitem"><div class="para">
+					The <span class="guilabel"><strong>Installation Summary</strong></span> hub which shows a summary of configured options before the installation begins
+				</div></li><li class="listitem"><div class="para">
+					The <span class="guilabel"><strong>Configuration and Progress</strong></span> hub which appears after you click <span class="guilabel"><strong>Begin Installation</strong></span> in <span class="guilabel"><strong>Installation Summary</strong></span>, and which displays the progress of the installation process and allows you to configure additional options (set the root password and create a user account).
+				</div></li></ul></div><div class="para">
+			Each spoke has several predefined <em class="firstterm">properties</em> which are reflected on the hub. These are:
+		</div><div xmlns:d="http://docbook.org/ns/docbook" class="itemizedlist"><ul><li class="listitem"><div class="para">
+					<span class="property">ready</span> - states whether the spoke can be visited or not; for example, when the installer is configuring a package source, that spoke is not ready, is colored gray, and cannot be accessed until configuration is complete
+				</div></li><li class="listitem"><div class="para">
+					<span class="property">completed</span> - marks the spoke as completed (all required values are set) or not
+				</div></li><li class="listitem"><div class="para">
+					<span class="property">mandatory</span> - determines whether the spoke <span class="emphasis"><em>must</em></span> be visited and confirmed by the user before continuing the installation; for example, the <span class="guilabel"><strong>Installation Destination</strong></span> spoke must always be visited, even if you want to use automatic disk partitioning
+				</div></li><li class="listitem"><div class="para">
+					<span class="property">status</span> - provides a short summary of values configured within the spoke (displayed under the spoke name in the hub)
+				</div></li></ul></div><div class="para">
+			To make the user interface clearer, spokes are grouped together into <em class="firstterm">categories</em>. For example, the <span class="guilabel"><strong>Localization</strong></span> category groups together spokes for keyboard layout selection, language support and time zone settings.
+		</div><div class="para">
+			Each spoke contains UI controls which display and allow you to modify values from one or more sub-trees of the in-memory tree-like structure which was discussed in <a class="xref" href="sect-anaconda-addon-architecture.html">Section 2, “Architecture of Anaconda”</a>. As <a class="xref" href="sect-writing-anaconda-addon.html">Section 6, “Writing an Anaconda add-on”</a> explains, the same applies to spokes provided by add-ons.
+		</div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-architecture.html"><strong>Prev</strong>2. Architecture of Anaconda</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect-anaconda-threads-communication.html"><strong>Next</strong>4. Threads and Communication</a></li></ul></body></html>

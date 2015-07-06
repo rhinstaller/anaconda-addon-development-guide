@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title xmlns:d="http://docbook.org/ns/docbook">6.3. Text User Interface</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta xmlns:d="http://docbook.org/ns/docbook" name="generator" content="publican v4.2.6" /><meta xmlns:d="http://docbook.org/ns/docbook" name="package" content="Fedora-Anaconda_Addon_Development_Guide-22-en-US-2-0" /><link rel="home" href="index.html" title="Anaconda Addon Development Guide" /><link rel="up" href="sect-writing-anaconda-addon.html" title="6. Writing an Anaconda add-on" /><link rel="prev" href="sect-anaconda-addon-gui-support-advanced.html" title="6.2.2. Advanced features" /><link rel="next" href="sect-anaconda-addon-deploying-testing.html" title="7. Deploying and Testing an Anaconda Add-on" /></head><body class="draft "><p id="title"><a class="left" href="http://www.fedoraproject.org"><img alt="Product Site" src="Common_Content/images//image_left.png" /></a><a class="right" href="http://docs.fedoraproject.org"><img alt="Documentation Site" src="Common_Content/images//image_right.png" /></a></p><ul class="docnav top"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-gui-support-advanced.html"><strong>Prev</strong></a></li><li class="home">Anaconda Addon Development Guide</li><li class="next"><a accesskey="n" href="sect-anaconda-addon-deploying-testing.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div keep-together.within-column="always"><h3 class="title"><a id="sect-anaconda-addon-tui-support">
+      ⁠</a>6.3. Text User Interface</h3></div></div></div><div class="para">
+				The third supported interface, after Kickstart and GUI which have been discussed in previous sections, <span class="application"><strong>Anaconda</strong></span> also supports a text-based interface. This interface is more limited in its capabilities, but on some systems it may be the only choice for an interactive installation. For more information about differences between the text-based and graphical interface and about limitations of the TUI, see <a class="xref" href="index.html#sect-anaconda-introduction">Section 1.1, “Introduction to Anaconda”</a>.
+			</div><div class="para">
+				To add support for the text interface into your add-on, create a new set of subpackages under the <code class="filename">tui</code> directory as described in <a class="xref" href="sect-anaconda-addon-structure.html">Section 5, “Anaconda Add-on Structure”</a>.
+			</div><div class="para">
+				Text mode support in the installer is based on the <code class="systemitem">simpleline</code> utility, which only allows very simple user interaction. It does <span class="emphasis"><em>not</em></span> support cursor movement (instead acting like a line printer) nor any visual enhancements like using different colors or fonts.
+			</div><div class="para">
+				Internally, there are three main classes in the <code class="systemitem">simpleline</code> toolkit: <code class="classname">App</code>, <code class="classname">UIScreen</code> and <code class="classname">Widget</code>. Widgets, which are units containing information to be shown (printed) on the screen, are placed on UIScreens which are switched by a single instance of the <code class="classname">App</code> class. On top of the basic elements, there are <span class="emphasis"><em>hubs</em></span>, <span class="emphasis"><em>spokes</em></span> and <span class="emphasis"><em>dialogs</em></span>, all containing various widgets in a way similar to the graphical interface.
+			</div><div class="para">
+				For an add-on, the most important classes are <code class="classname">NormalTUISpoke</code> and various other classes defined in the <a href="https://github.com/rhinstaller/anaconda/tree/master/pyanaconda/ui/tui/spokes"><code class="filename">pyanaconda.ui.tui.spokes</code></a> package. All of those classes are based on the <code class="classname">TUIObject</code> class, which itself is an equivalent of the <code class="classname">GUIObject</code> class discussed in the previous chapter. Each TUI spoke is a Python class inheriting from the <code class="classname">NormalTUISpoke</code> class, overriding special arguments and methods defined by the API.
+			</div><div class="para">
+				Because the text interface is simpler than the GUI, there are only two such arguments: <code class="varname">title</code>, which determines the title of the spoke, and <code class="varname">category</code>, which determines its category (the category name is not displayed anywhere, it is only used for grouping). Both have the same meanings as the equivalent GUI arguments, described in the previous section.
+			</div><div class="para">
+				Each spoke is also expected to override several methods, namely <code class="methodname">__init__</code>, <code class="methodname">initialize</code>, <code class="methodname">refresh</code>, <code class="methodname">refresh</code>, <code class="methodname">apply</code>, <code class="methodname">execute</code>, <code class="methodname">input</code>, and <code class="methodname">prompt</code>, and properties (<code class="methodname">ready</code>, <code class="methodname">completed</code>, <code class="methodname">mandatory</code>, and <code class="methodname">status</code>). All of these have already been described in <a class="xref" href="sect-anaconda-addon-gui-support.html">Section 6.2, “Graphical user interface”</a>.
+			</div><div class="para">
+				The example below shows the implementation of a simple TUI spoke in the Hello World sample add-on:
+			</div><div class="example"><a id="exam-tui-normaltuispoke">
+      ⁠</a><p class="title"><strong>Example 13. Defining a Simple TUI Spoke</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> __init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, app, data, storage, payload, instclass<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :see: pyanaconda.ui.tui.base.UIScreen</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :see: pyanaconda.ui.tui.base.App</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param app: reference to application which is a main class for TUI</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                    screen handling, it is responsible for mainloop control</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                    and keeping track of the stack where all TUI screens are</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                    scheduled</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type app: instance of pyanaconda.ui.tui.base.App</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param data: data object passed to every spoke to load/store data</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                     from/to it</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type data: pykickstart.base.BaseHandler</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param storage: object storing storage-related information</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                        (disks, partitioning, bootloader, etc.)</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type storage: blivet.Blivet</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param payload: object storing packaging-related information</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type payload: pyanaconda.packaging.Payload</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param instclass: distribution-specific information</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type instclass: pyanaconda.installclass.BaseInstallClass</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        NormalTUISpoke.__init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, app, data, storage, payload, instclass<span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>._entered_text <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">""</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> initialize<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The initialize method that is called after the instance is created.</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The difference between __init__ and this method is that this may take</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        a long time and thus could be called in a separated thread.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :see: pyanaconda.ui.common.UIObject.initialize</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        NormalTUISpoke.initialize<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> refresh<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, args<span xmlns="" class="perl_Char">=</span><span xmlns="" class="perl_Others">None</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The refresh method that is called every time the spoke is displayed.</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        It should update the UI elements according to the contents of</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        self.data.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :see: pyanaconda.ui.common.UIObject.refresh</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :see: pyanaconda.ui.tui.base.UIScreen.refresh</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param args: optional argument that may be used when the screen is</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                     scheduled (passed to App.switch_screen* methods)</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type args: anything</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :return: whether this screen requests input or not</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :rtype: bool</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>._entered_text <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_Others">self</span>.data.addons.org_fedora_hello_world.text
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">return</span> <span xmlns="" class="perl_Others">True</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> <span xmlns="" class="perl_DataType">apply</span><span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The apply method that is called when the spoke is left. It should</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        update the contents of self.data with values set in the spoke.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.data.addons.org_fedora_hello_world.text <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_Others">self</span>._entered_text
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> execute<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The excecute method that is called when the spoke is left. It is</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        supposed to do all changes to the runtime environment according to</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        the values set in the spoke.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># nothing to do here</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">pass</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> <span xmlns="" class="perl_DataType">input</span><span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, args, key<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The input method that is called by the main loop on user's input.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param args: optional argument that may be used when the screen is</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                     scheduled (passed to App.switch_screen* methods)</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type args: anything</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param key: user's input</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type key: unicode</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :return: if the input should not be handled here, return it, otherwise</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                 return True or False if the input was processed succesfully or</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                 not respectively</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :rtype: bool|unicode</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">if</span> key<span xmlns="" class="perl_Char">:</span>
+<span xmlns="" class="line">​</span>            <span xmlns="" class="perl_Others">self</span>._entered_text <span xmlns="" class="perl_Char">=</span> key
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># no other actions scheduled, apply changes</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.<span xmlns="" class="perl_DataType">apply</span><span xmlns="" class="perl_Char">()</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># close the current screen (remove it from the stack)</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.close<span xmlns="" class="perl_Char">()</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">return</span> <span xmlns="" class="perl_Others">True</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> prompt<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, args<span xmlns="" class="perl_Char">=</span><span xmlns="" class="perl_Others">None</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        The prompt method that is called by the main loop to get the prompt</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        for this screen.</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :param args: optional argument that can be passed to App.switch_screen*</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">                     methods</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :type args: anything</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :return: text that should be used in the prompt for the input</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        :rtype: unicode|None</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Comment">        """</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">return</span> _<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"Enter a new text or leave empty to use the old one: "</span><span xmlns="" class="perl_Char">)</span></pre></div></div><div class="para">
+				It is not necessary to override the <code class="methodname">__init__</code> method if it only calls the ancestor's <code class="methodname">__init__</code>, but the comments in the example describe the arguments passed to constructors of spoke classes in an understandable way.
+			</div><div class="para">
+				The <code class="methodname">initialize</code> method sets up a default value for the internal attribute of the spoke, which is then updated by the <code class="methodname">refresh</code> method and used by the <code class="methodname">apply</code> method to update Kickstart data. The only differences in these two methods from their equivalents in the GUI is the return type of the <code class="methodname">refresh</code> method (<span class="type">bool</span> instead of <span class="type">None</span>) and an additional <code class="varname">args</code> argument they take. The meaning of the returned value is explained in the comments - it tells the application (the <code class="classname">App</code> class instance) whether this spoke requires user input or not. The additional <code class="varname">args</code> argument is used for passing extra information to the spoke when scheduled.
+			</div><div class="para">
+				The <code class="methodname">execute</code> method has the same purpose as the equivalent method in the GUI; in this case, the method does nothing.
+			</div><div class="para">
+				Methods <code class="methodname">input</code> and <code class="methodname">prompt</code> are specific to the text interface; there are no equivalents in Kickstart or GUI. These two methods are responsible for user interaction.
+			</div><div class="para">
+				The <code class="methodname">prompt</code> method should return a prompt which will be displayed after the content of the spoke is printed. After a string is entered in reaction to the prompt, this string is passed to the <code class="methodname">input</code> method for processing. The <code class="methodname">input</code> method then processes the entered string and takes action depending on its type and value. The above example asks for <span class="emphasis"><em>any</em></span> value and then stores it as an internal attribute (<code class="varname">key</code>). In more complicated add-ons, you typically need to perform some non-trivial actions, such as parse <code class="literal">c</code> as "continue" or <code class="literal">r</code> as "refresh", convert numbers into integers, show additional screens or toggle boolean values.
+			</div><div class="para">
+				Return value of the <code class="classname">input</code> class must be either the <code class="varname">INPUT_PROCESSED</code> or <code class="varname">INPUT_DISCARDED</code> constant (both of these are defined in the <a href="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/constants_text.py"><code class="filename">pyanaconda.constants_text</code></a> module), <span class="emphasis"><em>or</em></span> the input string itself (in case this input should be processed by a different screen).
+			</div><div class="para">
+				In contrast to the graphical mode, the <code class="methodname">apply</code> method is not called automatically when leaving the spoke; it must be called explicitly from the <code class="methodname">input</code> method. The same applies to closing (hiding) the spoke's screen, which is done by calling the <code class="methodname">close</code> method.
+			</div><div class="para">
+				To show another screen (for example, if you need additional information which was entered in a different spoke), you can instantiate another <code class="classname">TUIObject</code> and call one of the <code class="methodname">self.app.switch_screen*</code> methods of the <code class="classname">App</code>.
+			</div><div class="para">
+				Due to restrictions of the text-based interface, TUI spokes tend to have a very similar structure: a list of checkboxes or entries which should be checked or unchecked and populated by the user. The previous paragraphs show a way to implement a TUI spoke where the its methods handle printing and processing of the available and provided data. However, there is a different way to accomplish this using the <code class="classname">EditTUISpoke</code> class from the <a href="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/ui/tui/spokes/__init__.py"><code class="filename">pyanaconda.ui.tui.spokes</code></a> package. By inheriting this class, you can implement a typical TUI spoke by only specifying fields and attributes which should be set in it. The example below demonstrates this:
+			</div><div class="example"><a id="exam-tui-edittuispoke">
+      ⁠</a><p class="title"><strong>Example 14. Using EditTUISpoke to Define a Text Interface Spoke</strong></p><div class="example-contents"><pre class="programlisting"><span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">class</span> _EditData<span xmlns="" class="perl_Char">(object):</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">"""Auxiliary class for storing data from the example EditSpoke"""</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> __init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment">"""Trivial constructor just defining the fields that will store data"""</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.checked <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_Others">False</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.shown_input <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">""</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.hidden_input <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_String">""</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span><span xmlns="" class="perl_Keyword">class</span> HelloWorldEditSpoke<span xmlns="" class="perl_Char">(EditTUISpoke):</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">"""Example class demonstrating usage of EditTUISpoke inheritance"""</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    title <span xmlns="" class="perl_Char">=</span> _<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"Hello World Edit"</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>    category <span xmlns="" class="perl_Char">=</span> HelloWorldCategory
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment"># simple RE used to specify we only accept a single word as a valid input</span>
+<span xmlns="" class="line">​</span>    _valid_input <span xmlns="" class="perl_Char">=</span> re.<span xmlns="" class="perl_DataType">compile</span><span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">r'\w+'</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment"># special class attribute defining spoke's entries as:</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment"># Entry(TITLE, ATTRIBUTE, CHECKING_RE or TYPE, SHOW_FUNC or SHOW)</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment"># where:</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   TITLE specifies descriptive title of the entry</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   ATTRIBUTE specifies attribute of self.args that should be set to the</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#             value entered by the user (may contain dots, i.e. may specify</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#             a deep attribute)</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   CHECKING_RE specifies compiled RE used for deciding about</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#               accepting/rejecting user's input</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   TYPE may be one of EditTUISpoke.CHECK or EditTUISpoke.PASSWORD used</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#        instead of CHECKING_RE for simple checkboxes or password entries,</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#        respectively</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   SHOW_FUNC is a function taking self and self.args and returning True or</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#             False indicating whether the entry should be shown or not</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   SHOW is a boolean value that may be used instead of the SHOW_FUNC</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Comment">#   :see: pyanaconda.ui.tui.spokes.EditTUISpoke</span>
+<span xmlns="" class="line">​</span>    edit_fields <span xmlns="" class="perl_Char">=</span> <span xmlns="" class="perl_Char">[</span>
+<span xmlns="" class="line">​</span>        Entry<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"Simple checkbox"</span>, <span xmlns="" class="perl_String">"checked"</span>, EditTUISpoke.CHECK, <span xmlns="" class="perl_Others">True</span><span xmlns="" class="perl_Char">)</span>,
+<span xmlns="" class="line">​</span>        Entry<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"Always shown input"</span>, <span xmlns="" class="perl_String">"shown_input"</span>, _valid_input, <span xmlns="" class="perl_Others">True</span><span xmlns="" class="perl_Char">)</span>,
+<span xmlns="" class="line">​</span>        Entry<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"Conditioned input"</span>, <span xmlns="" class="perl_String">"hidden_input"</span>, _valid_input,
+<span xmlns="" class="line">​</span>              <span xmlns="" class="perl_Keyword">lambda</span> <span xmlns="" class="perl_Others">self</span>, args<span xmlns="" class="perl_Char">:</span> bool<span xmlns="" class="perl_Char">(args</span>.shown_input<span xmlns="" class="perl_Char">))</span>,
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Char">]</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> __init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, app, data, storage, payload, instclass<span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        EditTUISpoke.__init__<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>, app, data, storage, payload, instclass<span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># just populate the self.args attribute to have a store for data</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># typically self.data or a subtree of self.data is used as self.args</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Others">self</span>.args <span xmlns="" class="perl_Char">=</span> _EditData<span xmlns="" class="perl_Char">()</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    @property
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> completed<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># completed if user entered something non-empty to the Conditioned input</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">return</span> bool<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span>.args.hidden_input<span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    @property
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> status<span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">return</span> <span xmlns="" class="perl_String">"Hidden input </span><span xmlns="" class="perl_Char">%s</span><span xmlns="" class="perl_String">"</span> <span xmlns="" class="perl_Char">%</span> <span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_String">"entered"</span> <span xmlns="" class="perl_Keyword">if</span> <span xmlns="" class="perl_Others">self</span>.args.hidden_input
+<span xmlns="" class="line">​</span>                                    <span xmlns="" class="perl_Keyword">else</span> <span xmlns="" class="perl_String">"not entered"</span><span xmlns="" class="perl_Char">)</span>
+<span xmlns="" class="line">​</span>
+<span xmlns="" class="line">​</span>    <span xmlns="" class="perl_Keyword">def</span> <span xmlns="" class="perl_DataType">apply</span><span xmlns="" class="perl_Char">(</span><span xmlns="" class="perl_Others">self</span><span xmlns="" class="perl_Char">):</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Comment"># nothing needed here, values are set in the self.args tree</span>
+<span xmlns="" class="line">​</span>        <span xmlns="" class="perl_Keyword">pass</span></pre></div></div><div class="para">
+				The auxiliary class <code class="classname">_EditData</code> serves as a data container which is used to store values entered by the user. The <code class="classname">HelloWorldEditSpoke</code> class defines a simple spoke with one checkbox and two entries, all of which are instances of the <code class="classname">EditTUISpokeEntry</code> class imported as the <code class="classname">Entry</code> class). The first one is shown every time the spoke is displayed, the second instance is only shown if the first one contains a non-empty value.
+			</div><div class="para">
+				For more information about the <code class="classname">EditTUISpoke</code> class, see the comments in the above example.
+			</div></div><ul class="docnav"><li class="previous"><a accesskey="p" href="sect-anaconda-addon-gui-support-advanced.html"><strong>Prev</strong>6.2.2. Advanced features</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect-anaconda-addon-deploying-testing.html"><strong>Next</strong>7. Deploying and Testing an Anaconda Add-on</a></li></ul></body></html>
