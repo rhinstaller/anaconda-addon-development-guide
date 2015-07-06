@@ -1,7 +1,9 @@
 <!ENTITY PRODUCT "Anaconda">
 <!ENTITY BOOKID "Anaconda_Addon_Development_Guide">
-<!ENTITY YEAR "2013">
+<!ENTITY YEAR "2015">
 <!ENTITY HOLDER "Fedora Project Contributors">
 <!ENTITY FEDORA "Fedora">
-<!ENTITY RHEL "RHEL">
+<!ENTITY RHEL "Red&nbsp;Hat Enterprise&nbsp;Linux">
 <!ENTITY HWADDON "Hello world addon">
+<!ENTITY PRODVER "22">
+<!ENTITY BZURL "<ulink url='https://bugzilla.redhat.com/enter_bug.cgi?product=&PRODUCT;&amp;component=&BOOKID;'>http://bugzilla.redhat.com/</ulink>">

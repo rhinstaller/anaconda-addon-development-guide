@@ -4,38 +4,52 @@
 %BOOK_ENTITIES;
 ]>
 <appendix id="appe-Anaconda_Addon_Development_Guide-Revision_History">
-	<title>Revision History</title>
-	<simpara>
-		<revhistory>
-			<revision>
-				<revnumber>1-0</revnumber>
-				<date>Wed Jan 15 2014</date>
-				<author>
-					<firstname>Vratislav</firstname>
-					<surname>Podzimek</surname>
-					<email>vpodzime@redhat.com</email>
-				</author>
-				<revdescription>
-					<simplelist>
-						<member>First version to be a part of the official documentation</member>
-					</simplelist>
-				</revdescription>
-			</revision>
-			<revision>
-				<revnumber>0-0</revnumber>
-				<date>Fri Dec 28 2012</date>
-				<author>
-					<firstname>Vratislav</firstname>
-					<surname>Podzimek</surname>
-					<email>vpodzime@redhat.com</email>
-				</author>
-				<revdescription>
-					<simplelist>
-						<member>Initial creation of book by publican</member>
-					</simplelist>
-				</revdescription>
-			</revision>
-		</revhistory>
-	</simpara>
+  <title>Revision History</title>
+  <simpara>
+    <revhistory>
+      <revision>
+        <revnumber>2-0</revnumber>
+        <date>Fri Jul 03 2015</date>
+        <author>
+          <firstname>Petr</firstname>
+          <surname>Bokoč</surname>
+          <email>pbokoc@redhat.com</email>
+        </author>
+        <revdescription>
+          <simplelist>
+            <member>Complete rewrite of the entire document - improved markup, style, structure</member>
+          </simplelist>
+        </revdescription>
+      </revision>
+      <revision>
+        <revnumber>1-0</revnumber>
+        <date>Wed Jan 15 2014</date>
+        <author>
+          <firstname>Vratislav</firstname>
+          <surname>Podzimek</surname>
+          <email>vpodzime@redhat.com</email>
+        </author>
+        <revdescription>
+          <simplelist>
+            <member>First version to be a part of the official documentation</member>
+          </simplelist>
+        </revdescription>
+      </revision>
+      <revision>
+        <revnumber>0-0</revnumber>
+        <date>Fri Dec 28 2012</date>
+        <author>
+          <firstname>Vratislav</firstname>
+          <surname>Podzimek</surname>
+          <email>vpodzime@redhat.com</email>
+        </author>
+        <revdescription>
+          <simplelist>
+            <member>Initial creation of book by publican</member>
+          </simplelist>
+        </revdescription>
+      </revision>
+    </revhistory>
+  </simpara>
 </appendix>
 

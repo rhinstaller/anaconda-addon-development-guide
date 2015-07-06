@@ -4,35 +4,35 @@
 %BOOK_ENTITIES;
 ]>
 <articleinfo id="arti-Anaconda_Addon_Development_Guide-Anaconda_Addon_Development_Guide">
-	<title>Anaconda Addon Development Guide</title>
-	<subtitle>Things one needs to know when writing an Anaconda installer Addon</subtitle>
-	<productname>Fedora</productname>
-	<productnumber>21</productnumber>
-	<edition>0</edition>
-	<pubsnumber>0</pubsnumber>
-	<abstract>
-		<para>
-          The Anaconda installer is a piece of software used to install
-          &FEDORA;, &RHEL; and their derivatives. Since the installation is
-          internally a complicated process and there are many aspects of the
-          resulting system that need to be configured during installation it has
-          been decided that the Anaconda installer needs to support dynamically
-          loaded plugins (addons) that will be developed and maintained by other
-          teams and people specialized in certain areas. This guide should help
-          those people writting an Anaconda addon to get an insight to the
-          architecture and basic principles used by the Anaconda installer as
-          well as an overview of the API and helper functions provided.
-		</para>
-	</abstract>
-	<corpauthor>
-		<inlinemediaobject>
-			<imageobject>
-				<imagedata fileref="Common_Content/images/title_logo.svg" format="SVG" />
-			</imageobject>
-		</inlinemediaobject>
-	</corpauthor>
-	<xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <title>Anaconda Addon Development Guide</title>
+  <subtitle>Things one needs to know when writing an Anaconda installer Addon</subtitle>
+  <productname>Fedora</productname>
+  <productnumber>22</productnumber>
+  <edition>0</edition>
+  <pubsnumber>0</pubsnumber>
+  <abstract>
+    <para>
+      The Anaconda installer is a piece of software used to install
+      &FEDORA;, &RHEL; and their derivatives. Since the installation is
+      internally a complicated process and there are many aspects of the
+      resulting system that need to be configured during installation it has
+      been decided that the Anaconda installer needs to support dynamically
+      loaded plugins (addons) that will be developed and maintained by other
+      teams and people specialized in certain areas. This guide should help
+      those people writting an Anaconda addon to get an insight to the
+      architecture and basic principles used by the Anaconda installer as
+      well as an overview of the API and helper functions provided.
+    </para>
+  </abstract>
+  <corpauthor>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref="Common_Content/images/title_logo.svg" format="SVG" />
+      </imageobject>
+    </inlinemediaobject>
+  </corpauthor>
+  <xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </articleinfo>
 
 

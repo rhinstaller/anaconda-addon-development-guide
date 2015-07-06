@@ -8,6 +8,11 @@
 		<firstname>Vratislav</firstname>
 		<surname>Podzimek</surname>
 		<email>vpodzime@redhat.com</email>
-	</author>
+  </author>
+  <editor>
+    <firstname>Petr</firstname>
+    <surname>Bokoč</surname>
+    <email>pbokoc@redhat.com</email>
+  </editor>
 </authorgroup>
 

@@ -1,23 +1,26 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "Anaconda_Addon_Development_Guide.ent">
 %BOOK_ENTITIES;
 ]>
 <article status="draft">
-    <xi:include href="Article_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <section id="section_introduction">
-      <title>Introduction</title>
+  <xi:include href="Article_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <section id="sect-anaconda-addon-introduction">
+    <title>Introduction to Anaconda and Add-ons</title>
+  
+    <section id="sect-anaconda-introduction">
+      <title>Introduction to Anaconda</title>
       <para>
-        Anaconda<indexterm id="idx_anaconda"> <primary>Anaconda</primary>
-        </indexterm> is the operating system installer (OS) used in &FEDORA;,
-        &RHEL; and their derivatives. At a closer look, it is a set of Python
-        modules and scripts together with some additional files like Gtk widgets
-        (written in C), systemd units and dracut libraries. Altogether they form
-        a tool that allows users to set parameters of the resulting (target)
-        system and then set such a system up on a machine. The final installation
-        process has four major steps:
+        <application>Anaconda</application> is the operating system installer used in Fedora,
+        Red&nbsp;Hat Enterprise&nbsp;Linux, and their derivatives. It is a set of Python modules and
+        scripts together with some additional files like <systemitem>Gtk</systemitem> widgets
+        (written in C), <systemitem>systemd</systemitem> units, and <systemitem>dracut</systemitem>
+        libraries. Together, they form a tool that allows users to set parameters of the resulting
+        (target) system and then set such a system up on a machine. The installation process has
+        four major steps:
       </para>
-      <itemizedlist mark="bullet">
+      <itemizedlist>
         <listitem>
           <para>
             installation destination preparation (usually disk partitioning)
@@ -39,564 +42,605 @@
           </para>
         </listitem>
       </itemizedlist>
-
       <para>
-        There are three ways the user can set parameters for the target
-        system (and in some cases also for the installation process). The most
-        commonly used is via the graphical user interface (GUI) <indexterm
-        id="idx_gui"> <primary>GUI</primary> </indexterm> which should cover all
-        common use cases and should be clear and easily understandable even for
-        non-advanced users. Although Anaconda also supports installation over
-        VNC <indexterm id="idx_vnc"> <primary>VNC</primary> </indexterm>, there
-        are some corner cases where a textual interface is needed, such as
-        installation over serial console on "exotic" pieces of hardware. For
-        this reason, Anaconda also has a textual user interface (TUI)
-        <indexterm id="idx_tui"> <primary>TUI</primary> </indexterm> that works
-        the same way as a black-only line printer. This behavior was chosen as
-        a result of various serial consoles not supporting cursor movement,
-        colors and other "advanced" features. Text mode installation implements
-        only the most important features of the graphical installation and
-        usually needs to be combined with installer-specific command line
-        arguments since it does not provide all of the options the GUI provides.
-        The third and most advanced way to set installation parameters is by
-        using a kickstart file. <indexterm id="idx_kickstart">
-        <primary>kickstart</primary> </indexterm> This is a simple file with
-        shell-like syntax which can contain data driving the installation
-        process, which then runs automatically. If the kickstart file doesn't
-        contain all data required, the installer asks the user about the missing
-        pieces. More information about kickstart can be found at <ulink
-        url="http://fedoraproject.org/wiki/Anaconda/Kickstart">the
-        Anaconda/Kickstart wiki page</ulink>. Addons related kickstart
-        specifications are covered in <xref linkend="section_addon_structure"/>.
-        The important distinction to note is that, compared to the TUI, which is
-        not a full-featured mode of installation, kickstart installation
-        provides the highest number of configuration options. The golden rule is
-        that everything has to be supported in kickstart first. Then the GUI and
-        TUI pieces can follow, supporting subsets of configuration options
-        provided in kickstart that allow the user interface (UI) to remain clear
-        and succinct. Anaconda has to maintain a balance between simplicity and
-        complexity which is difficult to achieve.
+        There are three ways you can control the installer and specify installation options. The
+        most common approach is to use the <firstterm>graphical user interface</firstterm> (GUI).
+        This interface is meant to allow users to install the system interactively with little or no
+        configuration required before beginning the installation, and it should cover all common use
+        cases, including setting up complicated partitioning layouts.
       </para>
-
       <para>
-        It should be clear by now that there are many things which need to
-        happen during the installation process. Many teams and individuals favor
-        the idea of adding more options to the installer so the target system
-        can be pre-configured before it is run for the first time. On one hand,
-        the installation environment is quite specific, and commonly used tools
-        utilized by Anaconda are not always ready to work in it. On the other
-        hand, once a feature is supported via kickstart, multiple systems with
-        the same configuration can be installed easily. However, the more code
-        in the installer, the more bugs it contains. Moreover, the maintenance
-        becomes increasingly difficult with additional functionality, which
-        makes it difficult to follow changes in so many areas. For these
-        reasons, it was decided when doing a major rewrite of the Anaconda
-        installer, support for addons <indexterm id="idx_addon">
-        <primary>addon</primary> </indexterm> must be added. This allows other
-        teams and individuals to participate and contribute as experts in their
-        particular areas of interest by developing and maintaining their own
-        pieces of code. This guide is intended to serve as a tool for lowering
-        the barrier to entry by providing an understanding of how the Anaconda
-        installer works and looks like internally, as well as explaining how its
-        functionality can be extended with an addon.
+        The graphical interface also supports remote access over <systemitem>VNC</systemitem>, which
+        allows you to use the GUI even on systems with no graphics cards or even attached monitor.
+        However, there are still cases where this is not desired, but at the same time, you may want
+        to perform an interactive installation. For these cases, a <firstterm>text mode</firstterm>
+        (TUI) is available. The TUI works in a way similar to a monochrome line printer, which
+        allows it to work even on serial consoles which do not support cursor movement, colors and
+        other advanced features. The text mode is limited in that it only allows you to customize
+        most common options, such as network settings, language options or installation (package)
+        source; advanced features such as manual partitioning are not available in this interface.
       </para>
-
       <para>
-        Traditionally, the first boot of the newly installed system is also
-        considered to be a part of the installation procedure--usually, some
-        configuration of the system (e.g. user creation) is taking place at
-        this point. For many years there has been a graphical tool called <ulink
-        url="http://fedoraproject.org/wiki/FirstBoot">Firstboot</ulink>
-        <indexterm id="idx_firstboot"><primary>Firstboot</primary></indexterm>,
-        which has helped users configure some aspects of the newly installed
-        system. The issue with Firstboot is that it is using Gtk2 and the pygtk
-        module, which are both no longer being developed. Since the goal was to
-        provide all existing options from Firstboot during the installation
-        process, it was obvious that the rewritten Firstboot should be sharing
-        code with the Anaconda installer.
-
-        <footnote>
-          <para>
-            At the same time, it was obvious that the old Firstboot had to be
-            kept working because of the third-party modules written for it.
-          </para>
-        </footnote>
-
-        That is how a new tool called <ulink
-        url="http://fedoraproject.org/wiki/Features/NewFirstboot"> Initial
-        Setup</ulink> <indexterm id="idx_is"><primary>Initial Setup</primary>
-        </indexterm> was born. It reuses a lot of code from the installer: it
-        has the same model and design as anaconda, and it reads data produced by
-        the installer to show which values are set during the installation
-        process. Most noteworthy is that only a little is needed for an Anaconda
-        addon to become an Initial Setup addon. This is explained in more detail
-        in <xref linkend="section_writing_addon"/>.
+        The third way to install a system using <application>Anaconda</application> is by using a
+        Kickstart file - a plain text file with shell-like syntax which can contain data to drive
+        the installation process. A Kickstart file allows you to partially or completely automate
+        the installation. A certain set of commands which configures all required areas is necessary
+        to completely automate the installation; if one or more of the required commands is missing,
+        the installation will require interaction. If all required commands are present, the
+        installation will be performed in a completely automatic way, without any need for
+        interaction.
       </para>
-
       <para>
-        Some additional information about the Anaconda installer can be found at
-        <ulink url="http://fedoraproject.org/wiki/Anaconda">the Anaconda wiki
-        page</ulink>, and additional information about the rewrite can be found
-        at <ulink url="https://fedoraproject.org/wiki/Anaconda/NewInstaller">the
-        Anaconda/NewInstaller wiki page</ulink>.
+        Kickstart provides the highest amount of options, covering use cases where neither the TUI
+        nor the GUI is sufficient. Every feature in <application>Anaconda</application> must always
+        be supported in Kickstart; other interfaces follow only subsets of all available options,
+        which allows them to remain clear.
       </para>
     </section>
 
-    <section id="section_architecture">
-      <title>Architecture</title>
+    <section id="sect-firstboot-introduction">
+      <title>Firstboot and Initial Setup</title>
       <para>
-        As already noted, the Anaconda installer is a set of
-        python modules and scripts. It also uses a number of external packages
-        and libraries, some of which were originally created specifically for
-        the installer. Major components of the toolset include the
-        following packages: <package>pykickstart</package>, <indexterm
-        id="idx_pykickstart"> <primary>pykickstart</primary> </indexterm>
-        <package>yum</package>, <indexterm id="idx_yum"> <primary>yum</primary>
-        </indexterm> <package>blivet</package> <indexterm id="idx_blivet">
-        <primary>blivet</primary> </indexterm> and
-        <package>pyanaconda</package>.  <indexterm id="idx_pyanaconda">
-        <primary>pyanaconda</primary> </indexterm>
-        <package>pykickstart</package> is a package that parses and validates
-        a provided kickstart file and also provides a data structure that
-        Anaconda uses to store values driving installation. We will focus
-        more on the data representation and life cycle in the following
-        paragraph. <package>yum</package> is the core python package of the
-        <command>yum</command> package manager. Anaconda uses it to interface
-        with package repositories and handle operations related to package
-        management during installation.
-        <package>blivet</package> is a relatively recent project which was split
-        out from the <package>pyanaconda</package> package as
-        <package>pyanaconda.storage</package>. As the old name suggests, blivet
-        is a storage library which handles all activities related to disk
-        management. Additionally, it provides functions for boot loader
-        installation and configuration. The <package>pyanaconda</package>
-        package acts as a glue for holding all of the components together; it
-        contains all of the UI code and several modules for functionality unique
-        to anaconda, such as keyboard and timezone selection, network
-        configuration, and user creation, as well as a number of utilities and
-        system-oriented functions.
-
-        There is also the <package> python-meh
-        </package> <indexterm id="idx_meh"> <primary> python-meh </primary>
-        </indexterm> package which contains an exception handler that gathers and
-        stores additional information from the system in case of a crash and
-        passes this data to the <package>libreport</package> <indexterm
-        id="idx_libreport"> <primary> libreport </primary> </indexterm> library,
-        which is a part of the <ulink url="https://fedorahosted.org/abrt/">ABRT
-        project</ulink>. <indexterm id="idx_abrt"> <primary> ABRT </primary>
-        </indexterm>
+        The first boot of the newly installed system is traditionally considered a part of the
+        installation process as well, because some parts of configuration such as user creation are
+        often performed at this point. In older releases of Red&nbsp;Hat Enterprise&nbsp;Linux, the
+        <application>Firstboot</application> tool has been used for this purpose, allowing you to
+        register your newly installed system or configure <application>Kdump</application>. However,
+        <application>Firstboot</application> relies on no longer maintained tools such as
+        <systemitem>Gtk2</systemitem> and the <systemitem>pygtk2</systemitem> module. 
+        <footnote>
+          <para>
+            While Firstboot is a legacy tool, it is still supported because of third-party modules
+            written for it.
+          </para>  
+        </footnote> 
+        For this reason, a new tool called <application>Initial Setup</application> was developed,
+        which reuses code from <application>Anaconda</application>. This allows add-ons developed
+        for <application>Anaconda</application> to be easily reused in <application>Initial
+          Setup</application>. This topic is further discussed in <xref
+          linkend="sect-writing-anaconda-addon" />.
       </para>
-
-      <!-- divide into subsections? -->
+    </section>
+    
+    <section id="sect-anaconda-introduction-addons">
+      <title>Anaconda and Initial Setup Add-ons</title>
       <para>
-        The life cycle of the data in the installation process is simple and
-        straightforward. If a kickstart file is provided, it is parsed and
-        processed by the <package>pykickstart</package> module to behave as an
-        in-memory, tree-like structure. If no kickstart file is given, an empty
-        tree-like structure is created. Items in this structure are then updated
-        with the user's choices as they are made within the UI. Next, the
-        installation process begins, and it is driven by the values which are
-        stored in the tree-like structure. At this point, the values are also
-        written out as a kickstart file which can be used to perform another
-        installation with the same configuration. Elements of the structure are
-        defined in the <package>pykickstart</package> package, but some of them
-        are overridden by modified versions from the
-        <package>pyanaconda.kickstart</package> module. The important rule which
-        governs this behavior is that there is nowhere to store configuration
-        data, and the installation process is data-driven and relies on
-        transactions as much as possible. This neatly enforces some nice
-        features:
+        Installing a new operating system is a vastly complicated use case - each user may want to
+        do something slightly different. Designing an installer for every corner case would cause it
+        to be cluttered with rarely-used functionality. For this reason, when the installer was
+        being rewritten into its current form, it gained support for add-ons.
       </para>
-      <itemizedlist mark="bullet">
+      <para>
+        <application>Anaconda</application> add-ons can be used to add your own Kickstart commands
+        and options as well as new configuration screens in the graphical and text-based user
+        interface, depending on your specific use case. Each add-on must have Kickstart support; the
+        GUI and TUI are optional, but can be very helpful.
+      </para>
+      <para>
+        In current releases of Fedora
+        <footnote>
+          <para>
+            In Fedora, the add-on is disabled by default. You can enable it using the
+            <option>inst.kdump_addon=on</option> option in the boot menu.
+          </para>
+        </footnote>
+        (21 and later) and Red&nbsp;Hat Enterprise&nbsp;Linux (7.1 and later), one add-on is
+        included by default: The <application>Kdump</application> add-on, which adds support for
+        configuring kernel crash dumping during the installation. This add-on has full support in
+        Kickstart (using the <command>%addon com_redhat_kdump</command> command and its options) and
+        is fully integrated as an additional screen in the text-based and graphical interfaces. You
+        can develop other add-ons in the same way and add them to the default installer using
+        procedures described further in this guide.
+      </para>
+    </section>
+    
+    <section id="sect-anaconda-introduction-additional-information">
+      <title>Additional Information</title>
+      <para>
+        Following links contain additional information about <application>Anaconda</application> and
+        <application>Initial Setup</application>:
+      </para>
+      <itemizedlist>
         <listitem>
           <para>
-            everything has to be supported in kickstart first, because in an
-            automated installation only the transaction happens
+            The <ulink url="http://fedoraproject.org/wiki/Anaconda">Anaconda page on Fedora Project
+              Wiki</ulink> contains provides more information about the installer.
           </para>
         </listitem>
         <listitem>
           <para>
-            there is a single and obvious point where the underlying machine starts
-            to be modified -- this marks the beginning of the transaction
+            Information about development of <application>Anaconda</application> into its current
+            version is available at the <ulink
+              url="https://fedoraproject.org/wiki/Anaconda/NewInstaller">Anaconda/NewInstaller Wiki
+              page</ulink>.
           </para>
         </listitem>
         <listitem>
           <para>
-            everything configured in the UI is reflected in the resultant
-            kickstart file
+           Chapters <ulink
+             url="https://docs.fedoraproject.org/en-US/Fedora/&PRODVER;/html/Installation_Guide/chap-kickstart-installations.html">Automating
+             the Installation with Kickstart</ulink> and <ulink
+             url="https://docs.fedoraproject.org/en-US/Fedora/&PRODVER;/html/Installation_Guide/appe-kickstart-syntax-reference.html">Kickstart
+             Syntax Reference</ulink> of the <citetitle>Fedora Installation Guide</citetitle>
+           provide full documentation of Kickstart, including a list of all supported commands and
+           options.
           </para>
+        </listitem>
+        <listitem>
+          <para>
+            The <ulink
+              url="https://docs.fedoraproject.org/en-US/Fedora/&PRODVER;/html/Installation_Guide/chap-installing-using-anaconda.html">Installing
+              Using Anaconda</ulink> chapter of the <citetitle>Fedora Installation Guide</citetitle>
+            describes the installation process in the graphical and text user interfaces.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            For information about tools used for after-installation configuration, see <ulink
+              url="https://docs.fedoraproject.org/en-US/Fedora/&PRODVER;/html/Installation_Guide/chap-after-installation.html#sect-initial-setup">Initial
+              Setup</ulink>.
+          </para> 
         </listitem>
       </itemizedlist>
-      <para>
-        What does it mean that the installation is data-driven? The installation
-        and configuration logic lies within the methods of the items in the
-        tree-like structure. Every item is set up (the
-        <methodname>setup</methodname> method) <indexterm id="idx_setup">
-        <primary> setup </primary> </indexterm> to modify the runtime environment
-        of the installation if needed, and then executed (the
-        <methodname>execute</methodname>) <indexterm id="idx_execute"> <primary>
-        execute </primary> </indexterm> to perform the changes on the newly
-        installed system. We will look at these methods closer in <xref
-        linkend="section_writing_addon"/>.
-      </para>
     </section>
 
-    <section id="section_hub_and_spoke">
-      <title>Hub&amp;Spoke model</title>
+  </section>
+
+  <section id="sect-anaconda-addon-architecture">
+    <title>Architecture of Anaconda</title>
+    <para>
+      <application>Anaconda</application> is a set of Python modules and scripts. It also uses
+      several external packages and libraries, some of which were created specifically for the
+      installer. Major components of this toolset include the following packages:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <systemitem>pykickstart</systemitem> - used to parse and validate Kickstart files and also
+          to provide a data structure which stores values which drive the installation
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <systemitem>yum</systemitem> - the package manager which handles installation of packages
+          and resolving dependencies
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <systemitem>blivet</systemitem> - originally split from the <package>anaconda</package>
+          package as <package>pyanaconda.storage</package>; used to handle all activities related to
+          storage management
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <systemitem>pyanaconda</systemitem> - package containing the core of the user interface
+          and modules for functionality unique to <application>Anaconda</application>, such as
+          keyboard and timezone selection, network configuration, and user creation, as well as a
+          number of utilities and system-oriented functions
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <systemitem>python-meh</systemitem> - contains an exception handler which gathers and
+          stores additional system information in case of a crash and passes this information to the
+          <systemitem>libreport</systemitem> library, which itself is a part of the <ulink
+            url="https://fedorahosted.org/abrt/">ABRT Project</ulink>.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      The life cycle of data during the installation process is straightforward. If a Kickstart file
+      is provided, it is processed by the <systemitem>pykickstart</systemitem> module and imported
+      into memory as a tree-like structure. If no Kickstart file is provided, an empty tree-like
+      structure is created instead. If the installation is interactive (not all required Kickstart
+      commands have been used), the structure is then updated with choices made by the user in the
+      interactive interface. 
+    </para>
+    <para>
+      Once all required choices are made, the installation process begins and values stored in the
+      structure are used to determine parameters of the installation. The values are also written as
+      a Kickstart file which is saved in the <filename>/root/</filename> directory on the installed
+      system; therefore the installation can be replicated automatically by reusing this
+      automatically generated Kickstart file.
+    </para>
+    <para>
+      Elements of the tree-like structure are defined by the <package>pykickstart</package> package,
+      but some of them can be overriden by modified versions from the
+      <systemitem>pyanaconda.kickstart</systemitem> module. An important rule which governs this
+      behavior is that there is no place to store configuration data, and the installation process
+      is data-driven and relies on transactions as much as possible. This enforces the following
+      features:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          every feature of the installer <emphasis>must</emphasis> be supported in Kickstart
+        </para>
+      </listitem>    
+      <listitem>
+        <para>
+          there is a single, obvious point in the installation process where changes are written to
+          the target system; before this point, no lasting changes (e.g. formatting storage) are
+          made
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          every change made manually in the user interface is reflected in the resulting Kickstart
+          file and can be replicated
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      The fact that the installation is <emphasis>data-driven</emphasis> means that installation and
+      configuration logic lies within the methods of the items in the tree-like structure. Every
+      item is set up (the <methodname>setup</methodname> method) to modify the runtime environment
+      of the installation if necessary, and then executed (the <methodname>execute</methodname>
+      method) to perform the changes on the target system. These methods are further described in
+      <xref linkend="sect-writing-anaconda-addon" />.
+    </para>
+  </section>
+
+  <section id="sect-anaconda-hub-and-spoke">
+    <title>The Hub &amp; Spoke model</title>
+    <para>
+      One of the notable differences between <application>Anaconda</application> and most other
+      operating system installers is its non-linear nature, also known as the <firstterm>hub and
+        spoke</firstterm> model.
+    </para>
+    <para>
+      The hub and spoke model of <application>Anaconda</application> has several advantages,
+      including:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          users are not forced to go through the screens in some strictly defined order
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          users are not forced to visit every screen no matter if they understand what the options
+          configured in it mean or not
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          it is good for the transactional mode where all desired values can be set while nothing is
+          actually happening to the underlying machine  until a special button is clicked
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          it provides way to show an overview of the configured values
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          it has a great support for extensibility, because additional spokes  can be put on hubs
+          without need to reorder anything and resolve some complex ordering dependencies
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          it can be used for both graphical and text mode of the installer
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      The diagram below shows the installer layout as well as possible interactions between
+      <firstterm>hubs</firstterm> and <firstterm>spokes</firstterm> (screens):
+    </para>
+    <figure id="figu-anaconda-hub-and-spoke">
+      <title>Diagram of the hub and spoke model</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/hub_and_spoke.svg" format="SVG" scalefit="0" width="660"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+    <para>
+      In the diagram, screens 2-13 are called <firstterm>normal spokes</firstterm>, and screens 1
+      and 14 are <firstterm>standalone spokes</firstterm>. Standalone spokes are a type of screen
+      which is a type of screen that should be used only in case it has to be visited before (or
+      after) the following (or previous) standalone spoke or hub. This may be, for example, the
+      <guilabel>Welcome</guilabel> screen at the beginning of the installation which prompts you to
+      choose your language for the rest of the installation.
+    </para>
+    <note>
       <para>
-        One of the biggest changes introduced with the rewrite of the Anaconda
-        installer was that the new UI (both graphical and textual) uses a
-        hub&amp;spoke model <indexterm id="idx_hub_and_spoke"> <primary>
-        hub&amp;spoke model </primary> </indexterm> instead of the wizard model
-        that had been used before. The following diagram shows how hub&amp;spoke
-        works regarding the possible transitions between screens (hubs and
-        spokes).
+        Screens mentioned in the rest of this section are screens from the installer's graphical
+        interface (GUI).
       </para>
+    </note>
+    <para>
+      Central points of the hub and spoke model are <firstterm>hubs</firstterm>. There are two hubs
+      by default:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          The <guilabel>Installation Summary</guilabel> hub which shows a summary of configured
+          options before the installation begins
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <guilabel>Configuration and Progress</guilabel> hub which appears after you click
+          <guilabel>Begin Installation</guilabel> in <guilabel>Installation Summary</guilabel>, and
+          which displays the progress of the installation process and allows you to configure
+          additional options (set the root password and create a user account).
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      Each spoke has several predefined <firstterm>properties</firstterm> which are reflected on the
+      hub. These are:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <property>ready</property> - states whether the spoke can be visited or not; for example,
+          when the installer is configuring a package source, that spoke is not ready, is colored
+          gray, and cannot be accessed until configuration is complete
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <property>completed</property> - marks the spoke as completed (all required values are
+          set) or not
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <property>mandatory</property> - determines whether the spoke <emphasis>must</emphasis> be
+          visited and confirmed by the user before continuing the installation; for example, the
+          <guilabel>Installation Destination</guilabel> spoke must always be visited, even if you
+          want to use automatic disk partitioning
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <property>status</property> - provides a short summary of values configured within the
+          spoke (displayed under the spoke name in the hub)
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      To make the user interface clearer, spokes are grouped together into
+      <firstterm>categories</firstterm>. For example, the <guilabel>Localization</guilabel> category
+      groups together spokes for keyboard layout selection, language support and time zone settings.
+    </para>
+    <para>
+      Each spoke contains UI controls which display and allow you to modify values from one or more
+      sub-trees of the in-memory tree-like structure which was discussed in <xref
+        linkend="sect-anaconda-addon-architecture" />. As <xref
+        linkend="sect-writing-anaconda-addon" /> explains, the same applies to spokes provided by
+      add-ons.
+    </para>
+  </section>
 
-      <figure id="fig_hub_and_spoke">
-        <title>Hub&amp;spoke model diagram</title>
-        <mediaobject id="picture_hub_and_spoke">
-          <imageobject>
-            <imagedata fileref="images/hub_and_spoke.svg" format="SVG" scalefit="1"/>
-          </imageobject>
-        </mediaobject>
-      </figure>
+  <section id="sect-anaconda-threads-communication">
+    <title>Threads and Communication</title>
+    <para>
+      Some of the actions which need to be performed during the installation process, such as
+      scanning disks for existing partitions or downloading package metadata, can take a long time.
+      To prevent you from waiting and remain responsive if possible,
+      <application>Anaconda</application> runs these actions in separate threads.
+    </para>
+    <para>
+      The <application>Gtk</application> toolkit does not support element changes from multiple
+      threads. The main event loop of <application>Gtk</application> runs in the main thread of the
+      <application>Anaconda</application> process itself, and all code performing actions which
+      involve the GUI must make sure that these actions are run in the main thread as well. The only
+      supported way to do so is by using the <methodname>GLib.idle_add</methodname>, which is not
+      always easy or desired. To alleviate this problem, several helper functions and decorators are
+      defined in the <package>pyanaconda.ui.gui.utils</package> module.
+    </para>
+    <para>
+      The most useful of those are the <function>@gtk_action_wait</function> and
+      <function>@gtk_action_nowait</function> decorators. They change the decorated function or
+      method in such a way that when this function or method is called, it is automatically queued
+      into Gtk's main loop, run in the main thread, and the return value is either returned to the
+      caller or dropped, respectively.
+    </para>
+    <para>
+      As mentioned previously, one of the main reasons for using multiple threads is to allow the
+      user to configure some screens while other screens which are currently busy (such as
+      <guilabel>Installation Source</guilabel> when it downloads package metadata) configure
+      themselves. Once the configuration is finished, the spoke which was previously busy needs to
+      announce that it is now ready and not blocked; this is handled by a message queue called
+      <systemitem>hubQ</systemitem>, which is being periodically checked in the main event loop.
+      When a spoke becomes accessible, it sends a message to this queue announcing this change and
+      that it should no longer be blocked.
+    </para>
+    <para>
+      The same applies in a situation where a spoke needs to refresh its status or completion flag.
+      The <guilabel>Configuration and Progress</guilabel> hub has a different queue called
+      <systemitem>progressQ</systemitem> which serves as a medium to transfer installation progress
+      updates.
+    </para>
+    <para>
+      These mechanisms are also needed for the text-based interface, where the situation is more
+      complicated; there is no main loop in text mode, instead the majority of time in this mode is
+      spent waiting for keyboard input.
+    </para>
+  </section>
 
+  <section id="sect-anaconda-addon-structure">
+    <title>Anaconda Add-on Structure</title>
+    <para>
+      An <application>Anaconda</application> add-on is a Python package containing a directory with
+      an <filename>__init__.py</filename> and other source directories (subpackages) inside. Because
+      Python allows importing each package name only once, the package top-level directory name must
+      be unique. At the same time, the name can be arbitrary, because add-ons are loaded regardless
+      of their name - the only requirement is that they must be placed in a specific directory. 
+    </para>
+    <para>
+      The suggested naming convention for add-ons is therefore similar to Java packages or D-Bus
+      service names: prefix the add-on name with the reversed domain name of your organization,
+      using underscores (<literal>_</literal>) instead of dots so that the directory name is a valid
+      identifier for a Python package. An example add-on name following these suggestions would
+      therefore be e.g. <literal>org_fedora_hello_world</literal>. This convention follows the
+      <ulink url="https://www.python.org/dev/peps/pep-0008/#package-and-module-names">recommended
+        naming scheme</ulink> for Python package and module names.
+    </para>
+    <important>
       <para>
-        The screens 2, 3, 5, 8, 10 and others are examples of so called
-        <emphasis>normal spokes</emphasis>. Those are the screens reachable from
-        hubs. The screens 1 and 14 are examples of a so called
-        <emphasis>standalone spoke</emphasis> which is a type of screen that
-        should be used only in case it has to be visited before (after) the
-        following (previous) standalone spoke or hub.
-
-        <footnote>
-          <para>
-            Screens mentioned in the rest of this section are screens from the
-            graphical mode of the installation.
-          </para>
-        </footnote>
-
-        The examples of such screens are the language and network configuration
-        screens in the Anaconda installer that are implemented as standalone
-        spokes because actions available on them have to and should,
-        respectively, take place before all the other actions controlled from
-        the user interface.
+        Make sure to create an <filename>__init__.py</filename> file in each directory. Directories
+        missing this file are not considered valid Python packages.
       </para>
+    </important>
+    <para>
+      When writing an add-on, keep in mind that every function supported in the installer
+      <emphasis>must</emphasis> be supported in Kickstart; GUI and TUI support is optional. Support
+      for each interface (Kickstart, graphical interface and text interface) must be in a separate
+      subpackage and these subpackages must be named <filename>ks</filename> for Kickstart,
+      <filename>gui</filename> for the graphical interface and <filename>tui</filename> for the
+      text-based interface. The <filename>gui</filename> and <filename>tui</filename> packages must
+      also contain a <filename>spokes</filename> subpackage.
+      <footnote>
+        <para>
+          The <package>gui</package> package may also contain a <package>categories</package>
+          subpackage if the add-on needs to define a new category, but this is not recommended.
+        </para>
+      </footnote>
+    </para>
+    <para>
+      Names of modules inside these packages are arbitrary; the <filename>ks/</filename>,
+      <filename>gui/</filename> and <filename>tui/</filename> directories can contain Python modules
+      with any name.
+    </para>
+    <para>
+      A sample directory structure for an add-on which supports every interface (Kickstart, GUI and
+      TUI) will look similar to the following:
+    </para>
+    <example id="exam-sample-addon-structure">
+      <title>Sample Add-on Structure</title>
+      <screen>
+org_fedora_hello_world
+├─ ks
+│  └─ __init__.py
+├─ gui
+│  ├─ __init__.py
+│  └─ spokes
+│      └─ __init__.py
+└─ tui
+   ├─ __init__.py
+   └─ spokes
+       └─ __init__.py
+      </screen>
+    </example>
+    <para>
+      Each package must contain at least one module with an arbitrary name defining classes
+      inherited from one or more classes defined in the API. This is further discussed in <xref
+        linkend="sect-writing-anaconda-addon" />.
+    </para>
+    <para>
+      All add-ons should follow Python's <ulink url="http://www.python.org/dev/peps/pep-0008/">PEP
+        8</ulink> and <ulink url="http://www.python.org/dev/peps/pep-0257/">PEP 257</ulink>
+      guidelines for docstring conventions. There is no consensus on the format of the actual
+      content of docstrings in <application>Anaconda</application>; the only requirement is that
+      they are human-readable. If you plan to use automatically generated documentation for your
+      add-on, docstrings should follow the guidelines for the toolkit you use to accomplish this.
+    </para>
+  </section>
 
+  <section id="sect-writing-anaconda-addon">
+    <title>Writing an Anaconda add-on</title>
+    <para>
+      The sections below will demonstrate the process writing and testing a sample add-on called
+      Hello World. This sample add-on will support all interfaces (Kickstart, GUI and TUI). Sources
+      for this sample add-on are available on GitHub in the <ulink
+        url="https://github.com/rhinstaller/hello-world-anaconda-addon">rhinstaller/hello-world-anaconda-addon</ulink>
+      repository; it is recommended to clone this repository or at least open the sources in the web
+      interface.
+    </para>
+    <para>
+      Another repository to review is <ulink
+        url="https://github.com/rhinstaller/anaconda">rhinstaller/anaconda</ulink>, which contains
+      the installer source code; it will be referred to in several parts of this section as well.
+    </para>
+    <para>
+      Before you begin developing the add-on itself, start by creating its directory structure as
+      described in <xref linkend="sect-anaconda-addon-structure" />. Then, continue with <xref
+        linkend="sect-anaconda-addon-kickstart-support" />, as Kickstart support is mandatory for
+      all add-ons. After that, you can optionally continue with <xref
+        linkend="sect-anaconda-addon-gui-support" /> and <xref
+        linkend="sect-anaconda-addon-tui-support" /> if needed.
+    </para>
+
+    <section id="sect-anaconda-addon-kickstart-support">
+      <title>Kickstart Support</title>
       <para>
-        The reason for the Hub&amp;Spoke model being used in the Anaconda
-        installer's UI is that it has many advantages:
+        Kickstart support is always the first part of any add-on that should be developed. Other
+        packages - support for the graphical and text-based interface - will depend on it. To begin,
+        navigate to the <filename>org_fedora_hello_world/ks/</filename> directory you have created
+        previously, make sure it contains an <filename>__init__.py</filename> file, and add another
+        Python script named <filename>hello_world.py</filename>.
       </para>
-      <itemizedlist mark="bullet">
-        <listitem>
-          <para>
-            users are not forced to go through the screens in some strictly
-            defined order,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            users are not forced to visit every screen no matter if they
-            understand what the options configured in it mean or not,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            it is good for the transactional mode where all desired values can
-            be set while nothing is actually happening to the underlying machine
-            until a special button is clicked,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            it provides way to show an overview of the configured values,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            it has a great support for extensibility, because additional spokes
-            can be put on hubs without need to reorder anything and resolve some
-            complex ordering dependencies and
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            it can be used for both graphical and textual mode of the installer.
-          </para>
-        </listitem>
-      </itemizedlist>
-
       <para>
-        As can be seen in <xref linkend="fig_hub_and_spoke"/> central points of
-        the Hub&amp;Spoke model are hubs, so let's focus on hubs in the Anaconda
-        installer for a while. Currently there are two of them:
+        Unlike built-in Kickstart commands, add-ons are used in their own
+        <firstterm>sections</firstterm>. Each use of an add-on in a Kickstart file begins with an
+        <command>%addon</command> statement and is closed by <command>%end</command>. The
+        <command>%addon</command> line also contains the name of the add-on (such as <command>%addon
+          org_fedora_hello_world</command>) and optionally a list of arguments, if the add-on
+        supports them.
       </para>
-
-      <itemizedlist mark="bullet">
-        <listitem>
-          <para>
-            the Summary hub <indexterm id="idx_summary_hub"> <primary> Summary
-            hub </primary> </indexterm> that shows a summary of configured
-            options and
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            the Progress hub <indexterm id="idx_progress_hub"> <primary>
-            Progress hub </primary> </indexterm> that shows the progress of the
-            installation process and also shows a summary of options that can be
-            configured during the actual installation being done in the
-            background thread.
-          </para>
-        </listitem>
-      </itemizedlist>
-
       <para>
-        Every spoke has a few predefined properties that are reflected on the
-        hub. There are: the <property> ready </property> property stating
-        whether the spoke can be visited or not, the <property> completed
-        </property> property marking the spoke as completed (all required values
-        are set) or not, the <property> mandatory </property> property telling
-        whether the spoke has to be completed before allowing user continue to
-        the next hub or standalone spoke and the <property> status </property>
-        property providing a short summary of the values set in the
-        spoke. <indexterm id="idx_spoke_properties"> <primary> spokes'
-        properties </primary>
-        </indexterm> To make the layout of the UI clearer, spokes reachable from
-        these two hubs are grouped together to so called <emphasis> categories
-        </emphasis>. <indexterm id="idx_category"> <primary> category </primary>
-        </indexterm> A good example of a category used in the Anaconda installer
-        is the <emphasis> Localization </emphasis> <indexterm
-        id="idx_local_cat"> <primary> Localization category </primary>
-        </indexterm> category that groups together spokes for keyboard and
-        timezone settings. So to sum it up there are hubs on the hubs there are
-        categories and in the categories there are spokes. Every spoke contains
-        UI controls that show and allow to modify values from one or more
-        subtrees of the in-memory representation of the kickstart file. As we
-        will see in <xref linkend="section_writing_addon"/> the same applies to
-        addons.
+        An example use of an add-on in a Kickstart file looks like the example below:
       </para>
-    </section>
-
-    <section id="section_threads_and_communication">
-      <title>Threads and communication</title>
-      <para>
-        Some of the actions that need to be run during the installation process
-        take a long time to be finished (e.g. scanning disks for existing
-        partitions, downloading package repository metadata, etc). And since
-        basic principle of the GUI programming is that the user interface should
-        be as responsive as possible and since the goal is to allow user
-        configure other settings while some are blocked by the long lasting
-        actions, the Anaconda installer has to run such actions in separate
-        threads. However, the Gtk toolkit doesn't support changing its elements
-        from multiple threads. The Gtk main event loop is running in the main
-        thread of the Anaconda installer process and every code doing some GUI
-        involving actions has to make sure that these actions are run in the
-        main thread as well. The only supported way to do that is by using
-        <methodname>GLib.idle_add</methodname> method which is not much
-        comfortable. To facilitate this issue there are some helper functions
-        and decorators <!--add reference--> defined in the <package>
-        pyanaconda.ui.gui.utils </package> module. The most useful ones are
-        <emphasis> @gtk_action_wait </emphasis> and <emphasis>
-        @gtk_action_nowait </emphasis> decorators that change the decorated
-        function or method in a way that when it is called it is automatically
-        queued to Gtk's main loop, run in the main thread and then the return
-        value is returned to the caller or dropped, respectively.
-      </para>
-
-      <para>
-        As it has been already mentioned one of the goals of using multiple
-        threads is to allow user configure something else while some parts of
-        the GUI wait for some actions to finish. The example of such case is
-        package repository metadata download which can take a while and without
-        it being finished the Source <indexterm id="idx_source_spoke"> <primary>
-        Source spoke </primary> </indexterm> and Software <indexterm
-        id="idx_softw_spoke"> <primary> Software spoke </primary> </indexterm>
-        spokes cannot be visited as they cannot display valid data. But in the
-        same time there is no reason why e.g. the Datetime spoke <indexterm
-        id="idx_datetime_spoke"> <primary> Datetime spoke </primary>
-        </indexterm> should be blocked. Now let's take a look from the blocked
-        spoke's perspective. It waits for some background thread to finish. But
-        once this thread is finished how should the spoke announce it is ready
-        and should not be blocked anymore? The hub that provides an access to
-        the spoke has no relation with the thread the spoke has been waiting for
-        and thus can't tell whether the spoke is yet ready or not. For such
-        cases there is a message queue called <emphasis>hubQ</emphasis>
-        <indexterm id="idx_hubq"> <primary> hubQ </primary> </indexterm> that is
-        being periodically checked in the main event loop. Once the thread the
-        spoke has been waiting for is finished the spoke sends a message
-        <footnote>
-          <para>
-            internally it means that it puts a message to the queue
-          </para>
-        </footnote>
-        that announces the spoke should no longer be blocked. The same applies to
-        the situation when the spoke needs to refresh its status or completion
-        flag. In case of the Progress hub there is the <emphasis> progressQ
-        </emphasis> <indexterm id="idx_progressq"> <primary>progressQ</primary>
-        </indexterm> which serves as a medium to transfer installation progress
-        updates. These mechanisms are needed also for the text mode where the
-        situation is much more complicated, because there is no main loop in the
-        text mode and for vast majority of time it is waiting for an input from
-        keyboard. However there is (a bit experimental) implementation of
-        asynchronous messages handling in TUI and the goal is to make, from
-        spoke's perspective, everything very similar to the graphical user
-        interface.
-      </para>
-    </section>
-
-    <section id="section_addon_structure">
-      <title>Addon structure</title>
-      <para>
-        Now that we know bits of how the Anaconda installer looks like and works
-        internally, we can finally focus on the main topic of this guide,
-        i.e. writing an addon for it. Let's take a top-down approach and start
-        with the high-level aspects diving deeper and deeper. The only supported
-        programming language for an Anaconda addon is Python with addon being a
-        Python package. Thus it shouldn't be a surprise that an addon is
-        actually a directory with an <filename>__init__.py</filename> and other
-        source files and directories (subpackages) in it. And since one package
-        name can be imported in Python only once, the top-level directory of an
-        addon needs to have a unique name. The naming convention suggested for
-        addons is to prefix the addon name with a reversed domain name as (it is
-        common with e.g. D-Bus service names or Java packages) but using dashes
-        instead of dots to separate subdomains so that the directory name is a
-        valid identifier for a Python package. For example
-        <filename class="directory">org_fedora_hello_world</filename> which is
-        used by <ulink
-        url="https://github.com/vpodzime/hello-world-anaconda-addon">
-        the &HWADDON;</ulink> from <xref
-        linkend="section_writing_addon"/>. <indexterm id="idx_hello_world">
-        <primary> &HWADDON; </primary> </indexterm> As it has been mentioned in
-        <xref linkend="section_introduction"/> everything should be supported in
-        the kickstart first, then GUI and TUI pieces can come covering some (or
-        all) configuration options from the kickstart part. As these three parts
-        are more or less independent the Anaconda's addon API defines that they
-        should be separate subpackages of the top-level addon package
-        (i.e. subdirectories of the top-level directory) with the following
-        names: <package>ks</package>, <package>gui</package>,
-        <package>tui</package> and <package>categories</package>, with the
-        <package>ks</package> being the only compulsory one. The
-        <package>gui</package> and <package>tui</package> packages should then
-        contain <package> spokes </package> subpackages. The
-        <package>categories</package> package may contain module(s) defining
-        categories if the addon needs to define one or more, but this is not
-        recommended.
-        <footnote>
-          <para>
-            If addon really doesn't fit into any of the categories defined by
-            Anaconda, it may be a good idea a new (as generic as possible)
-            category to Anaconda so that other addons may use it too.
-          </para>
-        </footnote>
-        All these packages have to contain at least one module
-        with an arbitrary name defining classes inherited from one or more API
-        defined classes. We will get to those classes in <xref
-        linkend="section_writing_addon"/>.
-        <important>
-          <para>
-            Do not forget to create all the <filename>__init__.py</filename>
-            files so that directories really are valid Python packages.
-          </para>
-        </important>
-      </para>
-    </section>
-
-    <section id="section_writing_addon">
-      <title>Writing an Anaconda addon</title>
-      <para>
-        We know how the addon's tree-like structure should look like, but
-        obviously the actual work needs to be done in the leafs, the addon's
-        modules. Instead of a lot of words describing how such modules should
-        look like and what they should contain, let's create a simple addon step
-        by step as a practical example. To make it obvious it is just a simple
-        example, we will call it <emphasis>&HWADDON;</emphasis>.<indexterm
-        id="idx_hello_world_addon"> <primary> &HWADDON; </primary> </indexterm>
-        To get an overall view on the addon and the code it is recommended to
-        clone the <ulink
-        url="https://github.com/vpodzime/hello-world-anaconda-addon.git">
-        &HWADDON;'s git repository</ulink> or if it is not possible, at least
-        use the web interface to open the source files. The same applies to the
-        <ulink url="http://git.fedorahosted.org/git/anaconda.git">Anaconda's git
-        repository</ulink> as the installer's sources will be referred many
-        times in the following text.<indexterm id="idx_anaconda_git"> <primary>
-        Anaconda git </primary> </indexterm>
-      </para>
-
-      <section id="section_kickstart_support">
-        <title>Kickstart support</title>
-      <para>
-        First we need the directories as described in the <xref
-        linkend="section_addon_structure"/> &mdash; the top-level directory
-        giving the addon its name (in this case <filename
-        class="directory">org_fedora_hello_world</filename>) and the directories
-        for separate parts providing code for kickstart, GUI and TUI support. As
-        it was already mentioned many times (intentionally) kickstart support is
-        the most important one so let's start with that part. Its subpackage
-        name is expected to be <package>ks</package> and we will thus need a
-        directory named <filename class="directory">ks</filename> under the
-        addon's top-level directory <filename
-        class="directory">org_fedora_hello_world</filename>. In that directory
-        there has to be the <filename>__init__.py</filename> file and at least
-        one Python module with arbitrary name. Let's use
-        <filename>hello_world.py</filename> which conforms to<ulink
-        url="http://www.python.org/dev/peps/pep-0008/#package-and-module-names">
-        Python's conventions for module names</ulink>. That brings us to the
-        coding style questions that should be answer before we start with any
-        actual code. The general rule is to follow Python's <ulink
-        url="http://www.python.org/dev/peps/pep-0008/">PEP 8</ulink> and <ulink
-        url="http://www.python.org/dev/peps/pep-0257/">PEP 257</ulink>
-        (docstring conventions). There is no consensus on the format of the
-        actual content of docstrings in the Anaconda installer. Anything that is
-        well human-readable is okay only if the addon is supposed to have a
-        documentation generated automatically, docstrings should, of course,
-        follow the rules of the toolkit used to generate the documentation. But
-        let's get back to the module with code providing &HWADDON;'s
-        support for kickstart. The reason why it can have an arbitrary name is
-        that the Anaconda installer looks in all files in the particular
-        directory and collects classes that are inherited from a particular
-        class defined by the API. The same rules apply to all of the <filename
-        class="directory">ks</filename>, <filename
-        class="directory">gui/spokes</filename> and <filename
-        class="directory">tui/spokes</filename> directories containing
-        modules. For the kickstart part of the addon the key class is the
-        <classname>AddonData</classname> class defined in the
-        <package>pyanaconda.addons</package> module that represents an object
-        for parsing and storing data from the kickstart file. The part of a
-        kickstart file containing data for an addon has the following format:
-
-        <programlisting>%addon ADDON_NAME [arguments]
+      <example id="exam-addon-kickstart-definition">
+        <title>Using an Add-on in a Kickstart File</title>
+        <programlisting>
+%addon ADDON_NAME [arguments]
 first line
 second line
 ...
-%end</programlisting>
-
-        Such sequence of lines is called <emphasis>a section</emphasis>. The
-        percent sign followed by the keyword <emphasis>addon</emphasis> marks
-        the beginning of addon section while <emphasis>%end</emphasis> marks its
-        end. In place of the string <emphasis>ADDON_NAME</emphasis> there should
-        be a name of a real addon (like
-        <emphasis>org_fedora_hello_world</emphasis> in our case). Any additional
-        <emphasis>arguments</emphasis> on the addon line will be passed as a
-        list to an instance of the addon's class inherited from the
-        <classname>AddonData</classname> class. The content between the two
-        lines starting with the percent sign is passed to the instance of the
-        addon's class one line at a time.  To make the code as simple as
-        possible, the &HWADDON; will just squash the lines passed in a
-        kickstart file to a single line separating the original lines with a
-        space. We know that our addon needs a class inherited from the
-        <classname>AddonData</classname> with a method handling the
-        <emphasis>%addon</emphasis> argument list and with a method handling
-        lines inside a kickstart <emphasis>%addon</emphasis> section. A quick
-        look into the <filename>pyanaconda/addons.py</filename> shows these
-        two methods: <methodname>handle_header</methodname> takes a list of
-        arguments and the current line numbers (for error reporting), and
-        <methodname>handle_line</methodname> takes a single line of content.
-        Let's have a look at the code implementing what we have covered so far.
+%end
+        </programlisting>
+      </example>
+      <para>
+        The key class for Kickstart support in add-ons is called <classname>AddonData</classname>.
+        This class is defined in <package>pyanaconda.addons</package> and represents an object for
+        parsing and storing data from a Kickstart file.
       </para>
-
-      <programlisting>from pyanaconda.addons import AddonData
+      <para>
+         Arguments are passed as a list to an instance of the add-on class inherited from the
+         <classname>AddonData</classname> class. Anything between the first and last line is passed
+         to the add-on's class one line at a time. To keep the example Hello World add-on simple, it
+         will merge all lines in this block into a single line and separate the original lines with
+         a space.
+      </para>
+      <para>
+        The example add-on requires a class inherited from <classname>AddonData</classname> with a
+        method for handling the list of arguments from the <command>%addon</command> line, and a
+        method for handling lines inside the section. The <ulink
+          url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/addons.py"><filename>pyanaconda/addons.py</filename></ulink>
+        module contains two methods which can be used for this:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            <methodname>handle_header</methodname> - takes a list of arguments from the
+            <command>%addon</command> line (and line numbers for error reporting)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <methodname>handle_line</methodname> - takes a single line of content from between the
+            <command>%addon</command> and <command>%end</command> statements
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        The example below demonstrates a Hello World add-on which uses the methods described above:
+      </para>
+      <example id="exam-kickstart-header-line">
+        <title>Using handle_header and handle_line</title>
+        <programlisting language="Python">from pyanaconda.addons import AddonData
 from pykickstart.options import KSOptionParser
 
 # export HelloWorldData class to prevent Anaconda's collect method from taking
@@ -667,67 +711,72 @@ class HelloWorldData(AddonData):
             self.text = line.strip()
         else:
             self.text += " " + line.strip()</programlisting>
+      </example>
       <para>
-        First few lines of the code describe what could be summed up as the
-        following rule:
-
-        <important>
+        The example begins by importing necessary methods and defining an <varname>__all__</varname>
+        variable which is necessary to prevent <application>Anaconda</application>'s collect method
+        from taking the <classname>AddonData</classname> class instead of add-on specific
+        <classname>HelloWorldData</classname>.
+      </para>
+      <para>
+        Then, the example shows a definition of the <classname>HelloWorldData</classname> class
+        inherited from <classname>AddonData</classname> with its <methodname>__init__</methodname>
+        method calling the parent's <methodname>__init__</methodname> and initializing the
+        attributes <varname>self.text</varname> and <varname>self.reverse</varname> to
+        <literal>False</literal>.
+      </para>
+      <para>
+        The <varname>self.reverse</varname> attribute is populated in the
+        <methodname>handle_header</methodname> method, and the <varname>self.text</varname> is
+        populated in <methodname>handle_line</methodname>. The
+        <methodname>handle_header</methodname> method uses an instance of the
+        <classname>KSOptionParser</classname> provided by <systemitem>pykickstart</systemitem> to
+        parse additional options used on the <command>%addon</command> line, and
+        <methodname>handle_line</methodname> strips the content lines of white space at the
+        beginning and end of each line, and appends them to <varname>self.text</varname>.
+      </para>
+      <para>
+        The code above covers the first phase of the data life cycle in the installation process: it
+        reads data from the Kickstart file. The next step is to use this data to drive the
+        installation process. Two predefined methods are available for this purpose:
+      </para>
+      <itemizedlist>
+        <listitem>
           <para>
-            Use <varname>__all__</varname> variables in modules as it is needed
-            for Anaconda's method for collecting classes to work properly.
+            <methodname>setup</methodname> - called before the installation transaction starts and
+            used to make changes to the installation runtime environment
           </para>
-        </important>
-
-        Then there is a definition of the <classname>HelloWorldData</classname>
-        class inherited from the <classname>AddonData</classname> class with its
-        <methodname>__init__</methodname> method calling the parent's
-        <methodname>__init__</methodname> method and initializing the attributes
-        <property>self.text</property> to an empty string and
-        <property>self.reverse</property> to False.
-        <property>self.reverse</property> is populated in the
-        <methodname>handle_header</methodname> method, and
-        <property>self.text</property> is populated in the
-        <methodname>handle_line</methodname> method.
-        <methodname>handle_header</methodname> uses an instance of the
-        <classname>KSOptionParser</classname> class provided by pykickstart to
-        parse the additional arguments on the <emphasis>%addon</emphasis> line,
-        and <methodname>handle_line</methodname> strips the content lines
-        (removes white space characters at the beginning and the end) and
-        appends them to <property>self.text</property>.
-      </para>
-
+        </listitem>
+        <listitem>
+          <para>
+            <methodname>execute</methodname> - called at the end of the transaction and used to make
+            changes to the target system
+          </para>
+        </listitem>
+      </itemizedlist>
       <para>
-        So far our code covers the first phase of the data life cycle in the
-        installation process where data from the kickstart file has to be
-        read. The second phase of the life cycle is updating data with values
-        from the UI which will be covered in the UI code. Then data is used to
-        drive the actual installation process. This is done by two methods with
-        predefined names &mdash; <methodname>setup</methodname> and
-        <methodname>execute</methodname>. The former one is called before the
-        installation transaction starts and should do all changes of the runtime
-        environment an addons needs to do. The later one is called at the end of
-        the transaction and should do all changes to the newly installed
-        (target) system an addon is supposed to do. Again, to make the code as
-        simple as possible, these two methods will be minimalistic. We will need
-        to prepend few imports and a constant definition to the begining of the
-        source file:
+        To use these two methods, you must add some new imports and a constant to your module, as
+        shown in the following example:
       </para>
-
-      <programlisting>import os.path
+      <example id="exam-kickstart-setup-execute-prepend">
+        <title>Importing the setup and execute Methods</title>
+        <programlisting language="Python">import os.path
 
 from pyanaconda.addons import AddonData
-from pyanaconda.iutil import getSysroot
+from pyanaconda.constants import getSysRoot
 
 from pykickstart.options import KSOptionParser
 from pykickstart.errors import KickstartParseError, formatErrorMsg
 
 HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
-
+      </example>
       <para>
-        And this is how the two methods will look:
+        An updated example of the Hello World add-ons with the <methodname>setup</methodname> and
+        <methodname>execute</methodname> methods included is below:
       </para>
-
-      <programlisting>    def setup(self, storage, ksdata, instclass):
+      <example id="exam-kickstart-setup-execute">
+        <title>Using the setup and execute Methods</title>
+        <programlisting language="Python">    def setup(self, storage, ksdata, instclass):
         """
         The setup method that should make changes to the runtime environment
         according to the data stored in this object.
@@ -759,35 +808,37 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
 
         hello_file_path = os.path.normpath(getSysroot() + HELLO_FILE_PATH)
         with open(hello_file_path, "w") as fobj:
-            fobj.write("%s&#92;n" % self.text)
-      </programlisting>
-
+            fobj.write("%s&#92;n" % self.text)</programlisting>
+      </example>
       <para>
-        It should be easy to find out that the <methodname>setup</methodname>
-        method does nothing and the <methodname>execute</methodname> method just
-        writes the stored text to a file created in the target system's root
-        (<filename class="directory">/</filename>) directory. The most important
-        information delivered by the code above is the number and meaning of the
-        arguments passed to those two methods as described in the docstrings.
+        In the above example, the <methodname>setup</methodname> method does nothing; the Hello
+        World add-on does not make any changes to the installation runtime environment. The
+        <methodname>execute</methodname> method writes stored text into a file created in the target
+        system's root (<filename>/</filename>) directory.
       </para>
-
       <para>
-        That brings us to the last phase of the data life cycle and also the
-        last piece of the code needed in the module providing a kickstart
-        support. At the end of the installation a new kickstart file with the
-        values set in the original kickstart file or during the installation
-        process is written out to the target system's <filename
-        class="directory">/root</filename> directory. It is done by calling
-        the <methodname>__str__</methodname> recursively on the tree-like
-        structure storing the data which means that our class inherited from the
-        <classname>AddonData</classname> class needs to define its own
-        <methodname>__str__</methodname> method returning its stored data in the
-        format that could be parsed again if the resulting kickstart file was
-        used to install another similar system. It should be obvious how the
-        <methodname>__str__</methodname> method should look like in our case:
+        The most important information in the above example is the amount and meaning of the
+        arguments passed to the two new methods; these are described in docstrings within the
+        example.
       </para>
-
-      <programlisting>    def __str__(self):
+      <para>
+        The final phase of the data life cycle, as well as the last part of the code needed in a
+        module providing Kickstart support, is generating a new Kickstart file, which includes
+        values set at installation time, at the end of the installation process as described in
+        <xref linkend="sect-anaconda-addon-architecture" />. This is performed by calling the
+        <methodname>__str__</methodname> method recursively on the tree-like structure storing
+        installation data, which means that the class inherited from
+        <classname>AddonData</classname> must define its own <methodname>__str__</methodname> method
+        which returns its stored data in valid Kickstart syntax. This returned data must be possible
+        to parse again using <systemitem>pykickstart</systemitem>.
+      </para>
+      <para>
+        In the Hello World example, the <methodname>__str__</methodname> method will be similar to
+        the following example:
+      </para>
+      <example id="exam-kickstart-str">
+        <title>Defining a __str__ Method</title>
+        <programlisting language="Python">    def __str__(self):
         """
         What should end up in the resulting kickstart file, i.e. the %addon
         section containing string representation of the stored data.
@@ -801,100 +852,97 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
 
         addon_str += "&#92;n%s&#92;n%%end&#92;n" % self.text
         return addon_str</programlisting>
-
+      </example>
       <para>
-        By adding this method method we have everything that is needed for a
-        kickstart support done and at the same time we have everything that an
-        addon needs to implement to become a valid addon. Thus we could finish
-        here and start enjoying the warm feeling of writing a new piece of the
-        OS installer. And, believe it or not, we only needed 36 lines of code (not
-        counting the docstrings and comments) to do that. But try to explain
-        how great this is to a majority of people who don't like writing
-        kickstart files and instead prefer clicking on buttons, filling in text
-        entries and so on. To make our code reachable for such people we need to
-        create a user interface for it.
+        Once your Kickstart support module contains all necessary methods
+        (<methodname>handle_header</methodname>, <methodname>handle_line</methodname>,
+        <methodname>setup</methodname>, <methodname>execute</methodname> and
+        <methodname>__str__</methodname>), it becomes a valid <application>Anaconda</application>
+        add-on. You can continue with the following sections to add support for the graphical and
+        text-based user interfaces, or you can continue with <xref
+          linkend="sect-anaconda-addon-deploying-testing" /> and test the add-on.
       </para>
-      </section>
+    </section>
 
-      <section id="section_gui_support">
-        <title>Graphical user interface</title>
-        <section id="basic_features">
-          <title>Basic features</title>
+    <section id="sect-anaconda-addon-gui-support">
+      <title>Graphical user interface</title>
       <para>
-        Since the textual interface uses a custom toolkit developed for the
-        Anaconda installer, let's start with the Graphical user interface using
-        standard Gtk toolkit that should be more familiar to developers. Again,
-        first we need a subdirectory (subpackage) in the addon's top-level
-        directory (package). The one for the GUI code must be named <filename
-        class="directory">gui</filename> and since there are more types of
-        objects it can provide, it needs to have subdirectories itself. We will
-        start with the most important and most common one &mdash; <filename
-        class="directory">spokes</filename>. As it was described in the <xref
-        linkend="section_kickstart_support"/> every part of the addon has to
-        contain at least one module with a definition of a class inherited from
-        a particular class defined by the API. In case of the kickstart support
-        this class was the <classname>AddonData</classname> class in case of the
-        GUI support there are multiple such classes. But the only recommended
-        one for an addon is the <classname>NormalSpoke</classname> class defined
-        in the <package>pyanaconda.ui.gui.spokes</package> package. As its name
-        suggests it is a class for the <emphasis>normal spoke</emphasis> screen
-        described in the <xref linkend="section_hub_and_spoke"/>. To implement a
-        new class inherited from the <classname>NormalSpoke</classname> class we
-        need to define the folowing class attributes required by the API:
+        This section will describe adding support for the graphical user interface (GUI) to your
+        add-on. Before you begin, make sure that your add-on already includes support for Kickstart
+        as described in the previous section.
       </para>
-      <itemizedlist mark="bullet">
-        <listitem>
-          <para>
-            <varname>builderObjects</varname> that should list all top-level
-            objects from the spoke's <filename>.glade</filename> file that
-            should be, with their children objects (recursively), exposed to the
-            spoke or should be an empty list if everything should be exposed to
-            the spoke (not recommended),
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            <varname>mainWidgetName</varname> containing the id of the main
-            window widget
-            <footnote>
-              <para>
-                an instance of the SpokeWindow widget which is a custom widget
-                created for the Anaconda installer
-              </para>
-            </footnote>
-            as defined in the <filename>.glade</filename> file,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            <varname>uiFile</varname> containing the name of the
-            <filename>.glade</filename> file,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            <varname>category</varname> containing the class of the category
-            the spoke belongs to,
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            <varname>icon</varname> containing the identifier of the icon that
-            will be used for the spoke on the hub and
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            <varname>title</varname> defining the title that will be used for
-            the spoke on the hub.
-          </para>
-        </listitem>
-      </itemizedlist>
-
-      <para>
-        The code with all those definitions will then look like this:
-      </para>
-      <programlisting># will never be translated
+      <note>
+        <para>
+          Before you start developing add-ons with support for the graphical interface, make sure to
+          install the <package>anaconda-widgets</package> and
+          <package>anaconda-widgets-devel</package> packages, which contain Gtk widgets specific for
+          <application>Anaconda</application> such as <systemitem>SpokeWindow</systemitem>.
+        </para>
+      </note>
+      <section id="sect-anaconda-addon-gui-support-basic">
+        <title>Basic features</title>
+        <para>
+          Similarly to Kickstart support in add-ons, GUI support requires every part of the add-on
+          to contain at least one module with a definition of a class inherited from a particular
+          class defined by the API. In case of graphical support, the only recommended class is
+          <classname>NormalSpoke</classname>, which is defined in <ulink
+            url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/ui/gui/spokes/__init__.py"><filename>pyanaconda.ui.gui.spokes</filename></ulink>.
+          As the class name suggests, it is a class for the <emphasis>normal spoke</emphasis> type
+          of screen as described in <xref linkend="sect-anaconda-hub-and-spoke" />.
+        </para>
+        <para>
+          To implement a new class inherited from <classname>NormalSpoke</classname>, you must
+          define the following class attributes which are required by the API:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <varname>builderObjects</varname> - lists all top-level  objects from the spoke's
+              <filename>.glade</filename> file that should be, with their children objects
+              (recursively), exposed to the spoke - or should be an empty list if everything should
+              be exposed to the spoke (not recommended)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <varname>mainWidgetName</varname> - contains the id of the main  window widget
+              <footnote>
+                <para>
+                  an instance of the SpokeWindow widget which is a custom widget
+                  created for the Anaconda installer
+                </para>
+              </footnote>
+              as defined in the <filename>.glade</filename> file
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <varname>uiFile</varname> - contains the name of the <filename>.glade</filename> file
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <varname>category</varname> - contains the class of the category the spoke belongs to
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <varname>icon</varname> - contains the identifier of the icon that will be used for
+              the spoke on the hub
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <varname>title</varname> defines the title that will be used for the spoke on the hub
+            </para>
+          </listitem>
+        </itemizedlist>
+        <para>
+          Example module with all required definitions is shown in the following example:
+        </para>
+        <example id="exam-gui-required-attributes">
+          <title>Defining Attributes Required for the Normalspoke Class</title>
+          <programlisting language="Python"># will never be translated
 _ = lambda x: x
 N_ = lambda x: x
 
@@ -938,64 +986,55 @@ class HelloWorldSpoke(NormalSpoke):
 
     # title of the spoke (will be displayed on the hub)
     title = N_("_HELLO WORLD")</programlisting>
-
-      <para>
-        In the begining two common functions for translations are defined, but
-        with the unusual definition for the <function>_</function>
-        function. This is caused by the fact that our addon is not meant to have
-        translations. Then we can again see the usage of the
-        <varname>__all__</varname> variable to export only the spoke class
-        <!--add reference to the warning?--> followed by the first lines of its
-        definition including the definitions of attributes mentioned
-        above. Their values are referencing the widgets defined in the
-        <filename>org_fedora_hello_world/gui/spokes/hello.glade</filename> file
-        included in the &HWADDON;'s sources (if you want to open the file, see
-        the begining of the <xref linkend="section_deploying_and_testing"/> that
-        lists the packages that are needed). Only two of the attributes deserve
-        a further comment. The first one is the <varname>category</varname>
-        attribute the value of which is the
-        <classname>HelloWorldCategory</classname> class imported from the
-        <package>org_fedora_hello_world.categories</package> module. We will
-        get to the <classname>HelloWorldCategory</classname> definition later,
-        but for now note what was mentioned in the comment just before the
-        import:
-
-        <important>
-          <para>
-            The path to addons is in sys.path so things can be imported from the
-            org_fedora_hello_world package.
-          </para>
-        </important>
-
-        The second attribute that deserves a comment is the
-        <varname>title</varname> attribute whose definition contains two
-        underscores. The former one is part of the <function>N_</function>
-        function name that marks the string for translation, but returns the
-        non-translated version of the string (translation is done later). The
-        latter one is part of the title itself and makes the spoke reachable
-        from the hub with the Alt+H keyboard shortcut.
-      </para>
-
-      <para>
-        What usually follows the header of the class definition and the class
-        attributes definitions is the constructor that initializes an instance
-        of the class. In case of the Anaconda installer's GUI objects there are
-        two methods initializing a new instance &mdash; common Python's
-        <methodname>__init__</methodname> method and the
-        <methodname>initialize</methodname> method. The reason for two such
-        functions is that the GUI objects may be created in memory at one time
-        and fully initialized (which can take a longer time) at a different
-        time. Thus the <methodname>__init__</methodname> method should only
-        call the parent's <methodname>__init__</methodname> method and
-        e.g. initialize non-GUI attributes. On the other hand the
-        <methodname>initialize</methodname> method that is called when the
-        installer's graphical user interface initializes should finish the full
-        initialization of the spoke. This is how these two methods look in our
-        case (note the number and description of the arguments passed to the
-        <methodname>__init__</methodname> method):
-      </para>
-
-      <programlisting>    def __init__(self, data, storage, payload, instclass):
+        </example>
+        <para>
+          The <varname>__all__</varname> attribute is used to export the spoke class, followed by
+          the first lines of its definition including definitions of attributes mentioned above. The
+          values of these attributes are referencing widgets defined in <ulink
+            url="https://github.com/rhinstaller/hello-world-anaconda-addon/blob/master/org_fedora_hello_world/gui/spokes/hello_world.glade"><filename>org_fedora_hello_world/gui/spokes/hello.glade</filename></ulink>
+          file.
+        </para>
+        <para>
+          Two other notable attributes are present. The first is <varname>category</varname>, which
+          has its value imported from the <classname>HelloWorldCategory</classname> class from the
+          <ulink
+            url="https://github.com/rhinstaller/hello-world-anaconda-addon/blob/master/org_fedora_hello_world/categories/hello_world.py"><filename>org_fedora_hello_world.categories</filename></ulink>
+          module. The <classname>HelloWorldCategory</classname> class will be discussed later, but
+          for now, note that the path to add-ons is in sys.path so that things can be imported from
+          the <package>org_fedora_hello_world</package> package.
+        </para>
+        <para>
+          The second notable attribute in the example is <varname>title</varname>, which contains
+          two underscores in its definition. The first one is part of the <function>N_</function>
+          function name which marks the string for translation, but returns the non-translated
+          version of the string (translation is done later). The second underscore marks the
+          beginning of the title itself and makes the spoke reachable using the
+          <keycombo><keycap>Alt</keycap><keycap>H</keycap></keycombo> keyboard shortcut.
+        </para>
+        <para>
+          What usually follows the header of the class definition and the class  attributes
+          definitions is the constructor that initializes an instance of the class. In case of the
+          <application>Anaconda</application> graphical interface objects there are two methods
+          initializing a new instance: the <methodname>__init__</methodname> method and the
+          <methodname>initialize</methodname> method.
+        </para>
+        <para>
+          The reason for two such functions is that the GUI objects may be created in memory at one
+          time and fully initialized (which can take a longer time) at a different time. Therefore,
+          the <methodname>__init__</methodname> method should only  call the parent's
+          <methodname>__init__</methodname> method and (for example) initialize non-GUI attributes.
+          On the other hand, the <methodname>initialize</methodname> method that is called when the
+          installer's graphical user interface initializes should finish the full initialization of
+          the spoke. 
+        </para>
+        <para>
+          In the sample Hello World add-on, these two methods are defined as follows (note the
+          number and description of the arguments passed to the <methodname>__init__</methodname>
+          method):
+        </para>
+        <example id="exam-gui-init">
+          <title>Defining the __init__ and initialize Methods</title>
+          <programlisting language="Python">    def __init__(self, data, storage, payload, instclass):
         """
         :see: pyanaconda.ui.common.Spoke.__init__
         :param data: data object passed to every spoke to load/store data
@@ -1025,56 +1064,61 @@ class HelloWorldSpoke(NormalSpoke):
 
         NormalSpoke.initialize(self)
         self._entry = self.builder.get_object("textEntry")</programlisting>
-
-      <para>
-        Both methods are very simple, but still there are few things deserving a
-        comment. The most important one is the <varname>data</varname> parametr
-        passed to the <methodname>__init__</methodname> method. It is the
-        in-memory tree-like representation of the kickstart file where all the
-        data is stored. In one of the ancestors'
-        <methodname>__init__</methodname> methods it is stored in the
-        <varname>self.data</varname> attribute so we can read and modify it in
-        all other methods of the class. Since we have defined the
-        <classname>HelloWorldData</classname> class in <xref
-        linkend="section_kickstart_support"/> there is a subtree in
-        <varname>self.data</varname> for our addon and its root (an instance of
-        the <classname>HelloWorldData</classname>) is available as
-        <varname>self.data.addons.org_fedora_hello_world</varname>. One of the
-        other things an ancestor's <methodname>__init__</methodname> does is
-        initializing an instance of the <classname>GtkBuilder</classname>
-        with the spoke's <filename>.glade</filename> file and storing it as
-        <varname>self.builder</varname>. This is used in the
-        <methodname>initialize</methodname> method to get the
-        <classname>GtkTextEntry</classname> used to show and modify the text
-        from the kickstart file's %addon section.
-      </para>
-
-      <para>
-        The <methodname>__init__</methodname> and
-        <methodname>initialize</methodname> methods are the two methods that
-        play their roles when the spoke is created. However, the main role of
-        the spoke is to be visited by user who wants to change or review some
-        values it shows and sets. There are three methods &mdash;
-        <methodname>refresh</methodname>, <methodname>apply</methodname> and
-        <methodname>execute</methodname> &mdash; that handle things that need to be
-        done when the spoke is entered and left. The
-        <methodname>refresh</methodname> method is called when the spoke is
-        about to be visited by the user and its responsibility is to refresh the
-        spoke's state (mainly it's UI elements) to reflect the current values
-        stored in the <varname>self.data</varname> structure. The
-        <methodname>apply</methodname> and <methodname>execute</methodname>
-        methods are called when the spoke is left and they should store values
-        set in the UI elements to the <varname>self.data</varname> structure and
-        do all runtime changes the spoke requires based on its current state,
-        respectively.
-      </para>
-
-      <para>
-        The implementations of those three functions are very simple in the
-        &HWADDON;:
-      </para>
-
-      <programlisting>    def refresh(self):
+        </example>
+        <para>
+          Note the <varname>data</varname> parameter passed to the <methodname>__init__</methodname>
+          method. This is the in-memory tree-like representation of the Kickstart file where all
+          data is stored. In one of the ancestors' <methodname>__init__</methodname> methods it is
+          stored in the <varname>self.data</varname> attribute, which allows all other methods in
+          the class to read and modify the structure.
+        </para>
+        <para>
+          Because the <classname>HelloWorldData</classname> class has already been defined in <xref
+            linkend="sect-anaconda-addon-kickstart-support" />, there already is a subtree in
+          <varname>self.data</varname> for this add-on, and its root (an instance of the class) is
+          available as <varname>self.data.addons.org_fedora_hello_world</varname>.
+        </para>
+        <para>
+          One of the other things an ancestor's <methodname>__init__</methodname> does is
+          initializing an instance of the <classname>GtkBuilder</classname>  with the spoke's
+          <filename>.glade</filename> file and storing it as <varname>self.builder</varname>. This
+          is used in the  <methodname>initialize</methodname> method to get the
+          <classname>GtkTextEntry</classname> used to show and modify the text from the kickstart
+          file's %addon section.
+        </para>
+        <para>
+          The <methodname>__init__</methodname> and <methodname>initialize</methodname> methods are
+          both important when the spoke is created. However, the main role of the spoke is to be
+          visited by an user who wants to change or review the values this spoke shows and sets. To
+          enable this, three other methods are available:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <methodname>refresh</methodname> - called when the spoke is about to be visited; This
+              method refreshes the state of the spoke (mainly its UI elements) to make sure that
+              current values stored in the <varname>self.data</varname> structure are displayed
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <methodname>apply</methodname> - called when the spoke is left and used to store
+              values from UI elements back into the <varname>self.data</varname> structure
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <methodname>execute</methodname> - called when the spoke is left and used to perform
+              any runtime changes based on the new state of the spoke
+            </para>
+          </listitem>
+        </itemizedlist>
+        <para>
+          These functions are implemented in the sample Hello World add-on in the following way:
+        </para>
+        <example id="exam-gui-refresh-apply-execute">
+          <title>Defining the refresh, apply and execute Methods</title>
+          <programlisting language="Python">    def refresh(self):
         """
         The refresh method that is called every time the spoke is displayed.
         It should update the UI elements according to the contents of
@@ -1104,30 +1148,42 @@ class HelloWorldSpoke(NormalSpoke):
         """
 
         # nothing to do here
-        pass</programlisting>
-
-      <para>
-        So far we have covered methods that can be used to instantiate and visit
-        spoke. It may seem like everything that is needed, but not every spoke
-        can be visited anytime (e.g. What would be the point of software
-        selection being shown before the repository is set?) and while values
-        shown and controlled by some spokes are crucial to the installation
-        process and cannot be omitted, some spokes allow modification of
-        optional values with minor effect on the installed system. That's why
-        all spokes have the <property>ready</property>,
-        <property>completed</property> and <property>mandatory</property>
-        properties. As their names suggest, these properties determine if the
-        spoke is ready to be visited, if the spoke is completed (i.e. all values
-        it requires to be set are set) and if the spoke is mandatory to be
-        completed for the installation to continue. All these attributes of the
-        spoke need to be dynamically determined based on the current state of
-        the installer/installation process. Here comes the trivial
-        implementation of those properties from the &HWADDON; which requires
-        some value to be set in the <classname>HelloWorldData</classname>'s
-        <varname>text</varname> attribute:
-      </para>
-
-      <programlisting>    @property
+        pass
+          </programlisting>
+        </example>
+        <para>
+          You can use several additional methods to control the spoke's state:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <methodname>ready</methodname> - determines whether the spoke is ready to be visited;
+              if the value is false, the spoke is not accessible (e.g. the <guilabel>Package
+                Selection</guilabel> spoke before a package source is configured)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <methodname>completed</methodname> - determines if the spoke has been completed
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <methodname>mandatory</methodname> - determines if the spoke is mandatory or not (e.g.
+              the <guilabel>Installation Destination</guilabel> spoke, which must be always visited,
+              even if you want to use automatic partitioning)
+            </para>
+          </listitem>
+        </itemizedlist>
+        <para>
+          All of these attributes need to be dynamically determined based on the current state of
+          the installation process. Below is a sample implementation of these methods in the Hello
+          World add-on, which requires some value to be set in the <varname>text</varname> attribute
+          of the <classname>HelloWorldData</classname> class:
+        </para>
+        <example id="exam-gui-ready-completed-mandatory">
+          <title>Defining the ready, completed and mandatory Methods</title>
+          <programlisting language="Python">    @property
     def ready(self):
         """
         The ready property that tells whether the spoke is ready (can be visited)
@@ -1165,20 +1221,22 @@ class HelloWorldSpoke(NormalSpoke):
 
         # this is an optional spoke that is not mandatory to be completed
         return False</programlisting>
-
-      <para>
-        With those three properties defined, a spoke can tell users whether they
-        may, have to or cannot visit the spoke. Nevertheless, users seeing the
-        hub need to decide whether to visit the spoke or not. That's why every
-        spoke also has the <property>status</property> property, which is
-        supposed to provide a short (one-line) summary describing values set on
-        the spoke. Since the only value managed by the spoke is the text it
-        shows, allows to edit and stores in the <varname>self.data</varname>
-        structure, it is only logical to use that text as the status. Also, the
-        status should warn user if no text is set:
-      </para>
-
-      <programlisting>    @property
+        </example>
+        <para>
+          After defining these properties, the spoke can control its accessibility and completeness,
+          but it cannot provide a summary of the values configured within - you must visit the spoke
+          to see how it is configured, which may not be desired. For this reason, an additional
+          property called <methodname>status</methodname> exists; this property contains a single
+          line of text with a short summary of configured values, which can then be displayed in the
+          hub under the spoke title.
+        </para>
+        <para>
+          The <methodname>status</methodname> property is defined in the Hello World example add-on
+          as follows:
+        </para>
+        <example id="sect-gui-status">
+          <title>Defining the status Property</title>
+          <programlisting language="Python">    @property
     def status(self):
         """
         The status property that is a brief string describing the state of the
@@ -1200,158 +1258,160 @@ class HelloWorldSpoke(NormalSpoke):
             return _("Text set: %s") % text
         else:
             return _("Text not set")</programlisting>
+        </example>
+        <para>
+          After defining all properties described in this chapter, the add-on has full support for
+          the graphical user interface as well as Kickstart. Note that the example demonstrated here
+          is very simple and does not contain any controls; knowledge of Python Gtk programming is
+          required to develop a functional, interactive spoke in the GUI.
+        </para>
+        <para>
+          One notable restriction is that each spoke must have its own main window - an instance of
+          the <systemitem>SpokeWindow</systemitem> widget. This widget, along with some other
+          widgets specific to <application>Anaconda</application>, is found in the
+          <package>anaconda-widgets</package> package. Other files required for development of
+          add-ons with GUI support (such as Glade definitions) can be found in the
+          <package>anaconda-widgets-devel</package> package.
+        </para>
+        <para>
+          Once your graphical interface support module contains all necessary methods you can continue
+          with the following section to add support for the text-based user interface, or you can
+          continue with <xref linkend="sect-anaconda-addon-deploying-testing" /> and test the add-on.
+        </para>
+      </section>
 
-      <para>
-        And that's it! Less than 60 lines of code (the real code lines) are
-        needed to implement the basic GUI of an addon. Of course, it is a
-        trivial addon that does nothing useful, but anything else is just a
-        common Python Gtk programming with some minor specific restrictions. For
-        example, as was mentioned in the begining of this section, every spoke
-        has to have its main window &mdash; an instance of the
-        <classname>SpokeWindow</classname> widget. This widget (together with
-        some more Anaconda-specific widgets) exists in the
-        <package>anaconda-widgets</package> package and files needed for
-        development (e.g. Glade definitions) live in the
-        <package>anaconda-widgets-devel</package> package.
-      </para>
-        </section>
-
-        <section id="advanced_features">
-          <title>Advanced features</title>
-      <para>
-        Because many spokes have a lot in common, the
-        <package>pyanaconda</package> package contains a lot of helper and
-        utility functions and constructs, that may be used by hubs and
-        spokes. Majority of them are available in the
-        <package>pyanaconda.ui.gui.utils</package> module. The &HWADDON;
-        demonstrates usage of the utility, that is used in a number of
-        Anaconda's GUI code &mdash; the <function>englightbox</function> context
-        manager, that puts a window into a lightbox to make it better visible,
-        focused and to prevent users from interaction with the underlying
-        window. To demonstrate such functionality, the &HWADDON;'s GUI contains
-        a button that runs a dialog. The dialog itself is a special class
-        <classname>HelloWorldDialog</classname> inheriting from the
-        <classname>GUIObject</classname> class defined in the
-        <package>pyanaconda.ui.gui.__init__</package> module. The dialog class
-        defines the <function>run</function> method that runs and destroys an
-        internal Gtk dialog accessible through the
-        <varname>self.window</varname> attribute that is populated thanks to the
-        <varname>mainWidgetName</varname> class attribute with the same meaning
-        as in case of the spoke. The code running the dialog within a lightbox
-        is then very simple:
-      </para>
-
-      <programlisting>        # every GUIObject gets ksdata in __init__
+      <section id="sect-anaconda-addon-gui-support-advanced">
+        <title>Advanced features</title>
+        <para>
+          The <filename>pyanaconda</filename> package contains several helper and utility functions
+          and constructs which may be used by hubs and spokes and which have not been covered in the
+          previous section. Most of them are located in <ulink
+            url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/ui/gui/utils.py"><filename>pyanaconda.ui.gui.utils</filename></ulink>.
+        </para>
+        <para>
+          The <ulink url="https://github.com/rhinstaller/hello-world-anaconda-addon">sample Hello
+            World add-on</ulink> demonstrates usage of the <function>englightbox</function> content
+          manager which is also used in <application>Anaconda</application>. This manager can put a
+          window into a lightbox to increase its visibility and focus it and to prevent users
+          interacting with the underlying window. To demonstrate this function, the sample add-on
+          contains a button which opens a new dialog window; the dialog itself is a special
+          <classname>HelloWorldDialog</classname> inheriting from the
+          <classname>GUIObject</classname> class, which is defined in <ulink
+            url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/ui/gui/__init__.py"><filename>pyanaconda.ui.gui.__init__</filename></ulink>.
+        </para>
+        <para>
+          The <classname>dialog</classname> class defines the <methodname>run</methodname> method
+          which runs and destroys an internal Gtk dialog accessible through the
+          <varname>self.window</varname> attribute, which is populated using a
+          <classname>mainWidgetName</classname> class attribute with the same meaning. Therefore,
+          the code defining the dialog is very simple, as demonstrated in the following example:
+        </para>
+        <example id="exam-gui-advanced-dialog">
+          <title>Defining a englightbox Dialog</title>
+          <programlisting language="Python">        # every GUIObject gets ksdata in __init__
         dialog = HelloWorldDialog(self.data)
 
         # show dialog above the lightbox
         with enlightbox(self.window, dialog.window):
-            dialog.run()
-      </programlisting>
-
-      <para>
-        The code simply creates an instance of the dialog and then uses the
-        <function>enlightbox</function> context manager to run the dialog within
-        a lightbox. The context manager needs a reference to the window of the
-        spoke and to the dialog's window to instantiate the lightbox for them.
-      </para>
-
-      <para>
-        Another useful feature of the Anaconda's codebase is a possibility to
-        define a spoke that will appear in the installation process as well as
-        in the first boot when the <command>Initial Setup</command> tool reusing
-        the <package>pyanaconda</package> package runs. All that is needed to
-        make spoke available in the <command>Initial Setup</command> is to
-        inherit the special <classname>FirstbootSpokeMixIn</classname> class (or
-        more precisely mixin) as the first inherited class. The other option is
-        the <classname>FirstbootOnlySpokeMixIn</classname>
-        <footnote>
-          <para>
-            both those classes are defined in the
-            <package>pyanaconda.ui.common</package> module
-          </para>
-        </footnote>
-        class/mixin which, as its name suggests, make spoke appear only in the
-        <command>Initial Setup</command> utility.
-      </para>
-
-      <para>
-        There are many more advanced features provided by the
-        <package>pyanaconda</package> package (like the
-        <emphasis>@gtk_action_wait</emphasis> and
-        <emphasis>@gtk_action_nowait</emphasis> decorators), but they are out of
-        scope of this guide. Readers are recommended to go through the Anaconda
-        installer's sources that contain a lot of examples.
-      </para>
-
-        </section>
-
+            dialog.run()</programlisting>
+        </example>
+        <para>
+          The code above creates an instance of the dialog and then uses the
+          <function>enlightbox</function> context manager to run the dialog within a lightbox. The
+          context manager needs a reference to the window of the spoke and to the dialog's window to
+          instantiate the lightbox for them.
+        </para>
+        <para>
+          Another useful feature provided by <application>Anaconda</application> is the ability to
+          define a spoke which will appear both during the installation and after the first reboot
+          (in the <application>Initial Setup</application> utility described in <xref
+            linkend="sect-firstboot-introduction" />). To make a spoke available in both
+          <application>Anaconda</application> and <application>Initial Setup</application>, you must
+          inherit the special <classname>FirstbootSpokeMixIn</classname> (or, more precisely, mixin)
+          as the first inherited class defined in the <ulink
+            url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/ui/common.py"><filename>pyanaconda.ui.common</filename></ulink>
+          module.
+        </para>
+        <para>
+          If you want to make a certain spoke available <emphasis>only</emphasis> in
+          <application>Initial Setup</application>, you should instead inherit the
+          <classname>FirstbootOnlySpokeMixIn</classname> class.
+        </para>
+        <para>
+          There are many more advanced features provided by the <package>pyanaconda</package>
+          package (like the  <function>@gtk_action_wait</function> and
+          <function>@gtk_action_nowait</function> decorators), but they are out of scope of this
+          guide. Readers are recommended to go through the <ulink
+            url="https://github.com/rhinstaller/anaconda">installer's sources</ulink> for examples.
+        </para>
       </section>
-      <section id="section_tui">
-        <title>Textual user interface</title>
 
-        <para>
-          The <xref linkend="section_introduction"/> mentions that apart from
-          the GUI installation, the Anaconda installer also supports text mode
-          installation that may be the only choice on some hardware
-          configurations. The previous <xref linkend="section_gui_support"/>
-          describes, how it is possible for an addon to define and implement
-          graphical screens for the installer allowing user interaction. Now
-          it's time to have a look at the text mode which is based on the
-          Anaconda's <emphasis>simpleline</emphasis> toolkit that is suitable
-          for purely textual output without any "advanced" features like
-          colours, fonts, cursor movement etc.
-        </para>
+    </section>
 
-        <para>
-          Internally, there are three main classes in the
-          <emphasis>simpleline</emphasis> toolkit &mdash;
-          <classname>App</classname>, <classname>UIScreen</classname> and
-          <classname>Widget</classname>. Widgets, which are elemental units
-          containing the information to be shown (printed) to the user, are
-          placed on the UIScreens that are switched by a single instance of the
-          <classname>App</classname> class. On top of those basic elements there
-          are hubs, spokes and dialogs all containing various widgets similarly
-          as in the GUI. So from the addon's perspective, the most important
-          classes are the <classname>NormalTUISpoke</classname> and various
-          other classes defined in the
-          <package>pyanaconda.ui.tui.spokes</package> package. All those classes
-          are based on the <classname>TUIObject</classname> class which is an
-          equivalent of the <classname>GUIObject</classname> class mentioned in
-          the previous chapter.
-        </para>
-
-        <para>
-          Creating a text spoke for an addon again means creating subpackages of
-          the main addon's package. This time it has to be named <filename
-          class="directory">tui</filename> and the directory for spokes has to
-          be, surprisingly, named <filename
-          class="directory">spokes</filename>. A TUI spoke is again a Python
-          class this time inheriting from the
-          <classname>NormalTUISpoke</classname> class overriding special
-          arguments and methods defined by the API. Because the TUI is simpler
-          than the GUI there are fewer such arguments, namely two &mdash;
-          <varname>title</varname> and <varname>category</varname>. These two
-          have the same meaning as in the case of the GUI spoke.
-
-          However, categories are used only for grouping and ordering spokes on
-          hubs in the text mode (their titles are not shown anywere), so the
-          easiest thing is to use some preexisting category.
-        </para>
-
-        <para>
-          Apart from the two arguments, the spoke class is expected to define
-          (override) a few methods &mdash; <methodname>__init__</methodname>,
-          <methodname>initialize</methodname>, <methodname>refresh</methodname>,
-          <methodname>refresh</methodname>, <methodname>apply</methodname>,
-          <methodname>execute</methodname>, <methodname>input</methodname>,
-          <methodname>prompt</methodname> &mdash; and properties described in
-          the <xref linkend="section_gui_support"/> for the case of a GUI
-          spoke. Let's have a look on a trivial TUI spoke defined in the
-          &HWADDON;. We could start with the methods:
-        </para>
-
-        <programlisting>    def __init__(self, app, data, storage, payload, instclass):
+    <section id="sect-anaconda-addon-tui-support">
+      <title>Text User Interface</title>
+      <para>
+        The third supported interface, after Kickstart and GUI which have been discussed in previous
+        sections, <application>Anaconda</application> also supports a text-based interface. This
+        interface is more limited in its capabilities, but on some systems it may be the only choice
+        for an interactive installation. For more information about differences between the
+        text-based and graphical interface and about limitations of the TUI, see <xref
+          linkend="sect-anaconda-introduction" />.
+      </para>
+      <para>
+        To add support for the text interface into your add-on, create a new set of subpackages
+        under the <filename>tui</filename> directory as described in <xref
+          linkend="sect-anaconda-addon-structure" />. 
+      </para>
+      <para>
+        Text mode support in the installer is based on the <systemitem>simpleline</systemitem>
+        utility, which only allows very simple user interaction. It does <emphasis>not</emphasis>
+        support cursor movement (instead acting like a line printer) nor any visual enhancements
+        like using different colors or fonts.
+      </para>
+      <para>
+        Internally, there are three main classes in the <systemitem>simpleline</systemitem> toolkit:
+        <classname>App</classname>, <classname>UIScreen</classname> and
+        <classname>Widget</classname>. Widgets, which are units containing information to be shown
+        (printed) on the screen, are placed on UIScreens which are switched by a single instance of
+        the <classname>App</classname> class. On top of the basic elements, there are
+        <emphasis>hubs</emphasis>, <emphasis>spokes</emphasis> and <emphasis>dialogs</emphasis>, all
+        containing various widgets in a way similar to the graphical interface.
+      </para>
+      <para>
+        For an add-on, the most important classes are <classname>NormalTUISpoke</classname> and
+        various other classes defined in the <ulink
+          url="https://github.com/rhinstaller/anaconda/tree/master/pyanaconda/ui/tui/spokes"><filename>pyanaconda.ui.tui.spokes</filename></ulink>
+        package. All of those classes are based on the <classname>TUIObject</classname> class, which
+        itself is an equivalent of the <classname>GUIObject</classname> class discussed in the
+        previous chapter. Each TUI spoke is a Python class inheriting from the
+        <classname>NormalTUISpoke</classname> class, overriding special arguments and methods
+        defined by the API. 
+      </para>
+      <para>
+        Because the text interface is simpler than the GUI, there are only two such arguments:
+        <varname>title</varname>, which determines the title of the spoke, and
+        <varname>category</varname>, which determines its category (the category name is not
+        displayed anywhere, it is only used for grouping). Both have the same meanings as the
+        equivalent GUI arguments, described in the previous section.
+      </para>
+      <para>
+        Each spoke is also expected to override several methods, namely
+        <methodname>__init__</methodname>, <methodname>initialize</methodname>,
+        <methodname>refresh</methodname>,  <methodname>refresh</methodname>,
+        <methodname>apply</methodname>,  <methodname>execute</methodname>,
+        <methodname>input</methodname>, and  <methodname>prompt</methodname>, and properties
+        (<methodname>ready</methodname>, <methodname>completed</methodname>,
+        <methodname>mandatory</methodname>, and <methodname>status</methodname>). All of these have
+        already been described in <xref linkend="sect-anaconda-addon-gui-support" />.
+      </para>
+      <para>
+        The example below shows the implementation of a simple TUI spoke in the Hello World sample
+        add-on:
+      </para>
+      <example id="exam-tui-normaltuispoke">
+        <title>Defining a Simple TUI Spoke</title>
+        <programlisting language="Python">    def __init__(self, app, data, storage, payload, instclass):
         """
         :see: pyanaconda.ui.tui.base.UIScreen
         :see: pyanaconda.ui.tui.base.App
@@ -1467,82 +1527,78 @@ class HelloWorldSpoke(NormalSpoke):
         """
 
         return _("Enter a new text or leave empty to use the old one: ")</programlisting>
-
-        <para>
-          There is no need to override the <methodname>__init__</methodname>
-          method if it just calls the ancestor's
-          <methodname>__init__</methodname> method, but the comments in the
-          example code describe the arguments passed to constructors of spoke
-          classes in an understandable way. The
-          <methodname>initialize</methodname> method just sets up a default
-          value for the spoke's internal attribute which is then updated by the
-          <methodname>refresh</methodname> method and used by the
-          <methodname>apply</methodname> method to update the kickstart
-          data. The only differences from the GUI equivalents of those two
-          methods are the return type of the <methodname>refresh</methodname>
-          method that is <type>bool</type> instead of <type>None</type> and an
-          additional <varname>args</varname> argument it takes. The meaning of
-          the returned value is explained in the comment &mdash; it tells the
-          application (the single <classname>App</classname> class instance)
-          whether that spoke requires input from user or not. The additional
-          <varname>args</varname> argument is used for passing extra information
-          to the spoke when it scheduled. Then there is also the
-          <methodname>execute</methodname> method with the same purpose as in
-          the GUI and with the same <emphasis>pass</emphasis> statement doing
-          all that is needed in such a trivial case.
-        </para>
-
-        <para>
-          The <methodname>input</methodname> and <methodname>prompt</methodname>
-          methods are TUI-specific and as thier names suggest they are
-          responsible for interaction with the user. The
-          <methodname>prompt</methodname> method should simply return the prompt
-          that should be printed once the content of the spoke is printed. After
-          a user enters some string in a reaction to the prompt, the entered
-          string is passed to the <methodname>input</methodname> method for
-          processing. The <methodname>input</methodname> method usually needs to
-          parse the input and take some actions based on its type and
-          value. Since our spoke just asks for some value, the value is simply
-          stored in an internal attribute. But typically there are some
-          non-trivial actions done like accepting the 'c' or 'r' inputs for
-          continuing or refreshing, respectively, converting numbers into
-          integers and showing additional screens or toggling bool values based
-          on them etc. In contrast to the GUI code, the
-          <methodname>apply</methodname> method is not called automatically when
-          leaving the spoke, so we need to call it explicitly from the
-          <methodname>input</methodname> method. The same applies to closing
-          (hiding) the spoke's screen done by calling the
-          <methodname>close</methodname> method of the spoke. If we want to show
-          another screen (need some additional info from user entered in a
-          different spoke, dialog, etc.) we can also instantiate another
-          <classname>TUIObject</classname> here and call one of the
-          <methodname>self.app.switch_screen*</methodname> methods of the
-          <classname>App</classname>.  The last interesting thing about the
-          <methodname>input</methodname> method is its return value. It has to
-          be either <varname>INPUT_PROCESSED</varname> or
-          <varname>INPUT_DISCARDED</varname> constant (both defined in the
-          <package>pyanaconda.constants_text</package> module) or the input
-          string itself in case such an input should be processed by some other
-          screen.
-        </para>
-
-        <para>
-          Since the restrictions of the text user interface are quite strong the
-          TUI spokes typically have a very similar structure &mdash; a list of
-          checkboxes or entries that should be (un)checked or populated by the
-          user. The previous paragraphs show the imperative way of implementing
-          such TUI spoke where the spoke's methods handle printing and
-          processing of the available and provided data. However, there is a
-          different, simpler way of doing that by using the declarative
-          <classname>EditTUISpoke</classname> class from the
-          <package>pyanaconda.ui.tui.spokes</package> package. By inheriting
-          from this class, it is possible to implement a typical TUI spoke by
-          just specifying fields and attributes that should be set on the
-          spoke. The following code defines an example spoke implemented that
-          way:
-        </para>
-
-        <programlisting>class _EditData(object):
+      </example>
+      <para>
+        It is not necessary to override the <methodname>__init__</methodname> method if it only
+        calls the ancestor's <methodname>__init__</methodname>, but the comments in the example
+        describe the arguments passed to constructors of spoke classes in an understandable way.
+      </para>
+      <para>
+        The <methodname>initialize</methodname> method sets up a default value for the internal
+        attribute of the spoke, which is then updated by the <methodname>refresh</methodname> method
+        and used by the <methodname>apply</methodname> method to update Kickstart data. The only
+        differences in these two methods from their equivalents in the GUI is the return type of the
+        <methodname>refresh</methodname> method (<type>bool</type> instead of <type>None</type>) and
+        an additional <varname>args</varname> argument they take. The meaning of the returned value
+        is explained in the comments - it tells the application (the <classname>App</classname>
+        class instance) whether this spoke requires user input or not. The additional
+        <varname>args</varname> argument is used for passing extra information to the spoke when
+        scheduled.
+      </para>
+      <para>
+        The <methodname>execute</methodname> method has the same purpose as the equivalent method in
+        the GUI; in this case, the method does nothing.
+      </para>
+      <para>
+        Methods <methodname>input</methodname> and <methodname>prompt</methodname> are specific to
+        the text interface; there are no equivalents in Kickstart or GUI. These two methods are
+        responsible for user interaction.
+      </para>
+      <para>
+        The <methodname>prompt</methodname> method should return a prompt which will be displayed
+        after the content of the spoke is printed. After a string is entered in reaction to the
+        prompt, this string is passed to the <methodname>input</methodname> method for processing.
+        The <methodname>input</methodname> method then processes the entered string and takes action
+        depending on its type and value. The above example asks for <emphasis>any</emphasis> value
+        and then stores it as an internal attribute (<varname>key</varname>). In more complicated
+        add-ons, you typically need to perform some non-trivial actions, such as parse
+        <literal>c</literal> as "continue" or <literal>r</literal> as "refresh", convert numbers
+        into integers, show additional screens or toggle boolean values.
+      </para>
+      <para>
+        Return value of the <classname>input</classname> class must be either the
+        <varname>INPUT_PROCESSED</varname> or <varname>INPUT_DISCARDED</varname> constant (both of
+        these are defined in the <ulink
+          url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/constants_text.py"><filename>pyanaconda.constants_text</filename></ulink>
+        module), <emphasis>or</emphasis> the input string itself (in case this input should be
+        processed by a different screen).
+      </para>
+      <para>
+        In contrast to the graphical mode, the <methodname>apply</methodname> method is not called
+        automatically when leaving the spoke; it must be called explicitly from the
+        <methodname>input</methodname> method. The same applies to closing (hiding) the spoke's
+        screen, which is done by calling the <methodname>close</methodname> method.
+      </para>
+      <para>
+        To show another screen (for example, if you need additional information which was entered in
+        a different spoke), you can instantiate another <classname>TUIObject</classname> and call
+        one of the <methodname>self.app.switch_screen*</methodname> methods of the
+        <classname>App</classname>.
+      </para>
+      <para>
+        Due to restrictions of the text-based interface, TUI spokes tend to have a very similar
+        structure: a list of checkboxes or entries which should be checked or unchecked and
+        populated by the user. The previous paragraphs show a way to implement a TUI spoke where the
+        its methods handle printing and processing of the available and provided data. However,
+        there is a different way to accomplish this using the <classname>EditTUISpoke</classname>
+        class from the <ulink
+          url="https://github.com/rhinstaller/anaconda/blob/master/pyanaconda/ui/tui/spokes/__init__.py"><filename>pyanaconda.ui.tui.spokes</filename></ulink>
+        package. By inheriting this class, you can implement a typical TUI spoke by only specifying
+        fields and attributes which should be set in it. The example below demonstrates this:
+      </para>     
+      <example id="exam-tui-edittuispoke">
+        <title>Using EditTUISpoke to Define a Text Interface Spoke</title>
+        <programlisting language="Python">class _EditData(object):
     """Auxiliary class for storing data from the example EditSpoke"""
 
     def __init__(self):
@@ -1605,82 +1661,82 @@ class HelloWorldEditSpoke(EditTUISpoke):
     def apply(self):
         # nothing needed here, values are set in the self.args tree
         pass</programlisting>
-
-        <para>
-          The auxiliary class <classname>_EditData</classname> just serves as a
-          data container that is used for storing values entered by the
-          user. The <classname>HelloWorldEditSpoke</classname> defines a simple
-          spoke with one checkbox and two entries (all of which are instances of
-          the <classname>EditTUISpokeEntry</classname> class imported as the
-          <classname>Entry</classname> class). The first one is shown every time
-          the spoke is displayed and the second one that is shown only if there
-          is some non-empty value set in the first one. The comments in the
-          example code should be enough explanatory to guide reader through the
-          declarative definition of a TUI spoke by using the
-          <classname>EditTUISpoke</classname> class.
-        </para>
-      </section>
+      </example>
+      <para>
+        The auxiliary class <classname>_EditData</classname> serves as a data container which is
+        used to store values entered by the user. The <classname>HelloWorldEditSpoke</classname>
+        class defines a simple spoke with one checkbox and two entries, all of which are instances
+        of the <classname>EditTUISpokeEntry</classname> class imported as the
+        <classname>Entry</classname> class). The first one is shown every time the spoke is
+        displayed, the second instance is only shown if the first one contains a non-empty value.
+      </para>
+      <para>
+        For more information about the <classname>EditTUISpoke</classname> class, see the comments
+        in the above example.
+      </para>
     </section>
 
-    <section id="section_deploying_and_testing">
-      <title>Deploying and testing an Anaconda addon</title>
-      <para>
-        As was mentioned in the previous section, there are some packages
-        required for development of an Anaconda addon. In particular the
-        <package>anaconda-widgets</package> and
-        <package>anaconda-widgets-devel</package> packages that contain the
-        widgets, glade specifications etc. and the <package>anaconda</package>
-        package that contains the <package>pyanaconda</package> Python package
-        (needed for running pylint checks and so on).
-      </para>
+  </section>
 
-      <para>
-        To test a newly created addon one needs to put it in the installation
-        environment and let the Anaconda installer collect addon's classes and
-        definitions. Addons are collected from the <filename
-        class="directory">/usr/share/anaconda/addons/</filename> directory, that
-        is expected to contain addons' Python packages (directory trees). The
-        easiest way to achieve that is to create the <filename
-        class="directory">usr/share/anaconda/addons/</filename> directory tree
-        somewhere, place a copy of the addon's package into it and then run the
-        following command:
-      </para>
-
-      <programlisting>$ find . |cpio -c -o |gzip -9 > addon_updates.img</programlisting>
-
-      <para>
-        The result is a gzipped cpio archive, but at the same time a so-called
-        <emphasis>updates image</emphasis> that can be uploaded to a web server
-        or copied to a USB drive and used to update the installation
-        environment. If a boot option formatted as
-        <emphasis>"updates=UPDATES_IMAGE_URL"</emphasis> is used when booting
-        into the installer, Anaconda fetches the updates image, and unpacks it
-        to the installation environment.
-
-        <footnote>
-          <para>
-            overwriting the files that already exist with the files from the
-            updates image (which is how the Anaconda developers use those files
-            for testing patches)
-          </para>
-        </footnote>
-
-        If everything goes well, all addon's classes are collected by the
-        installer, the kickstart section (if any) is passed to the addon to
-        process, spokes are shown on the hub etc.
-      </para>
-
-      <para>
-        Once an addon is tested and ready to be deployed it should be packaged
-        as a Fedora package <!-- link to the packaging guide --> to facilitate
-        creation of the installation images containing the addon (so-called
-        <emphasis>composes</emphasis> <indexterm id="compose"> <primary> compose
-        </primary> </indexterm>. That requires writing a so-called
-        <emphasis>spec</emphasis><indexterm id="spec"> <primary> spec </primary>
-        </indexterm> file which defines and describes an RPM package. The basic
-        structure of an addon spec file may look like this:
-      </para>
-      <programlisting>Name:           example-anaconda-addon
+  <section id="sect-anaconda-addon-deploying-testing">
+    <title>Deploying and Testing an Anaconda Add-on</title>
+    <para>
+      As mentioned previously, there are some packages required for development of an Anaconda
+      ad-don. In particular, the <package>anaconda-widgets</package> and
+      <package>anaconda-widgets-devel</package> packages that contain the widgets, glade
+      specifications etc. and the <package>anaconda</package> package that contains the
+      <package>pyanaconda</package> Python package (needed for running pylint checks and so on).
+    </para>
+    <para>
+      To test a newly created add-on, you must place it into the installer runtime environment and
+      let <application>Anaconda</application> collect the add-on classes and definitions. Add-ons
+      are collected from the <filename>/usr/share/anaconda/addons/</filename> directory, which is
+      expected to contain your add-ons Python packages (directory trees).
+    </para>
+    <para>
+      The most simple way to load your add-on is to create an identical directory structure
+      somewhere on your system (e.g. <filename>~/temp/usr/share/anaconda/addons/</filename>), place
+      a copy of your add-on's
+      package into it, and then execute the following command: 
+    </para>
+    <screen><prompt>$</prompt> <command>find . | cpio -c -o | gzip -9 > addon_updates.img</command></screen>
+    <para>
+      The command creates an archive which can be used as a so-called <firstterm>updates
+        image</firstterm>. This image can then be placed on a web server or copied to a USB flash
+      drive, and then loaded from the boot menu using the <option>inst.updates=</option> boot
+      option. The image will then be loaded and its contents will be used to add or replace any
+      files in the installation environment.
+      <footnote>
+        <para>
+          overwriting the files that already exist with the files from the updates image (which is
+          how the Anaconda developers use those files for testing patches)
+        </para>
+      </footnote>
+    </para>
+    <para>
+      For information about boot options, see the <ulink
+        url="https://docs.fedoraproject.org/en-US/Fedora/22/html/Installation_Guide/chap-anaconda-boot-options.html">Fedora
+        Installation Guide</ulink>.
+    </para>
+    <indexterm>
+      <primary>compose</primary>
+    </indexterm>
+    <indexterm>
+      <primary>spec</primary>
+    </indexterm> 
+    <para>
+      Once an add-on is tested and ready for deployment, you should package it as a Fedora package
+      to facilitate the creation of installation images containing your add-on (so-called
+      <firstterm>composes</firstterm>). This requires you to write a <firstterm>spec
+        file</firstterm> which defines and describes the RPM package.
+    </para>
+    <para>
+      Below is an example of a basic spec file for an add-on:
+    </para>
+    <example id="exam-addon-specfile">
+      <title>Sample RPM Spec File</title>
+      <programlisting language="RPM Spec">
+Name:           example-anaconda-addon
 Version:        0.1
 Release:        1%{?dist}
 Summary:        Anaconda addon useful for something in the installation process
@@ -1691,7 +1747,7 @@ URL:            https://git.fedorahosted.org/cgit/example-anaconda-addon.git
 Source0:        %{name}-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:	python2-devel
+BuildRequires:  python2-devel
 BuildRequires:  anaconda >= 19
 Requires:       anaconda >= 19
 
@@ -1717,14 +1773,22 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Mon Jan 6 2014 Great Author &lt;great.author@example.com&gt; - 0.1-1
-- Initial RPM for the example-anaconda-addon</programlisting>
+- Initial RPM for the example-anaconda-addon
+      </programlisting>
+    </example>
+ 
+    <indexterm id="Makefile">
+      <primary>Makefile</primary>
+    </indexterm>
 
-      <para>
-        Such spec file makes use of the <command>make</command> utility with the
-        following example Makefile: <indexterm id="Makefile"> <primary> Makefile
-        </primary> </indexterm>
-      </para>
-      <programlisting>NAME = example-anaconda-addon
+    <para>
+      The above spec file makes use of the <command>make</command> utility with the following
+      example Makefile: 
+    </para>
+    <example id="exam-addon-example-makefile">
+      <title>Sample Makefile</title>
+      <programlisting language="Makefile">
+NAME = example-anaconda-addon
 
 VERSION = 0.1
 
@@ -1732,124 +1796,123 @@ ADDON = org_fedora_example
 TESTS = tests
 
 FILES = $(ADDON) &#92;
-	$(TESTS) &#92;
-	COPYING &#92;
-	Makefile &#92;
-	README
+        $(TESTS) &#92;
+        COPYING &#92;
+        Makefile &#92;
+        README
 
 EXCLUDES = &#92;
-	*.pyc
+        *.pyc
 
 all:
-	@echo "usage: make dist"
-	@echo "       make test"
-	@echo "       make install"
-	@echo "       make uninstall"
+        @echo "usage: make dist"
+        @echo "       make test"
+        @echo "       make install"
+        @echo "       make uninstall"
 
 DISTNAME = $(NAME)-$(VERSION)
 ADDONDIR = /usr/share/anaconda/addons/
 DISTBALL = $(DISTNAME).tar.gz
 
 install:
-	mkdir -p $(DESTDIR)$(ADDONDIR)
-	cp -rv $(ADDON) $(DESTDIR)$(ADDONDIR)
+        mkdir -p $(DESTDIR)$(ADDONDIR)
+        cp -rv $(ADDON) $(DESTDIR)$(ADDONDIR)
 
 uninstall:
-	rm -rfv $(DESTDIR)$(ADDONDIR)
+        rm -rfv $(DESTDIR)$(ADDONDIR)
 
 dist:
-	rm -rf $(DISTNAME)
-	mkdir -p $(DISTNAME)
-	@if test -d ".git"; &#92;
-	then &#92;
-		echo Creating ChangeLog &amp;&amp; &#92;
-		( cd "$(top_srcdir)" &amp;&amp; &#92;
-		  echo '# Generate automatically. Do not edit.'; echo; &#92;
-		  git log --stat --date=short ) > ChangeLog.tmp &#92;
-		&amp;&amp; mv -f ChangeLog.tmp $(DISTNAME)/ChangeLog &#92;
-		|| ( rm -f ChangeLog.tmp ; &#92;
-		     echo Failed to generate ChangeLog >&amp;2 ); &#92;
-	else &#92;
-		echo A git clone is required to generate a ChangeLog >&amp;2; &#92;
-	fi
-	for file in $(FILES); do &#92;
-		cp -rpv $$file $(DISTNAME)/$$file; &#92;
-	done
-	for excl in $(EXCLUDES); do &#92;
-		find $(DISTNAME) -name "$$excl" -delete; &#92;
-	done
-	tar -czvf $(DISTBALL) $(DISTNAME)
-	rm -rf $(DISTNAME)
-
+        rm -rf $(DISTNAME)
+        mkdir -p $(DISTNAME)
+        @if test -d ".git"; &#92;
+        then &#92;
+                echo Creating ChangeLog &amp;&amp; &#92;
+                ( cd "$(top_srcdir)" &amp;&amp; &#92;
+                  echo '# Generate automatically. Do not edit.'; echo; &#92;
+                  git log --stat --date=short ) > ChangeLog.tmp &#92;
+                &amp;&amp; mv -f ChangeLog.tmp $(DISTNAME)/ChangeLog &#92;
+                || ( rm -f ChangeLog.tmp ; &#92;
+                     echo Failed to generate ChangeLog >&amp;2 ); &#92;
+        else &#92;
+                echo A git clone is required to generate a ChangeLog >&amp;2; &#92;
+        fi
+        for file in $(FILES); do &#92;
+                cp -rpv $$file $(DISTNAME)/$$file; &#92;
+        done
+        for excl in $(EXCLUDES); do &#92;
+                find $(DISTNAME) -name "$$excl" -delete; &#92;
+        done
+        tar -czvf $(DISTBALL) $(DISTNAME)
+        rm -rf $(DISTNAME)
 test:
-	PYTHONPATH=. nosetests --processes=-1 -vw tests/</programlisting>
+        PYTHONPATH=. nosetests --processes=-1 -vw tests/
+      </programlisting>
+    </example>
 
-      <!--
-        Which packages are needed? How to deploy and test an Anaconda addon on
-        the running system?
-      -->
-    </section>
+    <!--
+      Which packages are needed? How to deploy and test an Anaconda addon on the running system?
+    -->
+  </section>
 
-    <section id="section_final_words">
-      <title>Addons welcomed</title>
-      <para>
-        As has been described in the <xref linkend="section_introduction" />,
-        there are many things that could be added to the Anaconda installer to
-        facilitate installation and configuration of the operating system. This
-        guide is supposed to be the first place to start the adventure of
-        Anaconda addon development and hopefully it shows it's quite easy and
-        peaceful to write a brand new piece of an OS installer. Apart from the
-        trivial &HWADDON; there exists the <ulink
-        url="https://fedorahosted.org/oscap-anaconda-addon">OSCAP Anaconda
-        Addon</ulink> <indexterm id="oscap_addon"><primary>OSCAP Anaconda
-        Addon</primary></indexterm> project that may be used as a source of
-        additional information, tips and patterns useful for addon
-        development. Hopefully there will soon be more addons created by various
-        developers coming from various projects.
-      </para>
-
-      <para>
-        This guide and the examples of addons are definitely not covering 100 %
-        of the trick&amp;treat game of Anaconda addon development. However,
-        members of the Anaconda installer team (and in particular Vratislav
-        Podzimek), are always willing to help addon developers with their
-        questions and issues. The best place to ask is the <ulink
-        url="https://www.redhat.com/mailman/listinfo/anaconda-devel-list">
-        anaconda-devel</ulink><indexterm id="anaconda_devel"> <primary>
-        anaconda-devel-list</primary> </indexterm> mailing list that is read
-        and moderated by the Anaconda developers.
-      </para>
-
-      <para>
-        If there is a nice feature that should be added to the Anaconda
-        installer's codebase and API or if there is a bug, please send tested
-        patches and pylint-checked
-
-        <footnote>
-          <para>
-            to facilitate testing and pylint checks, the <command>make
-            check</command> command may be used to run tests and checks with
-            quite effective false-positives handling
-          </para>
-        </footnote>
-
-        patches to the <ulink
+  <section id="sect-addons-welcome">
+    <title>Add-ons Welcome</title>
+    <para>
+      There are many things that could be added to the installer to facilitate installation and
+      configuration of the operating system. This guide is intended as a starting point for
+      <application>Anaconda</application> add-on development; it is not intended as a comprehensive
+      guide showing everything that can be accomplished with add-ons.
+    </para>
+    <indexterm id="oscap_addon">
+      <primary>OSCAP Anaconda Addon</primary>
+    </indexterm>
+    <para>
+      Apart from the trivial Hello World add-on demonstrated in this guide and the <ulink
+        url="https://github.com/daveyoung/kdump-anaconda-addon"><application>Kdump</application>
+        add-on</ulink> mentioned earlier, you can also use the <ulink
+        url="https://fedorahosted.org/oscap-anaconda-addon">OpenSCAP Anaconda Add-on</ulink> as a
+      source of additional information, tips and patterns which may be useful in custom add-on
+      development.
+    </para>
+    <indexterm>
+      <primary>anaconda-devel-list</primary>
+    </indexterm>
+    <para>
+      Members of the <application>Anaconda</application> development team (and in particular
+      Vratislav Podzimek) are always willing to help add-on developers with their questions and
+      issues. The best place to ask for help is the <ulink
+        url="https://www.redhat.com/mailman/listinfo/anaconda-devel-list">anaconda-devel</ulink>
+      mailing list that is read and moderated by the <application>Anaconda</application> developers.
+    </para>
+    <indexterm>
+      <primary>anaconda-patches-list</primary>
+    </indexterm>
+    <para>
+      If you have a request for a new feature to be added into the
+      <application>Anaconda</application> codebase or API, or if you discover a bug, you can send
+      your patches (tested and checked with <package>pylint</package>
+      <footnote>
+        <para>
+          to facilitate testing and pylint checks, the <command>make check</command> command may be
+          used to run tests and checks with quite effective false-positives handling
+        </para>
+      </footnote>
+      ) to the <ulink
         url="https://lists.fedorahosted.org/pipermail/anaconda-patches/">anaconda-patches</ulink>
-        <indexterm id="anaconda_patches"> <primary> anaconda-patches-list
-        </primary> </indexterm>mailing list for a review. If accepted, one of
-        the developers will push the patches to the Anaconda's git repository.
-      </para>
+      mailing list for review. If your patch is accepted, one of the developers will push it to the
+      <ulink url="https://github.com/rhinstaller/anaconda"><application>Anaconda</application>
+        GitHub repository</ulink>.
+    </para>
 
-      <para>
-        Keep in mind, <emphasis>addons and patches welcomed!</emphasis>
-      </para>
-        <!--
-            The FAQ section will be added based on the initial feedback and
-            actual FAQs
-        -->
-    </section>
+    <para>
+      Keep in mind, <emphasis>add-ons and patches welcome!</emphasis>
+    </para>
+      <!--
+          The FAQ section will be added based on the initial feedback and
+          actual FAQs
+      -->
+  </section>
 
-    <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <index />
+  <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <index />
 </article>
 
