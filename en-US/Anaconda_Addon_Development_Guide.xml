@@ -776,7 +776,7 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
       </para>
       <example id="exam-kickstart-setup-execute">
         <title>Using the setup and execute Methods</title>
-        <programlisting language="Python">    def setup(self, storage, ksdata, instclass):
+        <programlisting language="Python">    def setup(self, storage, ksdata, instclass, payload):
         """
         The setup method that should make changes to the runtime environment
         according to the data stored in this object.
@@ -789,13 +789,16 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         :type ksdata: pykickstart.base.BaseHandler instance
         :param instclass: distribution-specific information
         :type instclass: pyanaconda.installclass.BaseInstallClass
+        :param payload: object managing packages and environment groups
+                        for the installation
+        :type payload: pyanaconda.packaging.dnfpayload.DNFPayload
 
         """
 
         # no actions needed in this addon
         pass
 
-    def execute(self, storage, ksdata, instclass, users):
+    def execute(self, storage, ksdata, instclass, users, payload):
         """
         The execute method that should make changes to the installed system. It
         is called only once in the post-install setup phase.
