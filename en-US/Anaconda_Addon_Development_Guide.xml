@@ -4,7 +4,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "Anaconda_Addon_Development_Guide.ent">
 %BOOK_ENTITIES;
 ]>
-<article status="draft">
+<article>
   <xi:include href="Article_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <section id="sect-anaconda-addon-introduction">
     <title>Introduction to Anaconda and Add-ons</title>
@@ -143,16 +143,11 @@
       <itemizedlist>
         <listitem>
           <para>
-            The <ulink url="http://fedoraproject.org/wiki/Anaconda">Anaconda page on Fedora Project
-              Wiki</ulink> contains provides more information about the installer.
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            Information about development of <application>Anaconda</application> into its current
-            version is available at the <ulink
-              url="https://fedoraproject.org/wiki/Anaconda/NewInstaller">Anaconda/NewInstaller Wiki
-              page</ulink>.
+            The <ulink
+              url="https://anaconda-installer.readthedocs.io/">Anaconda documentation</ulink>
+            and <ulink
+              url="http://fedoraproject.org/wiki/Anaconda">Anaconda page on Fedora Project Wiki</ulink>
+            provides more information about the installer.
           </para>
         </listitem>
         <listitem>
@@ -162,8 +157,9 @@
              the Installation with Kickstart</ulink> and <ulink
              url="https://docs.fedoraproject.org/en-US/Fedora/&PRODVER;/html/Installation_Guide/appe-kickstart-syntax-reference.html">Kickstart
              Syntax Reference</ulink> of the <citetitle>Fedora Installation Guide</citetitle>
-           provide full documentation of Kickstart, including a list of all supported commands and
-           options.
+           contain documentation of Kickstart. <ulink
+             url="http://pykickstart.readthedocs.io">Pykickstart documentation</ulink> provides
+           a list of all supported commands and options.
           </para>
         </listitem>
         <listitem>
@@ -202,8 +198,8 @@
       </listitem>
       <listitem>
         <para>
-          <systemitem>yum</systemitem> - the package manager which handles installation of packages
-          and resolving dependencies
+          <systemitem>dnf</systemitem> or <systemitem>yum</systemitem> - the package manager which
+          handles installation of packages and resolving dependencies
         </para>
       </listitem>
       <listitem>
@@ -817,7 +813,8 @@ HELLO_FILE_PATH = "/root/hello_world_addon_output.txt"</programlisting>
         In the above example, the <methodname>setup</methodname> method does nothing; the Hello
         World add-on does not make any changes to the installation runtime environment. The
         <methodname>execute</methodname> method writes stored text into a file created in the target
-        system's root (<filename>/</filename>) directory.
+        system's root (<filename>/</filename>) directory. In RHEL, the <methodname>setup</methodname>
+        and <methodname>execute</methodname> methods don't have the payload argument.
       </para>
       <para>
         The most important information in the above example is the amount and meaning of the
@@ -1521,15 +1518,16 @@ class HelloWorldSpoke(NormalSpoke):
         The prompt method that is called by the main loop to get the prompt
         for this screen.
 
+        :see: pyanconda.ui.tui.simpleline.Prompt
+
         :param args: optional argument that can be passed to App.switch_screen*
                      methods
         :type args: anything
         :return: text that should be used in the prompt for the input
-        :rtype: unicode|None
-
+        :rtype: instance of pyanconda.ui.tui.simpleline.Prompt or None
         """
 
-        return _("Enter a new text or leave empty to use the old one: ")</programlisting>
+        return Prompt(_("Enter a new text or leave empty to use the old one: "))</programlisting>
       </example>
       <para>
         It is not necessary to override the <methodname>__init__</methodname> method if it only
@@ -1558,8 +1556,10 @@ class HelloWorldSpoke(NormalSpoke):
         responsible for user interaction.
       </para>
       <para>
-        The <methodname>prompt</methodname> method should return a prompt which will be displayed
-        after the content of the spoke is printed. After a string is entered in reaction to the
+        The <methodname>prompt</methodname> method should return an instance of
+        <classname>Prompt</classname>. The instance will provide text that will be displayed
+        after the content of the spoke is printed. In RHEL, the text is provided directly by the
+        <methodname>prompt</methodname> method. After a string is entered in reaction to the
         prompt, this string is passed to the <methodname>input</methodname> method for processing.
         The <methodname>input</methodname> method then processes the entered string and takes action
         depending on its type and value. The above example asks for <emphasis>any</emphasis> value
@@ -1718,7 +1718,7 @@ class HelloWorldEditSpoke(EditTUISpoke):
     </para>
     <para>
       For information about boot options, see the <ulink
-        url="https://docs.fedoraproject.org/en-US/Fedora/22/html/Installation_Guide/chap-anaconda-boot-options.html">Fedora
+        url="https://docs.fedoraproject.org/en-US/Fedora/&PRODVER;/html/Installation_Guide/chap-anaconda-boot-options.html">Fedora
         Installation Guide</ulink>.
     </para>
     <indexterm>
@@ -1872,7 +1872,7 @@ test:
       Apart from the trivial Hello World add-on demonstrated in this guide and the <ulink
         url="https://github.com/daveyoung/kdump-anaconda-addon"><application>Kdump</application>
         add-on</ulink> mentioned earlier, you can also use the <ulink
-        url="https://fedorahosted.org/oscap-anaconda-addon">OpenSCAP Anaconda Add-on</ulink> as a
+        url="https://github.com/OpenSCAP/oscap-anaconda-addon">OpenSCAP Anaconda Add-on</ulink> as a
       source of additional information, tips and patterns which may be useful in custom add-on
       development.
     </para>
@@ -1891,19 +1891,18 @@ test:
     </indexterm>
     <para>
       If you have a request for a new feature to be added into the
-      <application>Anaconda</application> codebase or API, or if you discover a bug, you can send
-      your patches (tested and checked with <package>pylint</package>
+      <application>Anaconda</application> codebase or API, or if you discover a bug, you can open
+      a pull request (tested and checked with <package>pylint</package>
       <footnote>
         <para>
           to facilitate testing and pylint checks, the <command>make check</command> command may be
           used to run tests and checks with quite effective false-positives handling
         </para>
       </footnote>
-      ) to the <ulink
-        url="https://lists.fedorahosted.org/pipermail/anaconda-patches/">anaconda-patches</ulink>
-      mailing list for review. If your patch is accepted, one of the developers will push it to the
-      <ulink url="https://github.com/rhinstaller/anaconda"><application>Anaconda</application>
-        GitHub repository</ulink>.
+      ) at <ulink
+        url="https://github.com/rhinstaller/anaconda"><application>Anaconda</application> GitHub
+      repository</ulink> for review. Once your pull request is approved, one of the developers
+      will merge it.
     </para>
 
     <para>

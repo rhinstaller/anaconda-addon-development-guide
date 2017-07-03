@@ -8,6 +8,23 @@
   <simpara>
     <revhistory>
       <revision>
+        <revnumber>2-2</revnumber>
+        <date>Mon Jul 3 2017</date>
+        <author>
+          <firstname>Vendula</firstname>
+          <surname>Poncova</surname>
+          <email>vponcova@redhat.com</email>
+        </author>
+        <revdescription>
+          <simplelist>
+            <member>
+              Updated links. Dropped the draft status. Changed the prompt method in the TUI section.
+              Added comment about payload in setup and execute methods in the KS section.
+            </member>
+          </simplelist>
+        </revdescription>
+      </revision>
+      <revision>
         <revnumber>2-1</revnumber>
         <date>Fri Apr 29 2016</date>
         <author>
