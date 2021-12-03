@@ -1883,7 +1883,7 @@ test:
       Members of the <application>Anaconda</application> development team (and in particular
       Vratislav Podzimek) are always willing to help add-on developers with their questions and
       issues. The best place to ask for help is the <ulink
-        url="https://www.redhat.com/mailman/listinfo/anaconda-devel-list">anaconda-devel</ulink>
+        url="https://lists.fedoraproject.org/archives/list/anaconda-devel@lists.fedoraproject.org/">anaconda-devel</ulink>
       mailing list that is read and moderated by the <application>Anaconda</application> developers.
     </para>
     <indexterm>
